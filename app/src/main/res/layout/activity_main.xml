@@ -30,7 +30,8 @@
                 android:layout_gravity="center"
                 android:layout_margin="16dp"
                 android:background="@drawable/re_drawable"
-                android:text="@string/multimeter" />
+                android:text="@string/multimeter"
+                android:textColor="@color/colorWhite" />
 
             <Button
                 android:id="@+id/dsoButton"
@@ -39,7 +40,8 @@
                 android:layout_gravity="center"
                 android:layout_margin="16dp"
                 android:background="@drawable/green_drawable"
-                android:text="@string/dso" />
+                android:text="@string/dso"
+                android:textColor="@color/colorWhite" />
 
             <Button
                 android:id="@+id/signalButton"
@@ -48,7 +50,8 @@
                 android:layout_gravity="center"
                 android:layout_margin="16dp"
                 android:background="@drawable/blue_drawable"
-                android:text="@string/signal_generator" />
+                android:text="@string/signal_generator"
+                android:textColor="@color/colorWhite" />
 
 
         </LinearLayout>

@@ -43,6 +43,7 @@
             android:layout_gravity="center"
             android:layout_margin="16dp"
             android:background="@drawable/re_drawable"
+            android:padding="5dp"
             android:text="@string/omega"
             android:textColor="@color/colorWhite"
             android:textSize="30sp" />
@@ -60,6 +61,7 @@
                 android:layout_height="50dp"
                 android:layout_gravity="center"
                 android:background="@drawable/green_drawable"
+                android:padding="5dp"
                 android:text="@string/v"
                 android:textColor="@color/colorWhite"
                 android:textSize="30sp" />
@@ -71,6 +73,7 @@
                 android:layout_gravity="center"
                 android:layout_marginLeft="100dp"
                 android:background="@drawable/blue_drawable"
+                android:padding="5dp"
                 android:text="@string/i"
                 android:textColor="@color/colorWhite"
                 android:textSize="30sp" />

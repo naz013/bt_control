@@ -19,7 +19,7 @@
 
     <Spinner
         android:id="@+id/waveType"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
@@ -86,7 +86,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="8dp"
         android:background="@drawable/blue_drawable"
-        android:padding="3dp"
+        android:padding="5dp"
         android:text="@string/generate"
         android:textColor="@color/colorWhite"
         android:textSize="18sp" />

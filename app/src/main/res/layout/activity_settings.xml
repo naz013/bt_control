@@ -27,8 +27,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:text="@string/connected_to"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                android:text="@string/connected_to" />
 
             <TextView
                 android:id="@+id/deviceName"
@@ -54,7 +54,9 @@
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/pink_drawable"
-                android:text="@string/forgot" />
+                android:padding="5dp"
+                android:text="@string/forgot"
+                android:textColor="@color/colorWhite" />
 
         </LinearLayout>
 

@@ -43,7 +43,7 @@
             android:layout_height="50dp"
             android:layout_gravity="center"
             android:background="@drawable/green_drawable"
-            android:padding="3dp"
+            android:padding="5dp"
             android:text="@string/capture"
             android:textColor="@color/colorWhite"
             android:textSize="18sp" />
@@ -55,7 +55,7 @@
             android:layout_gravity="center"
             android:layout_marginLeft="100dp"
             android:background="@drawable/blue_drawable"
-            android:padding="3dp"
+            android:padding="5dp"
             android:text="@string/screenshot"
             android:textColor="@color/colorWhite"
             android:textSize="18sp" />
