@@ -8,32 +8,21 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class DSOActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Button mMultimeterButton;
-    private Button mDSOButton;
-    private Button mSignalButton;
     private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
+        setContentView(R.layout.activity_dso);
         initActionBar();
         initButtons();
     }
 
     private void initButtons() {
-        mMultimeterButton = (Button) findViewById(R.id.multimeterButton);
-        mDSOButton = (Button) findViewById(R.id.dsoButton);
-        mSignalButton = (Button) findViewById(R.id.signalButton);
 
-        mMultimeterButton.setOnClickListener(this);
-        mDSOButton.setOnClickListener(this);
-        mSignalButton.setOnClickListener(this);
     }
 
     private void initActionBar() {
@@ -43,35 +32,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        toolbar.setTitle(R.string.main_menu);
+        toolbar.setTitle(R.string.dso);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.multimeterButton:
-                openMultimeter();
+            case R.id.captureButton:
+                capture();
                 break;
-            case R.id.dsoButton:
-                openDSO();
-                break;
-            case R.id.signalButton:
-                openSignal();
+            case R.id.screenshotButton:
+                takeScreenshot();
                 break;
         }
     }
 
-    private void openSignal() {
-        startActivity(new Intent(this, SignalActivity.class));
+    private void capture() {
+
     }
 
-    private void openDSO() {
-        startActivity(new Intent(this, DSOActivity.class));
-    }
+    private void takeScreenshot() {
 
-    private void openMultimeter() {
-        startActivity(new Intent(this, MultimeterActivity.class));
     }
 
     @Override

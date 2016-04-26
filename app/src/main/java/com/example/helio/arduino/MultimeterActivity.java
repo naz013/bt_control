@@ -10,30 +10,29 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MultimeterActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Button mMultimeterButton;
-    private Button mDSOButton;
-    private Button mSignalButton;
+    private Button resistanceButton;
+    private Button voltageButton;
+    private Button currentButton;
     private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
+        setContentView(R.layout.activity_multimeter);
         initActionBar();
         initButtons();
     }
 
     private void initButtons() {
-        mMultimeterButton = (Button) findViewById(R.id.multimeterButton);
-        mDSOButton = (Button) findViewById(R.id.dsoButton);
-        mSignalButton = (Button) findViewById(R.id.signalButton);
+        resistanceButton = (Button) findViewById(R.id.resistanceButton);
+        voltageButton = (Button) findViewById(R.id.voltageButton);
+        currentButton = (Button) findViewById(R.id.currentButton);
 
-        mMultimeterButton.setOnClickListener(this);
-        mDSOButton.setOnClickListener(this);
-        mSignalButton.setOnClickListener(this);
+        resistanceButton.setOnClickListener(this);
+        voltageButton.setOnClickListener(this);
+        currentButton.setOnClickListener(this);
     }
 
     private void initActionBar() {
@@ -43,35 +42,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        toolbar.setTitle(R.string.main_menu);
+        toolbar.setTitle(R.string.multimeter);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.multimeterButton:
-                openMultimeter();
+            case R.id.resistanceButton:
+                showResistance();
                 break;
-            case R.id.dsoButton:
-                openDSO();
+            case R.id.voltageButton:
+                showVoltage();
                 break;
-            case R.id.signalButton:
-                openSignal();
+            case R.id.currentButton:
+                showCurrent();
                 break;
         }
     }
 
-    private void openSignal() {
-        startActivity(new Intent(this, SignalActivity.class));
+    private void showCurrent() {
+
     }
 
-    private void openDSO() {
-        startActivity(new Intent(this, DSOActivity.class));
+    private void showResistance() {
+
     }
 
-    private void openMultimeter() {
-        startActivity(new Intent(this, MultimeterActivity.class));
+    private void showVoltage() {
+
     }
 
     @Override
