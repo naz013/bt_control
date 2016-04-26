@@ -2,6 +2,7 @@ package com.example.helio.arduino;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -80,7 +81,17 @@ public class SettingsActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.e("TAG", e.getMessage());
         }
+        removePrefs();
         finish();
+    }
+
+    private void removePrefs() {
+        SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE);
+        if (preferences.contains(Constants.DEVICE_ADDRESS)) {
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.remove(Constants.DEVICE_ADDRESS);
+            editor.commit();
+        }
     }
 
     @Override
