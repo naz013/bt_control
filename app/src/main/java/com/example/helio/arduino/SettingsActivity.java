@@ -5,7 +5,9 @@ import android.bluetooth.BluetoothDevice;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,6 +19,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Button mDisconnectButton;
     private TextView mNameView;
     private TextView mAddressView;
+    private Toolbar toolbar;
 
     private String mAddress;
 
@@ -26,18 +29,33 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        initActionBar();
+        initViews();
 
+        loadDevice();
+    }
+
+    private void initViews() {
         mNameView = (TextView) findViewById(R.id.deviceName);
         mAddressView = (TextView) findViewById(R.id.deviceAddress);
 
         mDisconnectButton = (Button) findViewById(R.id.disconnectButton);
         mDisconnectButton.setOnClickListener(visibleClick);
+    }
 
-        mAdapter = BluetoothAdapter.getDefaultAdapter();
-        loadDevice();
+    private void initActionBar() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        toolbar.setTitle(R.string.settings);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }
 
     private void loadDevice() {
+        mAdapter = BluetoothAdapter.getDefaultAdapter();
         SharedPreferences preferences = getSharedPreferences(Constants.PREFS, MODE_PRIVATE);
         mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
         if (mAddress != null) {
@@ -63,5 +81,16 @@ public class SettingsActivity extends AppCompatActivity {
             Log.e("TAG", e.getMessage());
         }
         finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
