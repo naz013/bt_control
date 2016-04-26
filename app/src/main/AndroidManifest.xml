@@ -2,9 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.helio.arduino">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -35,7 +38,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".DSOActivity"
+            android:name=".dso.DSOActivity"
             android:screenOrientation="portrait" />
 
         <activity
@@ -44,6 +47,10 @@
 
         <activity
             android:name=".SignalActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".dso.ImagesActivity"
             android:screenOrientation="portrait" />
     </application>
 
