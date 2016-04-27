@@ -23,7 +23,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.helio.arduino.DeviceClickListener;
@@ -33,9 +32,8 @@ import com.example.helio.arduino.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeviceListActivity extends AppCompatActivity implements DeviceClickListener {
+public class DeviceListActivity extends AppCompatActivity {
 
-    private static final String TAG = "DeviceListActivity";
     private static final int REQUEST_ENABLE_BT = 3;
     private String mDeviceAddress;
     private String mDeviceName;
@@ -70,8 +68,7 @@ public class DeviceListActivity extends AppCompatActivity implements DeviceClick
     }
 
     private void initButton() {
-        Button scanButton = (Button) findViewById(R.id.button_scan);
-        scanButton.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.button_scan).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 doDiscovery();
                 v.setVisibility(View.GONE);
@@ -84,7 +81,7 @@ public class DeviceListActivity extends AppCompatActivity implements DeviceClick
         RecyclerView mDeviceList = (RecyclerView) findViewById(R.id.new_devices);
         mDeviceList.setHasFixedSize(true);
         mDeviceList.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new DevicesRecyclerAdapter(this, this);
+        mAdapter = new DevicesRecyclerAdapter(this, mListener);
         mDeviceList.setAdapter(mAdapter);
     }
 
@@ -95,7 +92,6 @@ public class DeviceListActivity extends AppCompatActivity implements DeviceClick
     }
 
     private void doDiscovery() {
-        Log.d(TAG, "doDiscovery()");
         if (!checkLocationPermission()) {
             return;
         }
@@ -123,17 +119,25 @@ public class DeviceListActivity extends AppCompatActivity implements DeviceClick
             String action = intent.getAction();
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                mDevices.add(device);
-                Log.i("BT", device.getName() + "\n" + device.getAddress());
-                mAdapter.addDevice(device.getName() + "\n" + device.getAddress());
+                addDeviceToList(device);
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                if (mAdapter.getItemCount() == 0) {
-                    String noDevices = getResources().getText(R.string.none_found).toString();
-                    mAdapter.addDevice(noDevices);
-                }
+                addNoDevicesToList();
             }
         }
     };
+
+    private void addNoDevicesToList() {
+        if (mAdapter.getItemCount() == 0) {
+            String noDevices = getResources().getText(R.string.none_found).toString();
+            mAdapter.addDevice(noDevices);
+        }
+    }
+
+    private void addDeviceToList(BluetoothDevice device) {
+        mDevices.add(device);
+        Log.i("BT", device.getName() + "\n" + device.getAddress());
+        mAdapter.addDevice(device.getName() + "\n" + device.getAddress());
+    }
 
     private void openChatRoom() {
         startActivity(new Intent(this, ChatActivity.class));
@@ -153,42 +157,40 @@ public class DeviceListActivity extends AppCompatActivity implements DeviceClick
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            AppCompatActivity activity = DeviceListActivity.this;
-            switch (msg.what) {
-                case Constants.MESSAGE_STATE_CHANGE:
-                    switch (msg.arg1) {
-                        case BluetoothChatService.STATE_CONNECTED:
-                            if (mDialog != null && mDialog.isShowing()) {
-                                mDialog.dismiss();
-                            }
-                            saveDevice(mDeviceAddress);
-                            openChatRoom();
-                            break;
-                        case BluetoothChatService.STATE_CONNECTING:
-                            mDialog = ProgressDialog.show(activity,
-                                    activity.getString(R.string.bluetooth),
-                                    activity.getString(R.string.title_connecting) + " " + mDeviceName, true, false);
-                            break;
-                        case BluetoothChatService.STATE_LISTEN:
-                            if (mDialog != null && mDialog.isShowing()) {
-                                mDialog.dismiss();
-                            }
-                            saveDevice(mDeviceAddress);
-                            openChatRoom();
-                            break;
-                        case BluetoothChatService.STATE_NONE:
-                            break;
-                    }
-                    break;
-                case Constants.MESSAGE_TOAST:
-                    if (null != activity) {
-                        Toast.makeText(activity, msg.getData().getString(Constants.TOAST),
-                                Toast.LENGTH_SHORT).show();
-                    }
-                    break;
-            }
+            splitByMessageType(msg);
         }
     };
+
+    private void splitByMessageType(Message msg) {
+        switch (msg.what) {
+            case Constants.MESSAGE_STATE_CHANGE:
+                obtainConnectionMessage(msg);
+                break;
+            case Constants.MESSAGE_TOAST:
+                Toast.makeText(this, msg.getData().getString(Constants.TOAST), Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
+
+    private void obtainConnectionMessage(Message msg) {
+        switch (msg.arg1) {
+            case BluetoothChatService.STATE_CONNECTED:
+                if (mDialog != null && mDialog.isShowing()) {
+                    mDialog.dismiss();
+                }
+                saveDevice(mDeviceAddress);
+                openChatRoom();
+                break;
+            case BluetoothChatService.STATE_CONNECTING:
+                mDialog = ProgressDialog.show(this, getString(R.string.bluetooth),
+                        getString(R.string.title_connecting) + " " + mDeviceName, true, false);
+                break;
+            case BluetoothChatService.STATE_LISTEN:
+                break;
+            case BluetoothChatService.STATE_NONE:
+                break;
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
@@ -205,19 +207,21 @@ public class DeviceListActivity extends AppCompatActivity implements DeviceClick
     public void onStart() {
         super.onStart();
         if (!mBtAdapter.isEnabled()) {
-            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+            requestBluetoothEnabling();
         } else if (mChatService == null) {
             setupService();
         }
     }
 
+    private void requestBluetoothEnabling() {
+        Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mChatService != null) {
-            mChatService.stop();
-        }
+        stopChatService();
 
         if (mBtAdapter != null) {
             mBtAdapter.cancelDiscovery();
@@ -225,9 +229,19 @@ public class DeviceListActivity extends AppCompatActivity implements DeviceClick
         this.unregisterReceiver(mReceiver);
     }
 
+    private void stopChatService() {
+        if (mChatService != null) {
+            mChatService.stop();
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
+        startChatService();
+    }
+
+    private void startChatService() {
         if (mChatService != null) {
             if (mChatService.getState() == BluetoothChatService.STATE_NONE) {
                 mChatService.start();
@@ -235,14 +249,16 @@ public class DeviceListActivity extends AppCompatActivity implements DeviceClick
         }
     }
 
-    @Override
-    public void onClick(View view, int position) {
-        mBtAdapter.cancelDiscovery();
-        BluetoothDevice device = mDevices.get(position);
-        mDeviceAddress = device.getAddress();
-        mDeviceName = device.getName();
-        connectDevice(device);
-    }
+    DeviceClickListener mListener = new DeviceClickListener() {
+        @Override
+        public void onClick(View view, int position) {
+            mBtAdapter.cancelDiscovery();
+            BluetoothDevice device = mDevices.get(position);
+            mDeviceAddress = device.getAddress();
+            mDeviceName = device.getName();
+            connectDevice(device);
+        }
+    };
 
     private void connectDevice(BluetoothDevice device) {
         if (mDeviceAddress != null) {

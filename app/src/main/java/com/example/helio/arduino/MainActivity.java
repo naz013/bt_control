@@ -9,15 +9,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 
 import com.example.helio.arduino.dso.DSOActivity;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
-    private Button mMultimeterButton;
-    private Button mDSOButton;
-    private Button mSignalButton;
     private Toolbar toolbar;
 
     @Override
@@ -27,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
         initActionBar();
         initButtons();
-        checkBluetooth();
+        //checkBluetooth();
     }
 
     private void checkBluetooth() {
@@ -39,22 +35,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initButtons() {
-        mMultimeterButton = (Button) findViewById(R.id.multimeterButton);
-        mDSOButton = (Button) findViewById(R.id.dsoButton);
-        mSignalButton = (Button) findViewById(R.id.signalButton);
-
-        mMultimeterButton.setOnClickListener(this);
-        mDSOButton.setOnClickListener(this);
-        mSignalButton.setOnClickListener(this);
+        findViewById(R.id.multimeterButton).setOnClickListener(mListener);
+        findViewById(R.id.dsoButton).setOnClickListener(mListener);
+        findViewById(R.id.signalButton).setOnClickListener(mListener);
     }
 
     private void initActionBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
-
         toolbar.setTitle(R.string.main_menu);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }
@@ -71,20 +61,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startActivity(new Intent(this, MultimeterActivity.class));
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.multimeterButton:
-                openMultimeter();
-                break;
-            case R.id.dsoButton:
-                openDSO();
-                break;
-            case R.id.signalButton:
-                openSignal();
-                break;
+    View.OnClickListener mListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.multimeterButton:
+                    openMultimeter();
+                    break;
+                case R.id.dsoButton:
+                    openDSO();
+                    break;
+                case R.id.signalButton:
+                    openSignal();
+                    break;
+            }
         }
-    }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {

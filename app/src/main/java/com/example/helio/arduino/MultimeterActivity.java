@@ -8,13 +8,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 
-public class MultimeterActivity extends AppCompatActivity implements View.OnClickListener {
+public class MultimeterActivity extends AppCompatActivity {
 
-    private Button mResistanceButton;
-    private Button mVoltageButton;
-    private Button mCurrentButton;
     private Toolbar toolbar;
 
     @Override
@@ -26,22 +22,16 @@ public class MultimeterActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void initButtons() {
-        mResistanceButton = (Button) findViewById(R.id.resistanceButton);
-        mVoltageButton = (Button) findViewById(R.id.voltageButton);
-        mCurrentButton = (Button) findViewById(R.id.currentButton);
-
-        mResistanceButton.setOnClickListener(this);
-        mVoltageButton.setOnClickListener(this);
-        mCurrentButton.setOnClickListener(this);
+        findViewById(R.id.resistanceButton).setOnClickListener(mListener);
+        findViewById(R.id.voltageButton).setOnClickListener(mListener);
+        findViewById(R.id.currentButton).setOnClickListener(mListener);
     }
 
     private void initActionBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
-
         toolbar.setTitle(R.string.multimeter);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }
@@ -58,20 +48,22 @@ public class MultimeterActivity extends AppCompatActivity implements View.OnClic
 
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.resistanceButton:
-                showResistance();
-                break;
-            case R.id.voltageButton:
-                showVoltage();
-                break;
-            case R.id.currentButton:
-                showCurrent();
-                break;
+    View.OnClickListener mListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.resistanceButton:
+                    showResistance();
+                    break;
+                case R.id.voltageButton:
+                    showVoltage();
+                    break;
+                case R.id.currentButton:
+                    showCurrent();
+                    break;
+            }
         }
-    }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {

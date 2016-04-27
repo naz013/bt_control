@@ -9,7 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-public class SignalActivity extends AppCompatActivity implements View.OnClickListener {
+public class SignalActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
 
@@ -22,16 +22,14 @@ public class SignalActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void initButtons() {
-
+        findViewById(R.id.generateButton).setOnClickListener(mListener);
     }
 
     private void initActionBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
-
         toolbar.setTitle(R.string.signal_generator);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }
@@ -40,14 +38,16 @@ public class SignalActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.generateButton:
-                generateSignal();
-                break;
+    View.OnClickListener mListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.generateButton:
+                    generateSignal();
+                    break;
+            }
         }
-    }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {

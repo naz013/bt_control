@@ -29,7 +29,7 @@ import com.example.helio.arduino.transferring.DeviceListActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StartActivity extends AppCompatActivity implements DeviceClickListener {
+public class StartActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 15;
     private String mDeviceAddress;
@@ -51,11 +51,11 @@ public class StartActivity extends AppCompatActivity implements DeviceClickListe
         initDeviceList();
         initButtons();
 
-        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
+        /*mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBtAdapter == null) {
             Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_SHORT).show();
             finish();
-        }
+        }*/
     }
 
     private void initButtons() {
@@ -70,7 +70,7 @@ public class StartActivity extends AppCompatActivity implements DeviceClickListe
         mDeviceList = (RecyclerView) findViewById(R.id.deviceList);
         mDeviceList.setHasFixedSize(true);
         mDeviceList.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new DevicesRecyclerAdapter(StartActivity.this, StartActivity.this);
+        mAdapter = new DevicesRecyclerAdapter(StartActivity.this, mListener);
         mDeviceList.setAdapter(mAdapter);
     }
 
@@ -98,7 +98,7 @@ public class StartActivity extends AppCompatActivity implements DeviceClickListe
 
     private void selectDevice() {
         startActivity(new Intent(this, MainActivity.class));
-        if (!checkLocationPermission()) {
+        /*if (!checkLocationPermission()) {
             return;
         }
         if (!mBtAdapter.isEnabled()) {
@@ -106,7 +106,7 @@ public class StartActivity extends AppCompatActivity implements DeviceClickListe
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         } else {
             switchView();
-        }
+        }*/
     }
 
     private boolean checkLocationPermission() {
@@ -205,7 +205,7 @@ public class StartActivity extends AppCompatActivity implements DeviceClickListe
         }
     }
 
-    @Override
+    /*@Override
     public void onStart() {
         super.onStart();
         if (!mBtAdapter.isEnabled()) {
@@ -231,16 +231,16 @@ public class StartActivity extends AppCompatActivity implements DeviceClickListe
         } catch (IllegalArgumentException e) {
             //e.printStackTrace();
         }
-    }
+    }*/
 
     @Override
     public void onResume() {
         super.onResume();
-        if (mChatService != null) {
+        /*if (mChatService != null) {
             if (mChatService.getState() == BluetoothChatService.STATE_NONE) {
                 mChatService.start();
             }
-        }
+        }*/
     }
 
     @Override
@@ -250,13 +250,15 @@ public class StartActivity extends AppCompatActivity implements DeviceClickListe
         }
     }
 
-    @Override
-    public void onClick(View view, int position) {
-        BluetoothDevice device = mDevices.get(position);
-        mDialog = ProgressDialog.show(this, getString(R.string.bluetooth),
-                getString(R.string.title_connecting) + " " + device.getName(), true, false);
-        pairDevice(device);
-    }
+    DeviceClickListener mListener = new DeviceClickListener() {
+        @Override
+        public void onClick(View view, int position) {
+            BluetoothDevice device = mDevices.get(position);
+            mDialog = ProgressDialog.show(StartActivity.this, getString(R.string.bluetooth),
+                    getString(R.string.title_connecting) + " " + device.getName(), true, false);
+            pairDevice(device);
+        }
+    };
 
     public void onFinish(String address) {
         if (mDialog != null && mDialog.isShowing()) {

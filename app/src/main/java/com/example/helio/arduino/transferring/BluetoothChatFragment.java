@@ -1,6 +1,5 @@
 package com.example.helio.arduino.transferring;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -14,7 +13,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +43,10 @@ public class BluetoothChatFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        checkBluetoothAvailability();
+    }
+
+    private void checkBluetoothAvailability() {
         if (mBluetoothAdapter == null) {
             FragmentActivity activity = getActivity();
             Toast.makeText(activity, "Bluetooth is not available", Toast.LENGTH_LONG).show();
@@ -56,11 +58,15 @@ public class BluetoothChatFragment extends Fragment {
     public void onStart() {
         super.onStart();
         if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+            requestBluetoothEnable();
         } else if (mChatService == null) {
             setupChat();
         }
+    }
+
+    private void requestBluetoothEnable() {
+        Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
     }
 
     @Override
@@ -75,10 +81,14 @@ public class BluetoothChatFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (mChatService != null) {
-            if (mChatService.getState() == BluetoothChatService.STATE_NONE) {
-                mChatService.start();
-                connectDevice(true);
-            }
+            startBluetoothService();
+        }
+    }
+
+    private void startBluetoothService() {
+        if (mChatService.getState() == BluetoothChatService.STATE_NONE) {
+            mChatService.start();
+            connectDevice(true);
         }
     }
 
@@ -98,23 +108,25 @@ public class BluetoothChatFragment extends Fragment {
     }
 
     private void setupChat() {
-        Log.d(TAG, "setupChat()");
         mConversationArrayAdapter = new ConversationRecyclerAdapter(getActivity());
         mConversationView.setAdapter(mConversationArrayAdapter);
         mOutEditText.setOnEditorActionListener(mWriteListener);
         mSendButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                View view = getView();
-                if (null != view) {
-                    TextView textView = (TextView) view.findViewById(R.id.edit_text_out);
-                    String message = textView.getText().toString();
-                    sendMessage(message);
-                }
+                startSendingMessage(getView());
             }
         });
 
         mChatService = new BluetoothChatService(getActivity(), mHandler);
         mOutStringBuffer = new StringBuffer("");
+    }
+
+    private void startSendingMessage(View view) {
+        if (null != view) {
+            TextView textView = (TextView) view.findViewById(R.id.edit_text_out);
+            String message = textView.getText().toString();
+            sendMessage(message);
+        }
     }
 
     private void sendMessage(String message) {
@@ -125,14 +137,13 @@ public class BluetoothChatFragment extends Fragment {
 
         if (message.length() > 0) {
             byte[] send = message.getBytes();
-            mChatService.write(send);
+            mChatService.writeMessage(send);
             mOutStringBuffer.setLength(0);
             mOutEditText.setText(mOutStringBuffer);
         }
     }
 
-    private TextView.OnEditorActionListener mWriteListener
-            = new TextView.OnEditorActionListener() {
+    private TextView.OnEditorActionListener mWriteListener = new TextView.OnEditorActionListener() {
         public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
             if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_UP) {
                 String message = view.getText().toString();
@@ -142,75 +153,44 @@ public class BluetoothChatFragment extends Fragment {
         }
     };
 
-    private void setStatus(int resId) {
-        FragmentActivity activity = getActivity();
-        if (null == activity) {
-            return;
-        }
-        final ActionBar actionBar = activity.getActionBar();
-        if (null == actionBar) {
-            return;
-        }
-        actionBar.setSubtitle(resId);
-    }
-
-    private void setStatus(CharSequence subTitle) {
-        FragmentActivity activity = getActivity();
-        if (null == activity) {
-            return;
-        }
-        final ActionBar actionBar = activity.getActionBar();
-        if (null == actionBar) {
-            return;
-        }
-        actionBar.setSubtitle(subTitle);
-    }
-
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            FragmentActivity activity = getActivity();
             switch (msg.what) {
-                case Constants.MESSAGE_STATE_CHANGE:
-                    switch (msg.arg1) {
-                        case BluetoothChatService.STATE_CONNECTED:
-                            setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
-                            mConversationArrayAdapter.clear();
-                            break;
-                        case BluetoothChatService.STATE_CONNECTING:
-                            setStatus(R.string.title_connecting);
-                            break;
-                        case BluetoothChatService.STATE_LISTEN:
-                        case BluetoothChatService.STATE_NONE:
-                            setStatus(R.string.title_not_connected);
-                            break;
-                    }
-                    break;
                 case Constants.MESSAGE_WRITE:
-                    byte[] writeBuf = (byte[]) msg.obj;
-                    String writeMessage = new String(writeBuf);
-                    mConversationArrayAdapter.addMessage("Me:  " + writeMessage);
+                    addMyMessage(msg);
                     break;
                 case Constants.MESSAGE_READ:
-                    byte[] readBuf = (byte[]) msg.obj;
-                    String readMessage = new String(readBuf, 0, msg.arg1);
-                    mConversationArrayAdapter.addMessage(mConnectedDeviceName + ":  " + readMessage);
+                    addTheirMessage(msg);
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
-                    if (null != activity) {
-                        Toast.makeText(activity, "Connected to " + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
-                    }
+                    showToast("Connected to " + mConnectedDeviceName);
                     break;
                 case Constants.MESSAGE_TOAST:
-                    if (null != activity) {
-                        Toast.makeText(activity, msg.getData().getString(Constants.TOAST),
-                                Toast.LENGTH_SHORT).show();
-                    }
+                    showToast(msg.getData().getString(Constants.TOAST));
                     break;
             }
         }
     };
+
+    private void showToast(String message) {
+        if (getActivity() != null) {
+            Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void addTheirMessage(Message msg) {
+        byte[] readBuf = (byte[]) msg.obj;
+        String readMessage = new String(readBuf, 0, msg.arg1);
+        mConversationArrayAdapter.addMessage(mConnectedDeviceName + ":  " + readMessage);
+    }
+
+    private void addMyMessage(Message message) {
+        byte[] writeBuf = (byte[]) message.obj;
+        String writeMessage = new String(writeBuf);
+        mConversationArrayAdapter.addMessage("Me:  " + writeMessage);
+    }
 
     private void connectDevice(boolean secure) {
         SharedPreferences preferences =

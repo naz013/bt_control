@@ -52,10 +52,8 @@ public class ImagesActivity extends AppCompatActivity {
     private void initActionBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
-
         toolbar.setTitle(R.string.screenshots);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }

@@ -56,17 +56,9 @@ public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecycler
     }
 
     public void addDevice(String name) {
-        if (mDataList.size() > 0) {
-            if (!mDataList.contains(name)) {
-                mDataList.add(name);
-                int pos = mDataList.indexOf(name);
-                notifyItemInserted(pos);
-            }
-        } else {
-            mDataList.add(name);
-            int pos = mDataList.indexOf(name);
-            notifyItemInserted(pos);
-        }
+        mDataList.add(name);
+        int pos = mDataList.indexOf(name);
+        notifyItemInserted(pos);
     }
 
     private void handleClick(int adapterPosition) {

@@ -47,6 +47,7 @@
 
         <activity
             android:name=".SignalActivity"
+            android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait" />
 
         <activity

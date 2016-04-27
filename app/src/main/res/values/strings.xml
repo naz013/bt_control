@@ -43,4 +43,8 @@
 
     <string name="none_found">No devices found</string>
     <string name="button_scan">Scan for devices</string>
+    <string name="screenshot_saved">Screenshot saved</string>
+    <string name="date_time_sdf">dd-MM-yyyy-hh-mm-ss</string>
+    <string name="unable_to_connect_device">Unable to connect device</string>
+    <string name="device_connection_was_lost">Device connection was lost</string>
 </resources>

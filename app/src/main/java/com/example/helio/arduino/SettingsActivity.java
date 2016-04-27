@@ -9,12 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private Button mDisconnectButton;
     private TextView mNameView;
     private TextView mAddressView;
     private Toolbar toolbar;
@@ -36,18 +34,14 @@ public class SettingsActivity extends AppCompatActivity {
     private void initViews() {
         mNameView = (TextView) findViewById(R.id.deviceName);
         mAddressView = (TextView) findViewById(R.id.deviceAddress);
-
-        mDisconnectButton = (Button) findViewById(R.id.disconnectButton);
-        mDisconnectButton.setOnClickListener(visibleClick);
+        findViewById(R.id.disconnectButton).setOnClickListener(buttonClick);
     }
 
     private void initActionBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
-
         toolbar.setTitle(R.string.settings);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }
@@ -63,7 +57,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    View.OnClickListener visibleClick = new View.OnClickListener() {
+    View.OnClickListener buttonClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             unPairDevice();

@@ -36,7 +36,6 @@ public class ChatActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
-
         toolbar.setTitle(R.string.data_transferring);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }

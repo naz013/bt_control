@@ -40,7 +40,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class DSOActivity extends AppCompatActivity implements View.OnClickListener, OnChartGestureListener, OnChartValueSelectedListener {
+public class DSOActivity extends AppCompatActivity implements View.OnClickListener, OnChartGestureListener,
+        OnChartValueSelectedListener {
 
     private Toolbar toolbar;
     private LineChart mChart;
@@ -79,7 +80,7 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
         mChart.getAxisRight().setEnabled(false);
         mChart.getLegend().setEnabled(false);
 
-        setData(45, 100);
+        generateDataForChart(45, 100);
 
         mChart.animateX(2500, Easing.EasingOption.EaseInOutQuart);
     }
@@ -150,18 +151,22 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
 
     private void takeScreenshot() {
         if (checkPermission()) {
-            File file = new File(Environment.getExternalStorageDirectory().getPath() + "/" + Constants.SCREENS_FOLDER);
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy-hh-mm-ss", Locale.getDefault());
-            String fileName = sdf.format(new Date());
-            mChart.saveToPath(fileName, "/" + Constants.SCREENS_FOLDER);
-            Toast.makeText(this, "Screenshot saved", Toast.LENGTH_SHORT).show();
+            saveChartToImageFile();
         }
     }
 
-    private void setData(int count, float range) {
+    private void saveChartToImageFile() {
+        File file = new File(Environment.getExternalStorageDirectory().getPath() + "/" + Constants.SCREENS_FOLDER);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.date_time_sdf), Locale.getDefault());
+        String fileName = sdf.format(new Date());
+        mChart.saveToPath(fileName, "/" + Constants.SCREENS_FOLDER);
+        Toast.makeText(this, R.string.screenshot_saved, Toast.LENGTH_SHORT).show();
+    }
+
+    private void generateDataForChart(int count, float range) {
         ArrayList<String> xVals = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             xVals.add((i) + "");
@@ -227,57 +232,52 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
-        Log.i("Gesture", "START, x: " + me.getX() + ", y: " + me.getY());
+
     }
 
     @Override
     public void onChartGestureEnd(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
-        Log.i("Gesture", "END, lastGesture: " + lastPerformedGesture);
-
-        // un-highlight values after the gesture is finished and no single-tap
         if(lastPerformedGesture != ChartTouchListener.ChartGesture.SINGLE_TAP)
-            mChart.highlightValues(null); // or highlightTouch(null) for callback to onNothingSelected(...)
+            mChart.highlightValues(null);
     }
 
     @Override
     public void onChartLongPressed(MotionEvent me) {
-        Log.i("LongPress", "Chart longpressed.");
+
     }
 
     @Override
     public void onChartDoubleTapped(MotionEvent me) {
-        Log.i("DoubleTap", "Chart double-tapped.");
+
     }
 
     @Override
     public void onChartSingleTapped(MotionEvent me) {
-        Log.i("SingleTap", "Chart single-tapped.");
+
     }
 
     @Override
     public void onChartFling(MotionEvent me1, MotionEvent me2, float velocityX, float velocityY) {
-        Log.i("Fling", "Chart flinged. VeloX: " + velocityX + ", VeloY: " + velocityY);
+
     }
 
     @Override
     public void onChartScale(MotionEvent me, float scaleX, float scaleY) {
-        Log.i("Scale / Zoom", "ScaleX: " + scaleX + ", ScaleY: " + scaleY);
+
     }
 
     @Override
     public void onChartTranslate(MotionEvent me, float dX, float dY) {
-        Log.i("Translate / Move", "dX: " + dX + ", dY: " + dY);
+
     }
 
     @Override
     public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
-        Log.i("Entry selected", e.toString());
-        Log.i("LOWHIGH", "low: " + mChart.getLowestVisibleXIndex() + ", high: " + mChart.getHighestVisibleXIndex());
-        Log.i("MIN MAX", "xmin: " + mChart.getXChartMin() + ", xmax: " + mChart.getXChartMax() + ", ymin: " + mChart.getYChartMin() + ", ymax: " + mChart.getYChartMax());
+
     }
 
     @Override
     public void onNothingSelected() {
-        Log.i("Nothing selected", "Nothing selected.");
+
     }
 }
