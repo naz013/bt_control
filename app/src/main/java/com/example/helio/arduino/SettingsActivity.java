@@ -7,13 +7,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import java.lang.reflect.Method;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -74,13 +71,13 @@ public class SettingsActivity extends AppCompatActivity {
     };
 
     private void unPairDevice() {
-        BluetoothDevice device = mAdapter.getRemoteDevice(mAddress);
+        /*BluetoothDevice device = mAdapter.getRemoteDevice(mAddress);
         try {
             Method m = device.getClass().getMethod("removeBond", (Class[]) null);
             m.invoke(device, (Object[]) null);
         } catch (Exception e) {
             Log.e("TAG", e.getMessage());
-        }
+        }*/
         removePrefs();
         finish();
     }

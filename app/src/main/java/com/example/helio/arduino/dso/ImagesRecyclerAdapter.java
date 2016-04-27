@@ -4,7 +4,6 @@ import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,7 +66,6 @@ public class ImagesRecyclerAdapter extends RecyclerView.Adapter<ImagesRecyclerAd
 
     @BindingAdapter("app:loadImage")
     public static void loadImage(ImageView imageView, String v) {
-        //Log.d("TAG", "" + v);
         File file = new File(v);
         Picasso.with(imageView.getContext())
                 .load(file)

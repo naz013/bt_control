@@ -1,4 +1,4 @@
-package com.example.helio.arduino;
+package com.example.helio.arduino.transferring;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -7,19 +7,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.helio.arduino.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecyclerAdapter.DeviceViewHolder> {
+public class ConversationRecyclerAdapter extends RecyclerView.Adapter<ConversationRecyclerAdapter.DeviceViewHolder> {
 
     private Context mContext;
     private List<String> mDataList;
-    private DeviceClickListener mListener;
 
-    public DevicesRecyclerAdapter(Context context, DeviceClickListener listener) {
+    public ConversationRecyclerAdapter(Context context) {
         this.mContext = context;
         this.mDataList = new ArrayList<>();
-        this.mListener = listener;
     }
 
     @Override
@@ -34,9 +34,20 @@ public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecycler
         holder.deviceName.setText(mDataList.get(position));
     }
 
+    public void addMessage(String message) {
+        mDataList.add(message);
+        int pos = mDataList.indexOf(message);
+        notifyItemInserted(pos);
+    }
+
     @Override
     public int getItemCount() {
         return mDataList != null ? mDataList.size() : 0;
+    }
+
+    public void clear() {
+        mDataList.clear();
+        notifyDataSetChanged();
     }
 
     public class DeviceViewHolder extends RecyclerView.ViewHolder{
@@ -46,32 +57,6 @@ public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecycler
         public DeviceViewHolder(View itemView) {
             super(itemView);
             deviceName = (TextView) itemView.findViewById(R.id.deviceName);
-            deviceName.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    handleClick(getAdapterPosition());
-                }
-            });
-        }
-    }
-
-    public void addDevice(String name) {
-        if (mDataList.size() > 0) {
-            if (!mDataList.contains(name)) {
-                mDataList.add(name);
-                int pos = mDataList.indexOf(name);
-                notifyItemInserted(pos);
-            }
-        } else {
-            mDataList.add(name);
-            int pos = mDataList.indexOf(name);
-            notifyItemInserted(pos);
-        }
-    }
-
-    private void handleClick(int adapterPosition) {
-        if (mListener != null) {
-            mListener.onClick(null, adapterPosition);
         }
     }
 }

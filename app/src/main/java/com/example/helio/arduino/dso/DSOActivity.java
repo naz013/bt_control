@@ -156,14 +156,6 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
             }
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy-hh-mm-ss", Locale.getDefault());
             String fileName = sdf.format(new Date());
-            /*File img = new File(file, fileName + ".png");
-            if (!img.exists()) {
-                try {
-                    img.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }*/
             mChart.saveToPath(fileName, "/" + Constants.SCREENS_FOLDER);
             Toast.makeText(this, "Screenshot saved", Toast.LENGTH_SHORT).show();
         }

@@ -12,9 +12,9 @@ import android.widget.Button;
 
 public class MultimeterActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Button resistanceButton;
-    private Button voltageButton;
-    private Button currentButton;
+    private Button mResistanceButton;
+    private Button mVoltageButton;
+    private Button mCurrentButton;
     private Toolbar toolbar;
 
     @Override
@@ -26,13 +26,13 @@ public class MultimeterActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void initButtons() {
-        resistanceButton = (Button) findViewById(R.id.resistanceButton);
-        voltageButton = (Button) findViewById(R.id.voltageButton);
-        currentButton = (Button) findViewById(R.id.currentButton);
+        mResistanceButton = (Button) findViewById(R.id.resistanceButton);
+        mVoltageButton = (Button) findViewById(R.id.voltageButton);
+        mCurrentButton = (Button) findViewById(R.id.currentButton);
 
-        resistanceButton.setOnClickListener(this);
-        voltageButton.setOnClickListener(this);
-        currentButton.setOnClickListener(this);
+        mResistanceButton.setOnClickListener(this);
+        mVoltageButton.setOnClickListener(this);
+        mCurrentButton.setOnClickListener(this);
     }
 
     private void initActionBar() {
