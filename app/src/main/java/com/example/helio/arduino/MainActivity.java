@@ -59,6 +59,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }
 
+    private void openSignal() {
+        startActivity(new Intent(this, SignalActivity.class));
+    }
+
+    private void openDSO() {
+        startActivity(new Intent(this, DSOActivity.class));
+    }
+
+    private void openMultimeter() {
+        startActivity(new Intent(this, MultimeterActivity.class));
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -72,18 +84,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 openSignal();
                 break;
         }
-    }
-
-    private void openSignal() {
-        startActivity(new Intent(this, SignalActivity.class));
-    }
-
-    private void openDSO() {
-        startActivity(new Intent(this, DSOActivity.class));
-    }
-
-    private void openMultimeter() {
-        startActivity(new Intent(this, MultimeterActivity.class));
     }
 
     @Override

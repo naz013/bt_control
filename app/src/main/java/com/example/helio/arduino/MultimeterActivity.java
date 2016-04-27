@@ -46,6 +46,18 @@ public class MultimeterActivity extends AppCompatActivity implements View.OnClic
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }
 
+    private void showCurrent() {
+
+    }
+
+    private void showResistance() {
+
+    }
+
+    private void showVoltage() {
+
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -59,18 +71,6 @@ public class MultimeterActivity extends AppCompatActivity implements View.OnClic
                 showCurrent();
                 break;
         }
-    }
-
-    private void showCurrent() {
-
-    }
-
-    private void showResistance() {
-
-    }
-
-    private void showVoltage() {
-
     }
 
     @Override

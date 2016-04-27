@@ -36,6 +36,10 @@ public class SignalActivity extends AppCompatActivity implements View.OnClickLis
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }
 
+    private void generateSignal() {
+
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -43,10 +47,6 @@ public class SignalActivity extends AppCompatActivity implements View.OnClickLis
                 generateSignal();
                 break;
         }
-    }
-
-    private void generateSignal() {
-
     }
 
     @Override
