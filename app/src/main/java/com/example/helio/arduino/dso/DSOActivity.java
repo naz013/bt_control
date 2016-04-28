@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -42,7 +43,10 @@ import java.util.Locale;
 public class DSOActivity extends AppCompatActivity implements View.OnClickListener, OnChartGestureListener,
         OnChartValueSelectedListener {
 
+    private static final int CHART_VISIBLE = 50;
+
     private LineChart mChart;
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +66,7 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
         mChart.setDragEnabled(true);
         mChart.setScaleEnabled(true);
         mChart.setPinchZoom(true);
+        mChart.setDescription(getString(R.string.arduino_chart));
 
         LimitLine llXAxis = new LimitLine(10f, "Index 10");
         llXAxis.setLineWidth(4f);
@@ -77,10 +82,10 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
 
         mChart.getAxisRight().setEnabled(false);
         mChart.getLegend().setEnabled(false);
-
-        generateDataForChart(45, 100);
-
+        generateDataForChart(70, 100);
+        mChart.setVisibleXRangeMaximum(CHART_VISIBLE);
         mChart.animateX(2500, Easing.EasingOption.EaseInOutQuart);
+        mChart.moveViewToX(mChart.getLineData().getXValCount() - CHART_VISIBLE);
     }
 
     private void initButtons() {
@@ -191,6 +196,45 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
         dataSets.add(set1);
         LineData data = new LineData(xVals, dataSets);
         mChart.setData(data);
+    }
+
+    private Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            addNewEntry();
+        }
+    };
+
+    private void addNewEntry() {
+        LineData lineData = mChart.getLineData();
+        float mult = (100 + 1);
+        float val = (float) (Math.random() * mult) + 3;
+        ILineDataSet set = lineData.getDataSetByIndex(0);
+        lineData.addXValue(lineData.getXValCount() + " ");
+        lineData.addEntry(new Entry(val, set.getEntryCount()), 0);
+        updateChart(lineData.getXValCount());
+    }
+
+    private void updateChart(int xValCount) {
+        mChart.notifyDataSetChanged();
+        mChart.setVisibleXRangeMaximum(CHART_VISIBLE);
+        mChart.moveViewToX(xValCount - CHART_VISIBLE);
+        mHandler.postDelayed(mRunnable, 1000);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mHandler != null) {
+            mHandler.removeCallbacks(mRunnable);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mHandler = new Handler();
+        mHandler.postDelayed(mRunnable, 1000);
     }
 
     @Override
