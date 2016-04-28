@@ -68,8 +68,8 @@ public class DeviceListActivity extends AppCompatActivity {
     private void initButton() {
         findViewById(R.id.button_scan).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                doDiscovery();
                 v.setVisibility(View.GONE);
+                doDiscovery();
             }
         });
         initDeviceList();
