@@ -67,28 +67,28 @@ public class BluetoothChatService {
         startInSecureThread();
     }
 
-    private void startInSecureThread() {
+    private synchronized void startInSecureThread() {
         if (mInsecureAcceptThread == null) {
             mInsecureAcceptThread = new AcceptThread(false);
             mInsecureAcceptThread.start();
         }
     }
 
-    private void startSecureThread() {
+    private synchronized void startSecureThread() {
         if (mSecureAcceptThread == null) {
             mSecureAcceptThread = new AcceptThread(true);
             mSecureAcceptThread.start();
         }
     }
 
-    private void cancelConnectedThread() {
+    private synchronized void cancelConnectedThread() {
         if (mConnectedThread != null) {
             mConnectedThread.cancel();
             mConnectedThread = null;
         }
     }
 
-    private void cancelConnectThread() {
+    private synchronized void cancelConnectThread() {
         if (mConnectThread != null) {
             mConnectThread.cancel();
             mConnectThread = null;
@@ -119,7 +119,7 @@ public class BluetoothChatService {
         setState(STATE_CONNECTED);
     }
 
-    private void postMessage(BluetoothDevice device) {
+    private synchronized void postMessage(BluetoothDevice device) {
         Message msg = mHandler.obtainMessage(Constants.MESSAGE_DEVICE_NAME);
         Bundle bundle = new Bundle();
         bundle.putString(Constants.DEVICE_NAME, device.getName());
@@ -127,19 +127,19 @@ public class BluetoothChatService {
         mHandler.sendMessage(msg);
     }
 
-    private void startConnectedThread(BluetoothSocket socket, String socketType) {
+    private synchronized void startConnectedThread(BluetoothSocket socket, String socketType) {
         mConnectedThread = new ConnectedThread(socket, socketType);
         mConnectedThread.start();
     }
 
-    private void cancelInSecureThread() {
+    private synchronized void cancelInSecureThread() {
         if (mInsecureAcceptThread != null) {
             mInsecureAcceptThread.cancel();
             mInsecureAcceptThread = null;
         }
     }
 
-    private void cancelSecureThread() {
+    private synchronized void cancelSecureThread() {
         if (mSecureAcceptThread != null) {
             mSecureAcceptThread.cancel();
             mSecureAcceptThread = null;
@@ -163,7 +163,7 @@ public class BluetoothChatService {
         r.write(out);
     }
 
-    private void postToast(String message) {
+    private synchronized void postToast(String message) {
         Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
         bundle.putString(Constants.TOAST, message);
@@ -173,12 +173,12 @@ public class BluetoothChatService {
 
     private void connectionFailed() {
         postToast(mContext.getString(R.string.unable_to_connect_device));
-        BluetoothChatService.this.start();
+        start();
     }
 
     private void connectionLost() {
         postToast(mContext.getString(R.string.device_connection_was_lost));
-        BluetoothChatService.this.start();
+        start();
     }
 
     private class AcceptThread extends Thread {
@@ -208,7 +208,12 @@ public class BluetoothChatService {
         public void run() {
             setName("AcceptThread" + mSocketType);
             while (mState != STATE_CONNECTED) {
-                BluetoothSocket socket = getSocket();
+                BluetoothSocket socket;
+                try {
+                    socket = getSocket();
+                } catch (IOException e) {
+                    break;
+                }
                 if (socket != null) {
                     obtainSocket(socket);
                 }
@@ -235,13 +240,8 @@ public class BluetoothChatService {
             }
         }
 
-        private BluetoothSocket getSocket() {
-            try {
-                return mmServerSocket.accept();
-            } catch (IOException e) {
-                Log.e(TAG, "Socket Type: " + mSocketType + "accept() failed", e);
-                return null;
-            }
+        private BluetoothSocket getSocket() throws IOException {
+            return mmServerSocket.accept();
         }
 
         public void cancel() {
@@ -260,8 +260,20 @@ public class BluetoothChatService {
 
         public ConnectThread(BluetoothDevice device, boolean secure) {
             mmDevice = device;
+            BluetoothSocket tmp = null;
             mSocketType = secure ? "Secure" : "Insecure";
-            mmSocket = openSocket(device, secure);
+            try {
+                if (secure) {
+                    tmp = device.createRfcommSocketToServiceRecord(
+                            MY_UUID_SECURE);
+                } else {
+                    tmp = device.createInsecureRfcommSocketToServiceRecord(
+                            MY_UUID_INSECURE);
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
+            }
+            mmSocket = tmp;
         }
 
         private BluetoothSocket openSocket(BluetoothDevice device, boolean secure) {
@@ -356,10 +368,7 @@ public class BluetoothChatService {
                         .sendToTarget();
                 return true;
             } catch (IOException e) {
-                Log.e(TAG, "disconnected", e);
                 connectionLost();
-                // Start the service over to restart listening mode
-                BluetoothChatService.this.start();
                 return false;
             }
         }

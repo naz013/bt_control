@@ -41,4 +41,6 @@ dependencies {
     compile "com.android.support:recyclerview-v7:${supportLibraryVersion}"
     compile 'com.github.PhilJay:MPAndroidChart:v2.2.4'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile project(':imagePreview')
+    compile "com.android.support:support-v13:${supportLibraryVersion}"
 }

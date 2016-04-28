@@ -10,7 +10,6 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -43,7 +42,6 @@ import java.util.Locale;
 public class DSOActivity extends AppCompatActivity implements View.OnClickListener, OnChartGestureListener,
         OnChartValueSelectedListener {
 
-    private Toolbar toolbar;
     private LineChart mChart;
 
     @Override
@@ -92,7 +90,7 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     private void initActionBar() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null)
@@ -158,7 +156,9 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
     private void saveChartToImageFile() {
         File file = new File(Environment.getExternalStorageDirectory().getPath() + "/" + Constants.SCREENS_FOLDER);
         if (!file.exists()) {
-            file.mkdirs();
+            if (!file.mkdirs()) {
+                return;
+            }
         }
         SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.date_time_sdf), Locale.getDefault());
         String fileName = sdf.format(new Date());

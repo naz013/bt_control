@@ -1,8 +1,11 @@
 package com.example.helio.arduino.dso;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +22,8 @@ import java.util.List;
 
 public class ImagesRecyclerAdapter extends RecyclerView.Adapter<ImagesRecyclerAdapter.ImageViewHolder> {
 
-    private Context mContext;
-    private List<String> mDataList;
+    private final Context mContext;
+    private final List<String> mDataList;
 
     public ImagesRecyclerAdapter(Context context, List<String> list) {
         this.mContext = context;
@@ -46,7 +49,7 @@ public class ImagesRecyclerAdapter extends RecyclerView.Adapter<ImagesRecyclerAd
 
     public class ImageViewHolder extends RecyclerView.ViewHolder{
 
-        ImageListItemBinding binding;
+        final ImageListItemBinding binding;
 
         public ImageViewHolder(View itemView) {
             super(itemView);
@@ -54,14 +57,63 @@ public class ImagesRecyclerAdapter extends RecyclerView.Adapter<ImagesRecyclerAd
             binding.setClick(new ClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    performClick(view.getId(), getAdapterPosition());
                 }
             });
         }
     }
 
-    private void openActivity(int adapterPosition) {
+    private void performClick(int id, int adapterPosition) {
+        switch (id) {
+            case R.id.screenView:
+                openActivity(adapterPosition);
+                break;
+            case R.id.removeButton:
+                showConfirmationDialog(adapterPosition);
+                break;
+        }
+    }
 
+    private void showConfirmationDialog(final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setCancelable(true);
+        builder.setMessage(mContext.getString(R.string.are_you_sure));
+        builder.setPositiveButton(mContext.getString(R.string.remove), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                removeImage(position);
+            }
+        });
+        builder.setNegativeButton(mContext.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void removeImage(int position) {
+        if (position < mDataList.size()) {
+            String path = mDataList.get(position);
+            if (deleteFile(path)) {
+                mDataList.remove(position);
+                notifyItemRemoved(position);
+                notifyItemRangeChanged(0, mDataList.size());
+            }
+        }
+    }
+
+    private boolean deleteFile(String path) {
+        File file = new File(path);
+        return file.exists() && file.delete();
+    }
+
+    private void openActivity(int adapterPosition) {
+        mContext.startActivity(new Intent(mContext, ImagePreviewActivity.class)
+                .putExtra(mContext.getString(R.string.image_path_intent), mDataList.get(adapterPosition)));
     }
 
     @BindingAdapter("app:loadImage")

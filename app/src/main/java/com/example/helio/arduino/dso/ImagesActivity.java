@@ -17,11 +17,6 @@ import java.util.List;
 
 public class ImagesActivity extends AppCompatActivity {
 
-    private RecyclerView mImageList;
-    private Toolbar toolbar;
-
-    private ImagesRecyclerAdapter mAdapter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,10 +26,10 @@ public class ImagesActivity extends AppCompatActivity {
     }
 
     private void initList() {
-        mImageList = (RecyclerView) findViewById(R.id.imagesList);
+        RecyclerView mImageList = (RecyclerView) findViewById(R.id.imagesList);
         mImageList.setHasFixedSize(true);
         mImageList.setLayoutManager(new GridLayoutManager(this, 2));
-        mAdapter = new ImagesRecyclerAdapter(this, loadFiles());
+        ImagesRecyclerAdapter mAdapter = new ImagesRecyclerAdapter(this, loadFiles());
         mImageList.setAdapter(mAdapter);
     }
 
@@ -50,7 +45,7 @@ public class ImagesActivity extends AppCompatActivity {
     }
 
     private void initActionBar() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);

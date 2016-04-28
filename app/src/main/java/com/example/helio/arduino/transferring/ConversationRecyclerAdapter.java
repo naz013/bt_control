@@ -14,8 +14,8 @@ import java.util.List;
 
 public class ConversationRecyclerAdapter extends RecyclerView.Adapter<ConversationRecyclerAdapter.DeviceViewHolder> {
 
-    private Context mContext;
-    private List<String> mDataList;
+    private final Context mContext;
+    private final List<String> mDataList;
 
     public ConversationRecyclerAdapter(Context context) {
         this.mContext = context;
@@ -52,7 +52,7 @@ public class ConversationRecyclerAdapter extends RecyclerView.Adapter<Conversati
 
     public class DeviceViewHolder extends RecyclerView.ViewHolder{
 
-        TextView deviceName;
+        final TextView deviceName;
 
         public DeviceViewHolder(View itemView) {
             super(itemView);

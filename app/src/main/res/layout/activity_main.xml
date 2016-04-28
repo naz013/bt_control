@@ -9,67 +9,73 @@
         android:id="@+id/toolbar"
         layout="@layout/tool_bar" />
 
-    <android.support.v7.widget.CardView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="8dp"
-        app:cardCornerRadius="2dp"
-        app:cardElevation="2dp"
-        app:cardUseCompatPadding="true">
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/multimeterButton"
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="16dp"
-            android:background="@drawable/re_drawable"
-            android:text="@string/multimeter"
-            android:textColor="@color/colorWhite" />
+            android:layout_margin="8dp"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="2dp"
+            app:cardUseCompatPadding="true">
 
-    </android.support.v7.widget.CardView>
+            <Button
+                android:id="@+id/multimeterButton"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_margin="16dp"
+                android:background="@drawable/re_drawable"
+                android:text="@string/multimeter"
+                android:textColor="@color/colorWhite" />
 
-    <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="8dp"
-        app:cardCornerRadius="2dp"
-        app:cardElevation="2dp"
-        app:cardUseCompatPadding="true">
+        </android.support.v7.widget.CardView>
 
-        <Button
-            android:id="@+id/dsoButton"
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="16dp"
-            android:background="@drawable/green_drawable"
-            android:text="@string/dso"
-            android:textColor="@color/colorWhite" />
+            android:layout_margin="8dp"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="2dp"
+            app:cardUseCompatPadding="true">
 
-    </android.support.v7.widget.CardView>
+            <Button
+                android:id="@+id/dsoButton"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_margin="16dp"
+                android:background="@drawable/green_drawable"
+                android:text="@string/dso"
+                android:textColor="@color/colorWhite" />
 
-    <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="8dp"
-        app:cardCornerRadius="2dp"
-        app:cardElevation="2dp"
-        app:cardUseCompatPadding="true">
+        </android.support.v7.widget.CardView>
 
-        <Button
-            android:id="@+id/signalButton"
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="16dp"
-            android:background="@drawable/blue_drawable"
-            android:text="@string/signal_generator"
-            android:textColor="@color/colorWhite" />
+            android:layout_margin="8dp"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="2dp"
+            app:cardUseCompatPadding="true">
 
-    </android.support.v7.widget.CardView>
+            <Button
+                android:id="@+id/signalButton"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_margin="16dp"
+                android:background="@drawable/blue_drawable"
+                android:text="@string/signal_generator"
+                android:textColor="@color/colorWhite" />
 
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
 </LinearLayout>

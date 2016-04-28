@@ -22,7 +22,6 @@ public class SplashActivity extends AppCompatActivity {
 
     private String loadDevice() {
         SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE);
-        String address = preferences.getString(Constants.DEVICE_ADDRESS, null);
-        return address;
+        return preferences.getString(Constants.DEVICE_ADDRESS, null);
     }
 }

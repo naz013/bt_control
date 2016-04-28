@@ -31,6 +31,7 @@ import com.example.helio.arduino.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class DeviceListActivity extends AppCompatActivity {
 
@@ -38,11 +39,9 @@ public class DeviceListActivity extends AppCompatActivity {
     private String mDeviceAddress;
     private String mDeviceName;
 
-    private Toolbar toolbar;
-
-    private List<BluetoothDevice> mDevices = new ArrayList<>();
+    private final List<BluetoothDevice> mDevices = new ArrayList<>();
     private DevicesRecyclerAdapter mAdapter;
-    private BluetoothChatService mChatService = null;
+    private OriginalChatService mChatService = null;
     private BluetoothAdapter mBtAdapter;
 
     private ProgressDialog mDialog;
@@ -55,7 +54,6 @@ public class DeviceListActivity extends AppCompatActivity {
         initActionBar();
         initButton();
         initReceiver();
-
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
@@ -83,10 +81,18 @@ public class DeviceListActivity extends AppCompatActivity {
         mDeviceList.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new DevicesRecyclerAdapter(this, mListener);
         mDeviceList.setAdapter(mAdapter);
+        if (mBtAdapter != null) {
+            Set<BluetoothDevice> devices = mBtAdapter.getBondedDevices();
+            for (BluetoothDevice device : devices) {
+                String name = device.getName();
+                String address = device.getAddress();
+                mAdapter.addDevice(name + "\n" + address);
+            }
+        }
     }
 
     private void initActionBar() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }
@@ -95,7 +101,6 @@ public class DeviceListActivity extends AppCompatActivity {
         if (!checkLocationPermission()) {
             return;
         }
-
         if (mBtAdapter.isDiscovering()) {
             mBtAdapter.cancelDiscovery();
         }
@@ -128,7 +133,7 @@ public class DeviceListActivity extends AppCompatActivity {
 
     private void addNoDevicesToList() {
         if (mAdapter.getItemCount() == 0) {
-            String noDevices = getResources().getText(R.string.none_found).toString();
+            String noDevices = getString(R.string.none_found);
             mAdapter.addDevice(noDevices);
         }
     }
@@ -140,7 +145,9 @@ public class DeviceListActivity extends AppCompatActivity {
     }
 
     private void openChatRoom() {
-        startActivity(new Intent(this, ChatActivity.class));
+        startActivity(new Intent(this, ChatActivity.class)
+                .putExtra(getString(R.string.intent_server_key), false));
+        finish();
     }
 
     private void saveDevice(String address) {
@@ -151,7 +158,7 @@ public class DeviceListActivity extends AppCompatActivity {
     }
 
     private void setupService() {
-        mChatService = new BluetoothChatService(this, mHandler);
+        mChatService = new OriginalChatService(this, mHandler);
     }
 
     private final Handler mHandler = new Handler() {
@@ -174,20 +181,20 @@ public class DeviceListActivity extends AppCompatActivity {
 
     private void obtainConnectionMessage(Message msg) {
         switch (msg.arg1) {
-            case BluetoothChatService.STATE_CONNECTED:
+            case OriginalChatService.STATE_CONNECTED:
                 if (mDialog != null && mDialog.isShowing()) {
                     mDialog.dismiss();
                 }
                 saveDevice(mDeviceAddress);
                 openChatRoom();
                 break;
-            case BluetoothChatService.STATE_CONNECTING:
+            case OriginalChatService.STATE_CONNECTING:
                 mDialog = ProgressDialog.show(this, getString(R.string.bluetooth),
                         getString(R.string.title_connecting) + " " + mDeviceName, true, false);
                 break;
-            case BluetoothChatService.STATE_LISTEN:
+            case OriginalChatService.STATE_LISTEN:
                 break;
-            case BluetoothChatService.STATE_NONE:
+            case OriginalChatService.STATE_NONE:
                 break;
         }
     }
@@ -222,7 +229,6 @@ public class DeviceListActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         stopChatService();
-
         if (mBtAdapter != null) {
             mBtAdapter.cancelDiscovery();
         }
@@ -243,13 +249,13 @@ public class DeviceListActivity extends AppCompatActivity {
 
     private void startChatService() {
         if (mChatService != null) {
-            if (mChatService.getState() == BluetoothChatService.STATE_NONE) {
+            if (mChatService.getState() == OriginalChatService.STATE_NONE) {
                 mChatService.start();
             }
         }
     }
 
-    DeviceClickListener mListener = new DeviceClickListener() {
+    private final DeviceClickListener mListener = new DeviceClickListener() {
         @Override
         public void onClick(View view, int position) {
             mBtAdapter.cancelDiscovery();
@@ -263,7 +269,7 @@ public class DeviceListActivity extends AppCompatActivity {
     private void connectDevice(BluetoothDevice device) {
         if (mDeviceAddress != null) {
             while (true) {
-                if (mChatService.getState() == BluetoothChatService.STATE_LISTEN) {
+                if (mChatService.getState() == OriginalChatService.STATE_LISTEN) {
                     mChatService.connect(device, true);
                     break;
                 }

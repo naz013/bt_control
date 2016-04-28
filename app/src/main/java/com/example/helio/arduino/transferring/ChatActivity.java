@@ -1,7 +1,7 @@
 package com.example.helio.arduino.transferring;
 
+import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -10,12 +10,13 @@ import com.example.helio.arduino.R;
 
 public class ChatActivity extends AppCompatActivity {
 
-    private Toolbar toolbar;
+    private boolean mServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_main);
+        mServer = getIntent().getBooleanExtra(getString(R.string.intent_server_key), true);
         initActionBar();
 
         if (savedInstanceState == null) {
@@ -24,14 +25,14 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void showChatFragment() {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        BluetoothChatFragment fragment = new BluetoothChatFragment();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        BluetoothChatFragment fragment = BluetoothChatFragment.newInstance(mServer);
         transaction.replace(R.id.sample_content_fragment, fragment);
         transaction.commit();
     }
 
     private void initActionBar() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowTitleEnabled(false);

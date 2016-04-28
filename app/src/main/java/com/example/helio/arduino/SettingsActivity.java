@@ -15,11 +15,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     private TextView mNameView;
     private TextView mAddressView;
-    private Toolbar toolbar;
-
-    private String mAddress;
-
-    private BluetoothAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void initActionBar() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -47,9 +42,9 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void loadDevice() {
-        mAdapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothAdapter mAdapter = BluetoothAdapter.getDefaultAdapter();
         SharedPreferences preferences = getSharedPreferences(Constants.PREFS, MODE_PRIVATE);
-        mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
+        String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
         if (mAddress != null) {
             BluetoothDevice device = mAdapter.getRemoteDevice(mAddress);
             mNameView.setText(device.getName());
@@ -57,7 +52,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    View.OnClickListener buttonClick = new View.OnClickListener() {
+    private final View.OnClickListener buttonClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             unPairDevice();

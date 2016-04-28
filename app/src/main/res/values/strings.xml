@@ -38,8 +38,6 @@
     <string name="send">Send</string>
     <string name="not_connected">You are not connected to a device</string>
     <string name="title_connecting">Connecting to</string>
-    <string name="title_connected_to">Connected to <xliff:g id="device_name">%1$s</xliff:g></string>
-    <string name="title_not_connected">Not connected</string>
 
     <string name="none_found">No devices found</string>
     <string name="button_scan">Scan for devices</string>
@@ -47,4 +45,13 @@
     <string name="date_time_sdf">dd-MM-yyyy-hh-mm-ss</string>
     <string name="unable_to_connect_device">Unable to connect device</string>
     <string name="device_connection_was_lost">Device connection was lost</string>
+    <string name="intent_server_key">server_key</string>
+    <string name="select_connection_type">Select connection type</string>
+    <string name="server">Server</string>
+    <string name="client">Client</string>
+    <string name="data_test">DATA TEST</string>
+    <string name="image_path_intent">image_path</string>
+    <string name="remove">Remove</string>
+    <string name="cancel">Cancel</string>
+    <string name="are_you_sure">Are you sure?</string>
 </resources>

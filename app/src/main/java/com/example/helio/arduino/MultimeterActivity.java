@@ -11,8 +11,6 @@ import android.view.View;
 
 public class MultimeterActivity extends AppCompatActivity {
 
-    private Toolbar toolbar;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +26,7 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private void initActionBar() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -48,7 +46,7 @@ public class MultimeterActivity extends AppCompatActivity {
 
     }
 
-    View.OnClickListener mListener = new View.OnClickListener() {
+    private final View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {

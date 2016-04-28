@@ -1,18 +1,19 @@
 package com.example.helio.arduino.transferring;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,8 +28,8 @@ import com.example.helio.arduino.R;
 
 public class BluetoothChatFragment extends Fragment {
 
-    private static final String TAG = "BluetoothChatFragment";
     private static final int REQUEST_ENABLE_BT = 3;
+    private static final String ARG_SERVER = "server_key";
 
     private RecyclerView mConversationView;
     private EditText mOutEditText;
@@ -37,20 +38,41 @@ public class BluetoothChatFragment extends Fragment {
     private ConversationRecyclerAdapter mConversationArrayAdapter;
     private StringBuffer mOutStringBuffer;
     private BluetoothAdapter mBluetoothAdapter = null;
-    private BluetoothChatService mChatService = null;
+    private OriginalChatService mChatService = null;
+
+    private Context mContext;
+    private boolean mServer = false;
+
+    public BluetoothChatFragment() {
+
+    }
+
+    public static BluetoothChatFragment newInstance(boolean isServer) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ARG_SERVER, isServer);
+        BluetoothChatFragment fragment = new BluetoothChatFragment();
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         checkBluetoothAvailability();
+        getBundle();
+    }
+
+    private void getBundle() {
+        if (getArguments() != null) {
+            mServer = getArguments().getBoolean(ARG_SERVER, true);
+        }
     }
 
     private void checkBluetoothAvailability() {
         if (mBluetoothAdapter == null) {
-            FragmentActivity activity = getActivity();
-            Toast.makeText(activity, "Bluetooth is not available", Toast.LENGTH_LONG).show();
-            activity.finish();
+            Toast.makeText(mContext, "Bluetooth is not available", Toast.LENGTH_LONG).show();
+            getActivity().finish();
         }
     }
 
@@ -61,6 +83,22 @@ public class BluetoothChatFragment extends Fragment {
             requestBluetoothEnable();
         } else if (mChatService == null) {
             setupChat();
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (mContext == null) {
+            this.mContext = context;
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (mContext == null) {
+            this.mContext = activity;
         }
     }
 
@@ -86,10 +124,30 @@ public class BluetoothChatFragment extends Fragment {
     }
 
     private void startBluetoothService() {
-        if (mChatService.getState() == BluetoothChatService.STATE_NONE) {
+        if (mChatService.getState() == OriginalChatService.STATE_NONE) {
             mChatService.start();
-            connectDevice(true);
+            if (!mServer) {
+                while (true) {
+                    if (mChatService.getState() == OriginalChatService.STATE_LISTEN) {
+                        connectDevice(true);
+                        break;
+                    }
+                }
+            } else ensureDiscoverable();
         }
+    }
+
+    private void ensureDiscoverable() {
+        if (mBluetoothAdapter.getScanMode() !=
+                BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+            discoverRequest();
+        }
+    }
+
+    private void discoverRequest() {
+        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+        startActivity(discoverableIntent);
     }
 
     @Override
@@ -117,7 +175,7 @@ public class BluetoothChatFragment extends Fragment {
             }
         });
 
-        mChatService = new BluetoothChatService(getActivity(), mHandler);
+        mChatService = new OriginalChatService(getActivity(), mHandler);
         mOutStringBuffer = new StringBuffer("");
     }
 
@@ -130,7 +188,7 @@ public class BluetoothChatFragment extends Fragment {
     }
 
     private void sendMessage(String message) {
-        if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
+        if (mChatService.getState() != OriginalChatService.STATE_CONNECTED) {
             Toast.makeText(getActivity(), R.string.not_connected, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -143,7 +201,7 @@ public class BluetoothChatFragment extends Fragment {
         }
     }
 
-    private TextView.OnEditorActionListener mWriteListener = new TextView.OnEditorActionListener() {
+    private final TextView.OnEditorActionListener mWriteListener = new TextView.OnEditorActionListener() {
         public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
             if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_UP) {
                 String message = view.getText().toString();
@@ -165,9 +223,19 @@ public class BluetoothChatFragment extends Fragment {
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
-                    showToast("Connected to " + mConnectedDeviceName);
+                    showToast(mContext.getString(R.string.connected_to) + " " + mConnectedDeviceName);
                     break;
                 case Constants.MESSAGE_TOAST:
+                    String message = msg.getData().getString(Constants.TOAST);
+                    if (message == null) return;
+                    if (message.startsWith("Unable") || message.startsWith("Device")) {
+                        if (mChatService.getState() == OriginalChatService.STATE_NONE) {
+                            mChatService.start();
+                        }
+                        if (mChatService.getState() == OriginalChatService.STATE_LISTEN) {
+                            connectDevice(true);
+                        }
+                    }
                     showToast(msg.getData().getString(Constants.TOAST));
                     break;
             }
@@ -194,9 +262,10 @@ public class BluetoothChatFragment extends Fragment {
 
     private void connectDevice(boolean secure) {
         SharedPreferences preferences =
-                getActivity().getSharedPreferences(com.example.helio.arduino.Constants.PREFS, Activity.MODE_PRIVATE);
+                mContext.getSharedPreferences(com.example.helio.arduino.Constants.PREFS, Activity.MODE_PRIVATE);
         String mAddress = preferences.getString(com.example.helio.arduino.Constants.DEVICE_ADDRESS, null);
         if (mAddress != null) {
+            Log.d("TAG", mAddress);
             BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(mAddress);
             mConnectedDeviceName = device.getName();
             mChatService.connect(device, secure);

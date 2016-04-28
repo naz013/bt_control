@@ -24,7 +24,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.helio.arduino.transferring.BluetoothChatService;
-import com.example.helio.arduino.transferring.DeviceListActivity;
+import com.example.helio.arduino.transferring.SelectionActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +39,8 @@ public class StartActivity extends AppCompatActivity {
     private Button mTestButton;
     private RecyclerView mDeviceList;
     private ProgressDialog mDialog;
-    private BluetoothAdapter mBtAdapter = null;
-    private List<BluetoothDevice> mDevices = new ArrayList<>();
+    private final BluetoothAdapter mBtAdapter = null;
+    private final List<BluetoothDevice> mDevices = new ArrayList<>();
     private DevicesRecyclerAdapter mAdapter;
     private BluetoothChatService mChatService = null;
 
@@ -61,7 +61,7 @@ public class StartActivity extends AppCompatActivity {
     private void initButtons() {
         mPairButton = (Button) findViewById(R.id.pairButton);
         mTestButton = (Button) findViewById(R.id.testButton);
-        mTestButton.setVisibility(View.GONE);
+        //mTestButton.setVisibility(View.GONE);
         mPairButton.setOnClickListener(visibleClick);
         mTestButton.setOnClickListener(chatClick);
     }
@@ -78,7 +78,7 @@ public class StartActivity extends AppCompatActivity {
         mChatService = new BluetoothChatService(this, mHandler);
     }
 
-    View.OnClickListener chatClick = new View.OnClickListener() {
+    private final View.OnClickListener chatClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             openChat();
@@ -86,10 +86,10 @@ public class StartActivity extends AppCompatActivity {
     };
 
     private void openChat() {
-        startActivity(new Intent(this, DeviceListActivity.class));
+        startActivity(new Intent(this, SelectionActivity.class));
     }
 
-    View.OnClickListener visibleClick = new View.OnClickListener() {
+    private final View.OnClickListener visibleClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             selectDevice();
@@ -140,7 +140,7 @@ public class StartActivity extends AppCompatActivity {
         if (mDeviceAddress != null) {
             while (true) {
                 if (mChatService.getState() == BluetoothChatService.STATE_LISTEN) {
-                    mChatService.connect(device, true);
+                    mChatService.connect(device, false);
                     break;
                 }
             }
@@ -250,7 +250,7 @@ public class StartActivity extends AppCompatActivity {
         }
     }
 
-    DeviceClickListener mListener = new DeviceClickListener() {
+    private final DeviceClickListener mListener = new DeviceClickListener() {
         @Override
         public void onClick(View view, int position) {
             BluetoothDevice device = mDevices.get(position);

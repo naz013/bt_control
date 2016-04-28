@@ -12,9 +12,9 @@ import java.util.List;
 
 public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecyclerAdapter.DeviceViewHolder> {
 
-    private Context mContext;
-    private List<String> mDataList;
-    private DeviceClickListener mListener;
+    private final Context mContext;
+    private final List<String> mDataList;
+    private final DeviceClickListener mListener;
 
     public DevicesRecyclerAdapter(Context context, DeviceClickListener listener) {
         this.mContext = context;
@@ -41,7 +41,7 @@ public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecycler
 
     public class DeviceViewHolder extends RecyclerView.ViewHolder{
 
-        TextView deviceName;
+        final TextView deviceName;
 
         public DeviceViewHolder(View itemView) {
             super(itemView);
@@ -56,6 +56,15 @@ public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecycler
     }
 
     public void addDevice(String name) {
+        if (mDataList.size() > 0) {
+            String noDevices = mContext.getString(R.string.none_found);
+            if (mDataList.contains(noDevices)) {
+                mDataList.remove(noDevices);
+            }
+            if (mDataList.contains(name)) {
+                return;
+            }
+        }
         mDataList.add(name);
         int pos = mDataList.indexOf(name);
         notifyItemInserted(pos);
