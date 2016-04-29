@@ -1,3 +1,58 @@
-<resources>
-    <string name="app_name">Arduino</string>
+<resources xmlns:xliff="http://schemas.android.com/tools">
+    <string name="app_name">MULTI LAB</string>
+    <string name="pair_device">Pair device</string>
+    <string name="select_device">Select device</string>
+    <string name="forgot">Disconnect</string>
+    <string name="multimeter">Multimeter</string>
+    <string name="dso">DSO</string>
+    <string name="signal_generator">Signal Generator</string>
+    <string name="main_menu">Main menu</string>
+    <string name="settings">Settings</string>
+    <string name="v">V</string>
+    <string name="i">I</string>
+    <string name="omega">Ω</string>
+    <string name="capture">Capture</string>
+    <string name="screenshot">Screenshot</string>
+    <string name="generate">Generate</string>
+    <string name="signal_type">Signal type</string>
+    <string name="frequency">Frequency</string>
+    <string name="magnitude">Magnitude</string>
+    <string name="connected_to">Connected to</string>
+    <string name="screenshots">Screenshots</string>
+    <string name="your_message">Your message</string>
+    <string name="data_transferring">Data transferring</string>
+    <string name="bluetooth">Bluetooth</string>
+
+    <array name="wave_types">
+        <item>Square Wave</item>
+        <item>Sine Wave</item>
+        <item>Triangular Wave</item>
+    </array>
+
+    <array name="frequency_measure">
+        <item>Hz</item>
+        <item>kHz</item>
+        <item>MHz</item>
+    </array>
+
+    <string name="send">Send</string>
+    <string name="not_connected">You are not connected to a device</string>
+    <string name="title_connecting">Connecting to</string>
+
+    <string name="none_found">No devices found</string>
+    <string name="button_scan">Scan for devices</string>
+    <string name="screenshot_saved">Screenshot saved</string>
+    <string name="date_time_sdf">yyyy-MM-dd-hh-mm-ss</string>
+    <string name="unable_to_connect_device">Unable to connect device</string>
+    <string name="device_connection_was_lost">Device connection was lost</string>
+    <string name="intent_server_key">server_key</string>
+    <string name="select_connection_type">Select connection type</string>
+    <string name="server">Server</string>
+    <string name="client">Client</string>
+    <string name="data_test">DATA TEST</string>
+    <string name="image_path_intent">image_path</string>
+    <string name="remove">Remove</string>
+    <string name="cancel">Cancel</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="arduino_chart">Arduino chart</string>
 </resources>

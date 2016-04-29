@@ -1,6 +1,5 @@
 package com.example.helio.arduino;
 
-import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,32 +9,20 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.helio.arduino.dso.DSOActivity;
-
-public class MainActivity extends AppCompatActivity {
+public class MultimeterActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
+        setContentView(R.layout.activity_multimeter);
         initActionBar();
         initButtons();
-        //checkBluetooth();
-    }
-
-    private void checkBluetooth() {
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (!bluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, 100);
-        }
     }
 
     private void initButtons() {
-        findViewById(R.id.multimeterButton).setOnClickListener(mListener);
-        findViewById(R.id.dsoButton).setOnClickListener(mListener);
-        findViewById(R.id.signalButton).setOnClickListener(mListener);
+        findViewById(R.id.resistanceButton).setOnClickListener(mListener);
+        findViewById(R.id.voltageButton).setOnClickListener(mListener);
+        findViewById(R.id.currentButton).setOnClickListener(mListener);
     }
 
     private void initActionBar() {
@@ -43,34 +30,34 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setTitle(R.string.main_menu);
+        toolbar.setTitle(R.string.multimeter);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }
 
-    private void openSignal() {
-        startActivity(new Intent(this, SignalActivity.class));
+    private void showCurrent() {
+
     }
 
-    private void openDSO() {
-        startActivity(new Intent(this, DSOActivity.class));
+    private void showResistance() {
+
     }
 
-    private void openMultimeter() {
-        startActivity(new Intent(this, MultimeterActivity.class));
+    private void showVoltage() {
+
     }
 
     private final View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.multimeterButton:
-                    openMultimeter();
+                case R.id.resistanceButton:
+                    showResistance();
                     break;
-                case R.id.dsoButton:
-                    openDSO();
+                case R.id.voltageButton:
+                    showVoltage();
                     break;
-                case R.id.signalButton:
-                    openSignal();
+                case R.id.currentButton:
+                    showCurrent();
                     break;
             }
         }

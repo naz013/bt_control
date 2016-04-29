@@ -2,19 +2,74 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.helio.arduino">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".SplashActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".StartActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".dso.DSOActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".MultimeterActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".SignalActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".dso.ImagesActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".transferring.ChatActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".transferring.DeviceListActivity"
+            android:label="@string/select_device"
+            android:screenOrientation="portrait" />
+
+        <activity android:name=".dso.ImagePreviewActivity" />
+
+        <activity
+            android:name=".transferring.SelectionActivity"
+            android:label="@string/select_device"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

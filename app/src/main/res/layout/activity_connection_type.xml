@@ -12,6 +12,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -25,13 +26,13 @@
             app:cardUseCompatPadding="true">
 
             <Button
-                android:id="@+id/multimeterButton"
+                android:id="@+id/serverButton"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_gravity="center"
                 android:layout_margin="16dp"
                 android:background="@drawable/re_drawable"
-                android:text="@string/multimeter"
+                android:text="@string/server"
                 android:textColor="@color/colorWhite" />
 
         </android.support.v7.widget.CardView>
@@ -40,42 +41,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="16dp"
             app:cardCornerRadius="2dp"
             app:cardElevation="2dp"
             app:cardUseCompatPadding="true">
 
             <Button
-                android:id="@+id/dsoButton"
+                android:id="@+id/clientButton"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_gravity="center"
                 android:layout_margin="16dp"
                 android:background="@drawable/green_drawable"
-                android:text="@string/dso"
+                android:text="@string/client"
                 android:textColor="@color/colorWhite" />
 
         </android.support.v7.widget.CardView>
 
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="8dp"
-            app:cardCornerRadius="2dp"
-            app:cardElevation="2dp"
-            app:cardUseCompatPadding="true">
-
-            <Button
-                android:id="@+id/signalButton"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:layout_margin="16dp"
-                android:background="@drawable/blue_drawable"
-                android:text="@string/signal_generator"
-                android:textColor="@color/colorWhite" />
-
-        </android.support.v7.widget.CardView>
     </LinearLayout>
+
 </LinearLayout>
