@@ -11,13 +11,16 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        selectScreen();
+        finish();
+    }
+
+    private void selectScreen() {
         if (loadDevice() != null && !loadDevice().matches("")) {
             startActivity(new Intent(this, MainActivity.class));
         } else {
             startActivity(new Intent(this, StartActivity.class));
         }
-
-        finish();
     }
 
     private String loadDevice() {

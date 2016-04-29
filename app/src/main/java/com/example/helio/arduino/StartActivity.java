@@ -44,24 +44,43 @@ public class StartActivity extends AppCompatActivity {
     private DevicesRecyclerAdapter mAdapter;
     private BluetoothChatService mChatService = null;
 
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case com.example.helio.arduino.transferring.Constants.MESSAGE_STATE_CHANGE:
+                    workWithServiceState(msg);
+                    break;
+                case com.example.helio.arduino.transferring.Constants.MESSAGE_TOAST:
+                    showMessageToast(msg);
+                    break;
+            }
+        }
+    };
+
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                mDevices.add(device);
+                Log.i("BT", device.getName() + "\n" + device.getAddress());
+                mAdapter.addDevice(device.getName() + "\n" + device.getAddress());
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         initDeviceList();
         initButtons();
-
-        /*mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBtAdapter == null) {
-            Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_SHORT).show();
-            finish();
-        }*/
     }
 
     private void initButtons() {
         mPairButton = (Button) findViewById(R.id.pairButton);
         mTestButton = (Button) findViewById(R.id.testButton);
-        //mTestButton.setVisibility(View.GONE);
         mPairButton.setOnClickListener(visibleClick);
         mTestButton.setOnClickListener(chatClick);
     }
@@ -98,15 +117,6 @@ public class StartActivity extends AppCompatActivity {
 
     private void selectDevice() {
         startActivity(new Intent(this, MainActivity.class));
-        /*if (!checkLocationPermission()) {
-            return;
-        }
-        if (!mBtAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        } else {
-            switchView();
-        }*/
     }
 
     private boolean checkLocationPermission() {
@@ -154,45 +164,25 @@ public class StartActivity extends AppCompatActivity {
         editor.commit();
     }
 
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            AppCompatActivity activity = StartActivity.this;
-            switch (msg.what) {
-                case com.example.helio.arduino.transferring.Constants.MESSAGE_STATE_CHANGE:
-                    switch (msg.arg1) {
-                        case BluetoothChatService.STATE_CONNECTED:
-                            onFinish(mDeviceAddress);
-                            break;
-                        case BluetoothChatService.STATE_CONNECTING:
-                            mDialog = ProgressDialog.show(activity,
-                                    activity.getString(R.string.bluetooth),
-                                    activity.getString(R.string.title_connecting) + " " + mDeviceName, true, false);
-                            break;
-                        case BluetoothChatService.STATE_LISTEN:
-                        case BluetoothChatService.STATE_NONE:
-                            break;
-                    }
-                    break;
-                case com.example.helio.arduino.transferring.Constants.MESSAGE_TOAST:
-                    Toast.makeText(activity, msg.getData().getString(com.example.helio.arduino.transferring.Constants.TOAST),
-                            Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        }
-    };
+    private void showMessageToast(Message msg) {
+        Toast.makeText(this, msg.getData().getString(com.example.helio.arduino.transferring.Constants.TOAST),
+                Toast.LENGTH_SHORT).show();
+    }
 
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                mDevices.add(device);
-                Log.i("BT", device.getName() + "\n" + device.getAddress());
-                mAdapter.addDevice(device.getName() + "\n" + device.getAddress());
-            }
+    private void workWithServiceState(Message msg) {
+        switch (msg.arg1) {
+            case BluetoothChatService.STATE_CONNECTED:
+                onFinish(mDeviceAddress);
+                break;
+            case BluetoothChatService.STATE_CONNECTING:
+                mDialog = ProgressDialog.show(this, getString(R.string.bluetooth),
+                        getString(R.string.title_connecting) + " " + mDeviceName, true, false);
+                break;
+            case BluetoothChatService.STATE_LISTEN:
+            case BluetoothChatService.STATE_NONE:
+                break;
         }
-    };
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -203,44 +193,6 @@ public class StartActivity extends AppCompatActivity {
                 }
                 break;
         }
-    }
-
-    /*@Override
-    public void onStart() {
-        super.onStart();
-        if (!mBtAdapter.isEnabled()) {
-            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-        } else if (mChatService == null) {
-            setupService();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mChatService != null) {
-            mChatService.stop();
-        }
-
-        if (mBtAdapter != null) {
-            mBtAdapter.cancelDiscovery();
-        }
-        try {
-            unregisterReceiver(mReceiver);
-        } catch (IllegalArgumentException e) {
-            //e.printStackTrace();
-        }
-    }*/
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        /*if (mChatService != null) {
-            if (mChatService.getState() == BluetoothChatService.STATE_NONE) {
-                mChatService.start();
-            }
-        }*/
     }
 
     @Override

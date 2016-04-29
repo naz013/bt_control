@@ -58,9 +58,13 @@ public class BluetoothChatFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        initBluetoothAdapter();
         checkBluetoothAvailability();
         getBundle();
+    }
+
+    private void initBluetoothAdapter() {
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
     private void getBundle() {
@@ -79,6 +83,10 @@ public class BluetoothChatFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        checkAdapterStatus();
+    }
+
+    private void checkAdapterStatus() {
         if (!mBluetoothAdapter.isEnabled()) {
             requestBluetoothEnable();
         } else if (mChatService == null) {
@@ -118,6 +126,10 @@ public class BluetoothChatFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        resumeBluetoothService();
+    }
+
+    private void resumeBluetoothService() {
         if (mChatService != null) {
             startBluetoothService();
         }
@@ -222,25 +234,33 @@ public class BluetoothChatFragment extends Fragment {
                     addTheirMessage(msg);
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
-                    mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
-                    showToast(mContext.getString(R.string.connected_to) + " " + mConnectedDeviceName);
+                    getDeviceName(msg);
                     break;
                 case Constants.MESSAGE_TOAST:
-                    String message = msg.getData().getString(Constants.TOAST);
-                    if (message == null) return;
-                    if (message.startsWith("Unable") || message.startsWith("Device")) {
-                        if (mChatService.getState() == OriginalChatService.STATE_NONE) {
-                            mChatService.start();
-                        }
-                        if (mChatService.getState() == OriginalChatService.STATE_LISTEN) {
-                            connectDevice(true);
-                        }
-                    }
-                    showToast(msg.getData().getString(Constants.TOAST));
+                    showMessage(msg);
                     break;
             }
         }
     };
+
+    private void showMessage(Message msg) {
+        String message = msg.getData().getString(Constants.TOAST);
+        if (message == null) return;
+        if (message.startsWith("Unable") || message.startsWith("Device")) {
+            if (mChatService.getState() == OriginalChatService.STATE_NONE) {
+                mChatService.start();
+            }
+            if (mChatService.getState() == OriginalChatService.STATE_LISTEN) {
+                connectDevice(true);
+            }
+        }
+        showToast(msg.getData().getString(Constants.TOAST));
+    }
+
+    private void getDeviceName(Message msg) {
+        mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
+        showToast(mContext.getString(R.string.connected_to) + " " + mConnectedDeviceName);
+    }
 
     private void showToast(String message) {
         if (getActivity() != null) {
