@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.backdoor.shared.Constants;
+
 public class SplashActivity extends AppCompatActivity {
 
     @Override

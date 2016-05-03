@@ -1,4 +1,4 @@
-package com.example.helio.arduino.transferring;
+package com.backdoor.shared;
 
 public class Constants {
 
@@ -9,28 +9,31 @@ public class Constants {
     public static final int MESSAGE_DEVICE_NAME = 4;
     public static final int MESSAGE_TOAST = 5;
 
-    public static final int KEY_MULTIMETER = 7;
-    public static final int KEY_VOLTAGE = 8;
-    public static final int KEY_RESISTANCE = 9;
-    public static final int KEY_CURRENT = 10;
-
-    public static final int KEY_CAPTURE = 11;
-    public static final int KEY_DSO = 15;
-    public static final int KEY_STOP = 12;
-
-    public static final int KEY_TERMINATE = 13;
-    public static final int KEY_GENERATE = 14;
-
     // Key names received from the BluetoothChatService Handler
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
-    public static final String RESISTANCE = "resistance";
-    public static final String CURRENT = "current";
-    public static final String VOLTAGE = "voltage";
-    public static final String DSO = "dso";
+
+    public static final String FLAG = "flag";
+    public static final String R = "r";
+    public static final String I = "i";
+    public static final String V = "v";
+
+    public static final String C = "c";
+    public static final String S = "s";
+    public static final String Y = "y";
+
+    public static final String G = "g";
+    public static final String T = "t";
+
+    public static final String SIGNAL = "signal";
+
     public static final String FREQUENCY = "frequency";
     public static final String FREQUENCY_M = "frequency_m";
     public static final String MAGNITUDE = "magnitude";
     public static final String SIGNAL_TYPE = "signal_type";
+
+    public static final String DEVICE_ADDRESS = "device_address";
+    public static final String PREFS = "app_prefs";
+    public static final String SCREENS_FOLDER = "MultiLab";
 
 }

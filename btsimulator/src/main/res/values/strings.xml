@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">BT Simulator</string>
+    <string name="not_connected">Not connected</string>
+    <string name="connected_to">Connected to</string>
+    <string name="waiting_for_commands">Waiting for commands</string>
+    <string name="y_value">Y value:</string>
+    <string name="send">Send</string>
+    <string name="voltage">Voltage:</string>
+    <string name="current">Current:</string>
+    <string name="ohm">Ohm:</string>
+    <string name="bluetooth_is_not_available">Bluetooth is not available</string>
+    <string name="empty_y_field">Empty y field</string>
+    <string name="empty_resistance_field">Empty resistance field</string>
+    <string name="empty_current_field">Empty current field</string>
+    <string name="empty_voltage_field">Empty voltage field</string>
+</resources>

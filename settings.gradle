@@ -1,1 +1,1 @@
-include ':app', ':imagePreview'
+include ':app', ':imagePreview', ':btsimulator', ':shared'

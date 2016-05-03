@@ -1,4 +1,4 @@
-package com.example.helio.arduino.transferring;
+package com.backdoor.shared;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -149,22 +149,13 @@ public class OriginalChatService {
         setState(STATE_NONE);
     }
 
-    public void writeMessage(byte[] out, int key) {
+    public void writeBundle(Bundle bundle) {
         ConnectedThread r;
         synchronized (this) {
             if (mState != STATE_CONNECTED) return;
             r = mConnectedThread;
         }
-        r.write(out, key);
-    }
-
-    public void writeBundle(Bundle bundle, int key) {
-        ConnectedThread r;
-        synchronized (this) {
-            if (mState != STATE_CONNECTED) return;
-            r = mConnectedThread;
-        }
-        r.write(bundle, key);
+        r.write(bundle);
     }
 
     private void connectionFailed() {
@@ -343,20 +334,10 @@ public class OriginalChatService {
             }
         }
 
-        public void write(Bundle bundle, int key) {
-            Message msg = mHandler.obtainMessage(key);
+        public void write(Bundle bundle) {
+            Message msg = mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1);
             msg.setData(bundle);
             mHandler.sendMessage(msg);
-        }
-
-        public void write(byte[] buffer, int key) {
-            try {
-                mmOutStream.write(buffer);
-                mHandler.obtainMessage(key, -1, -1, buffer)
-                        .sendToTarget();
-            } catch (IOException e) {
-                Log.e(TAG, "Exception during write", e);
-            }
         }
 
         public void cancel() {

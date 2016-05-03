@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.backdoor.shared.Constants;
+
 public class SettingsActivity extends AppCompatActivity {
 
     private TextView mNameView;

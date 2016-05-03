@@ -22,10 +22,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.helio.arduino.Constants;
+import com.backdoor.shared.Constants;
+import com.backdoor.shared.OriginalChatService;
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.SettingsActivity;
-import com.example.helio.arduino.transferring.OriginalChatService;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.LimitLine;
@@ -43,13 +43,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.example.helio.arduino.transferring.Constants.DEVICE_NAME;
-import static com.example.helio.arduino.transferring.Constants.DSO;
-import static com.example.helio.arduino.transferring.Constants.KEY_DSO;
-import static com.example.helio.arduino.transferring.Constants.MESSAGE_DEVICE_NAME;
-import static com.example.helio.arduino.transferring.Constants.MESSAGE_TOAST;
-import static com.example.helio.arduino.transferring.Constants.TOAST;
-
 public class DSOActivity extends AppCompatActivity implements View.OnClickListener, OnChartGestureListener,
         OnChartValueSelectedListener {
 
@@ -61,9 +54,25 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
     private LineChart mChart;
 
     private BluetoothDevice mConnectedDevice = null;
-    private StringBuffer mOutStringBuffer;
     private BluetoothAdapter mBluetoothAdapter = null;
     private OriginalChatService mChatService = null;
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case Constants.MESSAGE_DEVICE_NAME:
+                    getDeviceName(msg);
+                    break;
+                case Constants.MESSAGE_TOAST:
+                    showMessage(msg);
+                    break;
+                case Constants.MESSAGE_READ:
+                    readDso(msg);
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,10 +113,8 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
 
         mChart.getAxisRight().setEnabled(false);
         mChart.getLegend().setEnabled(false);
-        //generateDataForChart(70, 100);
         mChart.setVisibleXRangeMaximum(CHART_VISIBLE);
         mChart.animateX(2500, Easing.EasingOption.EaseInOutQuart);
-        mChart.moveViewToX(mChart.getLineData().getXValCount() - CHART_VISIBLE);
     }
 
     private void initButtons() {
@@ -149,7 +156,6 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
 
     private void setupConnection() {
         mChatService = new OriginalChatService(this, mHandler);
-        mOutStringBuffer = new StringBuffer("");
     }
 
     private void sendMessage(String message) {
@@ -159,31 +165,14 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
         }
 
         if (message.length() > 0) {
-            byte[] send = message.getBytes();
-            mChatService.writeMessage(send, KEY_DSO);
-            mOutStringBuffer.setLength(0);
+            Bundle bundle = new Bundle();
+            bundle.putString(Constants.FLAG, message);
+            mChatService.writeBundle(bundle);
         }
     }
 
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MESSAGE_DEVICE_NAME:
-                    getDeviceName(msg);
-                    break;
-                case MESSAGE_TOAST:
-                    showMessage(msg);
-                    break;
-                case KEY_DSO:
-                    readDso(msg);
-                    break;
-            }
-        }
-    };
-
     private void readDso(Message msg) {
-        float value = msg.getData().getFloat(DSO);
+        float value = Float.parseFloat(msg.getData().getString(Constants.Y));
         if (mCapturing) addNewEntry(value);
     }
 
@@ -206,12 +195,12 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     private void getDeviceName(Message msg) {
-        String mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
+        String mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
         showToast(getString(R.string.connected_to) + " " + mConnectedDeviceName);
     }
 
     private void showMessage(Message msg) {
-        String message = msg.getData().getString(TOAST);
+        String message = msg.getData().getString(Constants.TOAST);
         if (message == null) return;
         if (message.startsWith("Unable") || message.startsWith("Device")) {
             if (mChatService.getState() == OriginalChatService.STATE_NONE) {
@@ -220,8 +209,9 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
             if (mChatService.getState() == OriginalChatService.STATE_LISTEN) {
                 connectDevice(true);
             }
+        } else {
+            showToast(msg.getData().getString(Constants.TOAST));
         }
-        showToast(msg.getData().getString(TOAST));
     }
 
     @Override
@@ -255,7 +245,7 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     private void stopCapturing() {
-        sendMessage(getString(R.string.key_stop));
+        sendMessage(Constants.S);
         mCapturing = false;
     }
 
@@ -266,7 +256,7 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     private void capture() {
-        sendMessage(getString(R.string.key_capture));
+        sendMessage(Constants.C);
         mCapturing = true;
     }
 
@@ -330,8 +320,8 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     private void connectDevice(boolean secure) {
-        SharedPreferences preferences = getSharedPreferences(com.example.helio.arduino.Constants.PREFS, Activity.MODE_PRIVATE);
-        String mAddress = preferences.getString(com.example.helio.arduino.Constants.DEVICE_ADDRESS, null);
+        SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Activity.MODE_PRIVATE);
+        String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
         if (mAddress != null) {
             mConnectedDevice = mBluetoothAdapter.getRemoteDevice(mAddress);
             mChatService.connect(mConnectedDevice, secure);

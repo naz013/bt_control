@@ -65,4 +65,5 @@
     <string name="terminate_key">t</string>
     <string name="empty_frequency">Empty frequency!</string>
     <string name="empty_magnitude">Empty magnitude!</string>
+    <string name="go_to_main_menu">Go to main menu</string>
 </resources>

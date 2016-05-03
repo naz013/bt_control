@@ -17,19 +17,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.helio.arduino.transferring.OriginalChatService;
-
-import static com.example.helio.arduino.transferring.Constants.CURRENT;
-import static com.example.helio.arduino.transferring.Constants.DEVICE_NAME;
-import static com.example.helio.arduino.transferring.Constants.KEY_CURRENT;
-import static com.example.helio.arduino.transferring.Constants.KEY_MULTIMETER;
-import static com.example.helio.arduino.transferring.Constants.KEY_RESISTANCE;
-import static com.example.helio.arduino.transferring.Constants.KEY_VOLTAGE;
-import static com.example.helio.arduino.transferring.Constants.MESSAGE_DEVICE_NAME;
-import static com.example.helio.arduino.transferring.Constants.MESSAGE_TOAST;
-import static com.example.helio.arduino.transferring.Constants.RESISTANCE;
-import static com.example.helio.arduino.transferring.Constants.TOAST;
-import static com.example.helio.arduino.transferring.Constants.VOLTAGE;
+import com.backdoor.shared.Constants;
+import com.backdoor.shared.OriginalChatService;
 
 public class MultimeterActivity extends AppCompatActivity {
 
@@ -38,9 +27,25 @@ public class MultimeterActivity extends AppCompatActivity {
     private TextView meterField;
 
     private BluetoothDevice mConnectedDevice = null;
-    private StringBuffer mOutStringBuffer;
     private BluetoothAdapter mBluetoothAdapter = null;
     private OriginalChatService mChatService = null;
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case Constants.MESSAGE_DEVICE_NAME:
+                    getDeviceName(msg);
+                    break;
+                case Constants.MESSAGE_TOAST:
+                    showMessage(msg);
+                    break;
+                case Constants.MESSAGE_READ:
+                    postResponse(msg);
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,15 +77,15 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private void showCurrent() {
-        sendMessage(getString(R.string.current_key));
+        sendMessage(Constants.I);
     }
 
     private void showResistance() {
-        sendMessage(getString(R.string.resistance_key));
+        sendMessage(Constants.R);
     }
 
     private void showVoltage() {
-        sendMessage(getString(R.string.voltage_key));
+        sendMessage(Constants.V);
     }
 
     private final View.OnClickListener mListener = new View.OnClickListener() {
@@ -121,7 +126,6 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private void setupConnection() {
         mChatService = new OriginalChatService(this, mHandler);
-        mOutStringBuffer = new StringBuffer("");
     }
 
     private void sendMessage(String message) {
@@ -130,59 +134,36 @@ public class MultimeterActivity extends AppCompatActivity {
             return;
         }
 
-        if (message.length() > 0) {
-            byte[] send = message.getBytes();
-            mChatService.writeMessage(send, KEY_MULTIMETER);
-            mOutStringBuffer.setLength(0);
+        Bundle bundle = new Bundle();
+        bundle.putString(Constants.FLAG, message);
+        mChatService.writeBundle(bundle);
+    }
+
+    private void postResponse(Message msg) {
+        Bundle bundle = msg.getData();
+        String v;
+        if (bundle.containsKey(Constants.V)) {
+            v = msg.getData().getString(Constants.V);
+        } else if (bundle.containsKey(Constants.I)) {
+            v = msg.getData().getString(Constants.I);
+        } else if (bundle.containsKey(Constants.R)) {
+            v = msg.getData().getString(Constants.R);
+        } else {
+            v = "No key";
         }
-    }
-
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MESSAGE_DEVICE_NAME:
-                    getDeviceName(msg);
-                    break;
-                case MESSAGE_TOAST:
-                    showMessage(msg);
-                    break;
-                case KEY_CURRENT:
-                    postCurrentResponse(msg);
-                    break;
-                case KEY_RESISTANCE:
-                    postResistanceResponse(msg);
-                    break;
-                case KEY_VOLTAGE:
-                    postVoltageResponse(msg);
-                    break;
-            }
-        }
-    };
-
-    private void postCurrentResponse(Message msg) {
-        String message = msg.getData().getString(CURRENT);
-        meterField.setText(message);
-    }
-
-    private void postVoltageResponse(Message msg) {
-        String message = msg.getData().getString(VOLTAGE);
-        meterField.setText(message);
-    }
-
-    private void postResistanceResponse(Message msg) {
-        String message = msg.getData().getString(RESISTANCE);
-        meterField.setText(message);
+        meterField.setText(v);
     }
 
     private void getDeviceName(Message msg) {
-        String mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
+        String mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
         showToast(getString(R.string.connected_to) + " " + mConnectedDeviceName);
     }
 
     private void showMessage(Message msg) {
-        String message = msg.getData().getString(TOAST);
-        if (message == null) return;
+        String message = msg.getData().getString(Constants.TOAST);
+        if (message == null) {
+            return;
+        }
         if (message.startsWith("Unable") || message.startsWith("Device")) {
             if (mChatService.getState() == OriginalChatService.STATE_NONE) {
                 mChatService.start();
@@ -190,8 +171,9 @@ public class MultimeterActivity extends AppCompatActivity {
             if (mChatService.getState() == OriginalChatService.STATE_LISTEN) {
                 connectDevice(true);
             }
+        } else {
+            showToast(msg.getData().getString(Constants.TOAST));
         }
-        showToast(msg.getData().getString(TOAST));
     }
 
     @Override
@@ -256,8 +238,8 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private void connectDevice(boolean secure) {
-        SharedPreferences preferences = getSharedPreferences(com.example.helio.arduino.Constants.PREFS, Activity.MODE_PRIVATE);
-        String mAddress = preferences.getString(com.example.helio.arduino.Constants.DEVICE_ADDRESS, null);
+        SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Activity.MODE_PRIVATE);
+        String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
         if (mAddress != null) {
             mConnectedDevice = mBluetoothAdapter.getRemoteDevice(mAddress);
             mChatService.connect(mConnectedDevice, secure);
