@@ -24,7 +24,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.helio.arduino.transferring.BluetoothChatService;
-import com.example.helio.arduino.transferring.SelectionActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,6 @@ public class StartActivity extends AppCompatActivity {
     private String mDeviceName;
 
     private Button mPairButton;
-    private Button mTestButton;
     private RecyclerView mDeviceList;
     private ProgressDialog mDialog;
     private final BluetoothAdapter mBtAdapter = null;
@@ -80,9 +78,7 @@ public class StartActivity extends AppCompatActivity {
 
     private void initButtons() {
         mPairButton = (Button) findViewById(R.id.pairButton);
-        mTestButton = (Button) findViewById(R.id.testButton);
         mPairButton.setOnClickListener(visibleClick);
-        mTestButton.setOnClickListener(chatClick);
     }
 
     private void initDeviceList() {
@@ -97,18 +93,6 @@ public class StartActivity extends AppCompatActivity {
         mChatService = new BluetoothChatService(this, mHandler);
     }
 
-    private final View.OnClickListener chatClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            openChat();
-        }
-    };
-
-    private void openChat() {
-        startActivity(new Intent(this, SelectionActivity.class));
-        finish();
-    }
-
     private final View.OnClickListener visibleClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -118,6 +102,7 @@ public class StartActivity extends AppCompatActivity {
 
     private void selectDevice() {
         startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 
     private boolean checkLocationPermission() {
@@ -134,7 +119,6 @@ public class StartActivity extends AppCompatActivity {
     private void switchView() {
         startSearching();
         mPairButton.setVisibility(View.GONE);
-        mTestButton.setVisibility(View.GONE);
         mDeviceList.setVisibility(View.VISIBLE);
     }
 

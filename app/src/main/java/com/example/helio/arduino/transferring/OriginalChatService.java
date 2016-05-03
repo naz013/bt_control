@@ -158,6 +158,15 @@ public class OriginalChatService {
         r.write(out, key);
     }
 
+    public void writeBundle(Bundle bundle, int key) {
+        ConnectedThread r;
+        synchronized (this) {
+            if (mState != STATE_CONNECTED) return;
+            r = mConnectedThread;
+        }
+        r.write(bundle, key);
+    }
+
     private void connectionFailed() {
         Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
@@ -332,6 +341,12 @@ public class OriginalChatService {
                     break;
                 }
             }
+        }
+
+        public void write(Bundle bundle, int key) {
+            Message msg = mHandler.obtainMessage(key);
+            msg.setData(bundle);
+            mHandler.sendMessage(msg);
         }
 
         public void write(byte[] buffer, int key) {

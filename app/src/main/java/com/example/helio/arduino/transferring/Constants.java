@@ -28,5 +28,9 @@ public class Constants {
     public static final String CURRENT = "current";
     public static final String VOLTAGE = "voltage";
     public static final String DSO = "dso";
+    public static final String FREQUENCY = "frequency";
+    public static final String FREQUENCY_M = "frequency_m";
+    public static final String MAGNITUDE = "magnitude";
+    public static final String SIGNAL_TYPE = "signal_type";
 
 }

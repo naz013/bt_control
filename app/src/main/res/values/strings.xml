@@ -61,4 +61,8 @@
     <string name="stop">Stop</string>
     <string name="key_stop">s</string>
     <string name="key_capture">c</string>
+    <string name="terminate">Terminate</string>
+    <string name="terminate_key">t</string>
+    <string name="empty_frequency">Empty frequency!</string>
+    <string name="empty_magnitude">Empty magnitude!</string>
 </resources>

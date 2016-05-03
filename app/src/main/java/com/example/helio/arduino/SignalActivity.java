@@ -1,26 +1,74 @@
 package com.example.helio.arduino;
 
+import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+import com.example.helio.arduino.transferring.OriginalChatService;
+
+import static com.example.helio.arduino.transferring.Constants.DEVICE_NAME;
+import static com.example.helio.arduino.transferring.Constants.FREQUENCY;
+import static com.example.helio.arduino.transferring.Constants.FREQUENCY_M;
+import static com.example.helio.arduino.transferring.Constants.KEY_GENERATE;
+import static com.example.helio.arduino.transferring.Constants.KEY_MULTIMETER;
+import static com.example.helio.arduino.transferring.Constants.MAGNITUDE;
+import static com.example.helio.arduino.transferring.Constants.MESSAGE_DEVICE_NAME;
+import static com.example.helio.arduino.transferring.Constants.MESSAGE_TOAST;
+import static com.example.helio.arduino.transferring.Constants.SIGNAL_TYPE;
+import static com.example.helio.arduino.transferring.Constants.TOAST;
 
 public class SignalActivity extends AppCompatActivity {
+
+    private static final int REQUEST_ENABLE_BT = 3;
+
+    private BluetoothDevice mConnectedDevice = null;
+    private StringBuffer mOutStringBuffer;
+    private BluetoothAdapter mBluetoothAdapter = null;
+    private OriginalChatService mChatService = null;
+
+    private Spinner waveType;
+    private Spinner freqSelector;
+    private EditText freqField;
+    private EditText magnitudeField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signal);
+        initBluetoothAdapter();
         initActionBar();
+        initViews();
         initButtons();
+    }
+
+    private void initViews() {
+        waveType = (Spinner) findViewById(R.id.waveType);
+        freqSelector = (Spinner) findViewById(R.id.freqSelector);
+        freqField = (EditText) findViewById(R.id.freqField);
+        magnitudeField = (EditText) findViewById(R.id.magnitudeField);
+    }
+
+    private void initBluetoothAdapter() {
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
     private void initButtons() {
         findViewById(R.id.generateButton).setOnClickListener(mListener);
+        findViewById(R.id.terminateButton).setOnClickListener(mListener);
     }
 
     private void initActionBar() {
@@ -33,7 +81,7 @@ public class SignalActivity extends AppCompatActivity {
     }
 
     private void generateSignal() {
-
+        sendSignal();
     }
 
     private final View.OnClickListener mListener = new View.OnClickListener() {
@@ -43,9 +91,162 @@ public class SignalActivity extends AppCompatActivity {
                 case R.id.generateButton:
                     generateSignal();
                     break;
+                case R.id.terminateButton:
+                    terminateSignal();
+                    break;
             }
         }
     };
+
+    private void terminateSignal() {
+        sendMessage(getString(R.string.terminate_key));
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        checkAdapterStatus();
+    }
+
+    private void requestBluetoothEnable() {
+        Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+    }
+
+    private void checkAdapterStatus() {
+        if (!mBluetoothAdapter.isEnabled()) {
+            requestBluetoothEnable();
+        } else if (mChatService == null) {
+            setupConnection();
+        }
+    }
+
+    private void setupConnection() {
+        mChatService = new OriginalChatService(this, mHandler);
+        mOutStringBuffer = new StringBuffer("");
+    }
+
+    private void sendMessage(String message) {
+        if (mChatService.getState() != OriginalChatService.STATE_CONNECTED) {
+            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (message.length() > 0) {
+            byte[] send = message.getBytes();
+            mChatService.writeMessage(send, KEY_MULTIMETER);
+            mOutStringBuffer.setLength(0);
+        }
+    }
+
+    private void sendSignal() {
+        if (mChatService.getState() != OriginalChatService.STATE_CONNECTED) {
+            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String freqString = freqField.getText().toString().trim();
+        if (freqString.matches("")) {
+            showToast(getString(R.string.empty_frequency));
+        }
+        int freq = Integer.parseInt(freqString);
+
+        String magnitudeString = magnitudeField.getText().toString().trim();
+        if (magnitudeString.matches("")) {
+            showToast(getString(R.string.empty_magnitude));
+        }
+        int magn = Integer.parseInt(magnitudeString);
+
+        Bundle bundle = new Bundle();
+        bundle.putInt(SIGNAL_TYPE, waveType.getSelectedItemPosition());
+        bundle.putInt(FREQUENCY, freq);
+        bundle.putInt(FREQUENCY_M, freqSelector.getSelectedItemPosition());
+        bundle.putInt(MAGNITUDE, magn);
+        mChatService.writeBundle(bundle, KEY_GENERATE);
+        mOutStringBuffer.setLength(0);
+    }
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MESSAGE_DEVICE_NAME:
+                    getDeviceName(msg);
+                    break;
+                case MESSAGE_TOAST:
+                    showMessage(msg);
+                    break;
+            }
+        }
+    };
+
+    private void getDeviceName(Message msg) {
+        String mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
+        showToast(getString(R.string.connected_to) + " " + mConnectedDeviceName);
+    }
+
+    private void showMessage(Message msg) {
+        String message = msg.getData().getString(TOAST);
+        if (message == null) return;
+        if (message.startsWith("Unable") || message.startsWith("Device")) {
+            if (mChatService.getState() == OriginalChatService.STATE_NONE) {
+                mChatService.start();
+            }
+            if (mChatService.getState() == OriginalChatService.STATE_LISTEN) {
+                connectDevice(true);
+            }
+        }
+        showToast(msg.getData().getString(TOAST));
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopBTService();
+    }
+
+    private void stopBTService() {
+        if (mChatService != null) {
+            mChatService.stop();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        resumeBluetoothService();
+    }
+
+    private void resumeBluetoothService() {
+        if (mChatService != null) {
+            startBluetoothService();
+        }
+    }
+
+    private void startBluetoothService() {
+        if (mChatService.getState() == OriginalChatService.STATE_NONE) {
+            mChatService.start();
+            while (true) {
+                if (mChatService.getState() == OriginalChatService.STATE_LISTEN) {
+                    connectDevice(true);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void connectDevice(boolean secure) {
+        SharedPreferences preferences = getSharedPreferences(com.example.helio.arduino.Constants.PREFS, Activity.MODE_PRIVATE);
+        String mAddress = preferences.getString(com.example.helio.arduino.Constants.DEVICE_ADDRESS, null);
+        if (mAddress != null) {
+            mConnectedDevice = mBluetoothAdapter.getRemoteDevice(mAddress);
+            mChatService.connect(mConnectedDevice, secure);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
