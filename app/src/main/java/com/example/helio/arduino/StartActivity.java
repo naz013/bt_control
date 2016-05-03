@@ -106,6 +106,7 @@ public class StartActivity extends AppCompatActivity {
 
     private void openChat() {
         startActivity(new Intent(this, SelectionActivity.class));
+        finish();
     }
 
     private final View.OnClickListener visibleClick = new View.OnClickListener() {

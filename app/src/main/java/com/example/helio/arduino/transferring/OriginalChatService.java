@@ -149,13 +149,13 @@ public class OriginalChatService {
         setState(STATE_NONE);
     }
 
-    public void writeMessage(byte[] out) {
+    public void writeMessage(byte[] out, int key) {
         ConnectedThread r;
         synchronized (this) {
             if (mState != STATE_CONNECTED) return;
             r = mConnectedThread;
         }
-        r.write(out);
+        r.write(out, key);
     }
 
     private void connectionFailed() {
@@ -334,10 +334,10 @@ public class OriginalChatService {
             }
         }
 
-        public void write(byte[] buffer) {
+        public void write(byte[] buffer, int key) {
             try {
                 mmOutStream.write(buffer);
-                mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer)
+                mHandler.obtainMessage(key, -1, -1, buffer)
                         .sendToTarget();
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);

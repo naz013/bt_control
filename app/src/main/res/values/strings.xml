@@ -55,4 +55,7 @@
     <string name="cancel">Cancel</string>
     <string name="are_you_sure">Are you sure?</string>
     <string name="arduino_chart">Arduino chart</string>
+    <string name="voltage_key">v</string>
+    <string name="resistance_key">r</string>
+    <string name="current_key">i</string>
 </resources>

@@ -25,7 +25,6 @@
             android:background="@drawable/text_field_res"
             android:gravity="center"
             android:padding="8dp"
-            android:text="4555"
             android:textSize="35sp" />
 
     </android.support.v7.widget.CardView>

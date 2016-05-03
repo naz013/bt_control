@@ -207,7 +207,7 @@ public class BluetoothChatFragment extends Fragment {
 
         if (message.length() > 0) {
             byte[] send = message.getBytes();
-            mChatService.writeMessage(send);
+            mChatService.writeMessage(send, Constants.MESSAGE_READ);
             mOutStringBuffer.setLength(0);
             mOutEditText.setText(mOutStringBuffer);
         }
