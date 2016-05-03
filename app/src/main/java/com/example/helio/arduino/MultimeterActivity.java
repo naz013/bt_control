@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,7 +26,6 @@ import static com.example.helio.arduino.transferring.Constants.KEY_MULTIMETER;
 import static com.example.helio.arduino.transferring.Constants.KEY_RESISTANCE;
 import static com.example.helio.arduino.transferring.Constants.KEY_VOLTAGE;
 import static com.example.helio.arduino.transferring.Constants.MESSAGE_DEVICE_NAME;
-import static com.example.helio.arduino.transferring.Constants.MESSAGE_READ;
 import static com.example.helio.arduino.transferring.Constants.MESSAGE_TOAST;
 import static com.example.helio.arduino.transferring.Constants.RESISTANCE;
 import static com.example.helio.arduino.transferring.Constants.TOAST;
@@ -143,9 +141,6 @@ public class MultimeterActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case MESSAGE_READ:
-                    readData(msg);
-                    break;
                 case MESSAGE_DEVICE_NAME:
                     getDeviceName(msg);
                     break;
@@ -260,17 +255,10 @@ public class MultimeterActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    private void readData(Message msg) {
-        byte[] readBuf = (byte[]) msg.obj;
-        String readMessage = new String(readBuf, 0, msg.arg1);
-
-    }
-
     private void connectDevice(boolean secure) {
         SharedPreferences preferences = getSharedPreferences(com.example.helio.arduino.Constants.PREFS, Activity.MODE_PRIVATE);
         String mAddress = preferences.getString(com.example.helio.arduino.Constants.DEVICE_ADDRESS, null);
         if (mAddress != null) {
-            Log.d("TAG", mAddress);
             mConnectedDevice = mBluetoothAdapter.getRemoteDevice(mAddress);
             mChatService.connect(mConnectedDevice, secure);
         }

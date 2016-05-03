@@ -58,4 +58,7 @@
     <string name="voltage_key">v</string>
     <string name="resistance_key">r</string>
     <string name="current_key">i</string>
+    <string name="stop">Stop</string>
+    <string name="key_stop">s</string>
+    <string name="key_capture">c</string>
 </resources>
