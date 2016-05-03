@@ -19,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.backdoor.shared.Constants;
+import com.backdoor.shared.JMessage;
 import com.backdoor.shared.OriginalChatService;
 import com.backdoor.shared.SignalObject;
 
@@ -135,9 +136,8 @@ public class SignalActivity extends AppCompatActivity {
             return;
         }
 
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.FLAG, Constants.T);
-        mChatService.writeBundle(bundle);
+        String msg = new JMessage().putFlag(Constants.T).asString();
+        mChatService.writeBundle(msg.getBytes());
     }
 
     private void sendSignal() {
@@ -161,9 +161,8 @@ public class SignalActivity extends AppCompatActivity {
         int magn = Integer.parseInt(magnitudeString);
 
         SignalObject object = new SignalObject(waveType.getSelectedItemPosition(), freq, freqSelector.getSelectedItemPosition(), magn);
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.SIGNAL, object.toJson().toString());
-        mChatService.writeBundle(bundle);
+        String msg = new JMessage().putSignal(object).asString();
+        mChatService.writeBundle(msg.getBytes());
     }
 
     private void getDeviceName(Message msg) {

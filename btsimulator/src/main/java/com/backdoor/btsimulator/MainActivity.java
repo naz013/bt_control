@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            showToast("KEY " + msg.what);
             switch (msg.what) {
                 case Constants.MESSAGE_READ:
                     readMessage(msg);
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
         Bundle bundle = msg.getData();
         if (bundle.containsKey(Constants.FLAG)) {
             String flag = bundle.getString(Constants.FLAG);
+            showToast("Has flag " + flag);
             if (flag == null) return;
             if (flag.matches(Constants.I) || flag.matches(Constants.V) || flag.matches(Constants.R)) {
                 replaceFragment(MultimeterFragment.newInstance(msg));
@@ -114,6 +116,8 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
             } else {
                 replaceFragment(EmptyFragment.newInstance());
             }
+        } else {
+            showToast("No flag");
         }
     }
 
@@ -165,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     }
 
     @Override
-    public void obtainData(Bundle value) {
+    public void obtainData(byte[] value) {
         mChatService.writeBundle(value);
     }
 }

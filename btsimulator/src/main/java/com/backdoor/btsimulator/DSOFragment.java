@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.backdoor.shared.Constants;
+import com.backdoor.shared.JMessage;
 
 public class DSOFragment extends Fragment {
 
@@ -89,9 +89,8 @@ public class DSOFragment extends Fragment {
 
     private void sendMessage(String message) {
         if (mMultimeterListener != null) {
-            Bundle bundle = new Bundle();
-            bundle.putString(Constants.Y, message);
-            mMultimeterListener.obtainData(bundle);
+            String msg = new JMessage().putYValue(message).asString();
+            mMultimeterListener.obtainData(msg.getBytes());
         }
     }
 

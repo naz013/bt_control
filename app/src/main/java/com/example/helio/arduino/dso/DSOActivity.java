@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.backdoor.shared.Constants;
+import com.backdoor.shared.JMessage;
 import com.backdoor.shared.OriginalChatService;
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.SettingsActivity;
@@ -165,9 +166,8 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
         }
 
         if (message.length() > 0) {
-            Bundle bundle = new Bundle();
-            bundle.putString(Constants.FLAG, message);
-            mChatService.writeBundle(bundle);
+            String msg = new JMessage().putFlag(message).asString();
+            mChatService.writeBundle(msg.getBytes());
         }
     }
 

@@ -149,7 +149,7 @@ public class OriginalChatService {
         setState(STATE_NONE);
     }
 
-    public void writeBundle(Bundle bundle) {
+    public void writeBundle(byte[] bundle) {
         ConnectedThread r;
         synchronized (this) {
             if (mState != STATE_CONNECTED) return;
@@ -334,10 +334,12 @@ public class OriginalChatService {
             }
         }
 
-        public void write(Bundle bundle) {
-            Message msg = mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1);
-            msg.setData(bundle);
-            mHandler.sendMessage(msg);
+        public void write(byte[] bundle) {
+            try {
+                mmOutStream.write(bundle);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         public void cancel() {

@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.backdoor.shared.Constants;
+import com.backdoor.shared.JMessage;
 
 public class MultimeterFragment extends Fragment {
 
@@ -135,9 +136,8 @@ public class MultimeterFragment extends Fragment {
             return;
         }
 
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.R, resistanceString);
-        sendMessage(bundle);
+        String msg = new JMessage().putResistance(resistanceString).asString();
+        sendMessage(msg.getBytes());
     }
 
     private void sendCurrent() {
@@ -151,9 +151,8 @@ public class MultimeterFragment extends Fragment {
             return;
         }
 
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.I, currentString);
-        sendMessage(bundle);
+        String msg = new JMessage().putCurrent(currentString).asString();
+        sendMessage(msg.getBytes());
     }
 
     private void sendVoltage() {
@@ -167,12 +166,11 @@ public class MultimeterFragment extends Fragment {
             return;
         }
 
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.V, voltageString);
-        sendMessage(bundle);
+        String msg = new JMessage().putVoltage(voltageString).asString();
+        sendMessage(msg.getBytes());
     }
 
-    private void sendMessage(Bundle bundle) {
+    private void sendMessage(byte[] bundle) {
         if (mMultimeterListener != null) {
             mMultimeterListener.obtainData(bundle);
         }

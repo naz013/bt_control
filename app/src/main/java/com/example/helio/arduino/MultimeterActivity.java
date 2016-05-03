@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.backdoor.shared.Constants;
+import com.backdoor.shared.JMessage;
 import com.backdoor.shared.OriginalChatService;
 
 public class MultimeterActivity extends AppCompatActivity {
@@ -134,20 +135,21 @@ public class MultimeterActivity extends AppCompatActivity {
             return;
         }
 
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.FLAG, message);
-        mChatService.writeBundle(bundle);
+        String msg = new JMessage().putFlag(message).asString();
+        mChatService.writeBundle(msg.getBytes());
     }
 
     private void postResponse(Message msg) {
-        Bundle bundle = msg.getData();
+        byte[] readBuff = (byte[]) msg.obj;
+        String data = new String(readBuff, 0, msg.arg1);
+        JMessage jMessage = new JMessage(data);
         String v;
-        if (bundle.containsKey(Constants.V)) {
-            v = msg.getData().getString(Constants.V);
-        } else if (bundle.containsKey(Constants.I)) {
-            v = msg.getData().getString(Constants.I);
-        } else if (bundle.containsKey(Constants.R)) {
-            v = msg.getData().getString(Constants.R);
+        if (jMessage.hasVoltage()) {
+            v = jMessage.getVoltage();
+        } else if (jMessage.hasCurrent()) {
+            v = jMessage.getCurrent();
+        } else if (jMessage.hasResistance()) {
+            v = jMessage.getResistance();
         } else {
             v = "No key";
         }
