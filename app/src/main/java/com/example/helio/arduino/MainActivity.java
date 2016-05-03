@@ -41,10 +41,11 @@ public class MainActivity extends AppCompatActivity {
     private void initActionBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null)
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setHomeButtonEnabled(false);
+        }
         toolbar.setTitle(R.string.main_menu);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }
 
     private void openSignal() {
