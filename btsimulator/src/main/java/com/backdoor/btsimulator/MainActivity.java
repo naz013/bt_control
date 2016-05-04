@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            showToast("KEY " + msg.what);
             switch (msg.what) {
                 case Constants.MESSAGE_READ:
                     readMessage(msg);
@@ -66,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
 
     private void checkBluetoothAvailability() {
         if (mBluetoothAdapter == null) {
-            Toast.makeText(this, R.string.bluetooth_is_not_available, Toast.LENGTH_LONG).show();
+            showToast(getString(R.string.bluetooth_is_not_available));
             finish();
         }
     }
@@ -86,6 +85,9 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
 
     private void resumeBluetoothService() {
         if (mChatService != null) {
+            startBluetoothService();
+        } else {
+            checkAdapterStatus();
             startBluetoothService();
         }
     }
@@ -120,10 +122,7 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
         JMessage jMessage = new JMessage(data);
         if (jMessage.hasFlag()) {
             String flag = jMessage.getFlag();
-            showToast("Has flag " + flag);
             workWithFlag(flag, msg);
-        } else {
-            showToast("No flag");
         }
     }
 
@@ -137,7 +136,13 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
             replaceFragment(SignalFragment.newInstance(msg));
         } else {
             replaceFragment(EmptyFragment.newInstance());
+            refreshService();
         }
+    }
+
+    private void refreshService() {
+        setupService();
+        resumeBluetoothService();
     }
 
     private void getDeviceName(Message msg) {
@@ -153,7 +158,6 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
                 mChatService.start();
             }
         }
-        showToast(msg.getData().getString(Constants.TOAST));
     }
 
     private void showToast(String message) {
@@ -174,8 +178,8 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         if (mChatService != null) {
             mChatService.stop();
         }

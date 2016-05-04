@@ -27,7 +27,6 @@ public class SignalActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 3;
 
-    private BluetoothDevice mConnectedDevice = null;
     private BluetoothAdapter mBluetoothAdapter = null;
     private OriginalChatService mChatService = null;
 
@@ -107,12 +106,6 @@ public class SignalActivity extends AppCompatActivity {
         sendMessage();
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        checkAdapterStatus();
-    }
-
     private void requestBluetoothEnable() {
         Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
@@ -132,8 +125,7 @@ public class SignalActivity extends AppCompatActivity {
 
     private void sendMessage() {
         if (mChatService.getState() != OriginalChatService.STATE_CONNECTED) {
-            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
-            return;
+            resumeBluetoothService();
         }
 
         String msg = new JMessage().putFlag(Constants.T).asString();
@@ -142,8 +134,7 @@ public class SignalActivity extends AppCompatActivity {
 
     private void sendSignal() {
         if (mChatService.getState() != OriginalChatService.STATE_CONNECTED) {
-            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
-            return;
+            resumeBluetoothService();
         }
 
         String freqString = freqField.getText().toString().trim();
@@ -158,9 +149,9 @@ public class SignalActivity extends AppCompatActivity {
             showToast(getString(R.string.empty_magnitude));
             return;
         }
-        int magn = Integer.parseInt(magnitudeString);
+        int magnitude = Integer.parseInt(magnitudeString);
 
-        SignalObject object = new SignalObject(waveType.getSelectedItemPosition(), freq, freqSelector.getSelectedItemPosition(), magn);
+        SignalObject object = new SignalObject(waveType.getSelectedItemPosition(), freq, freqSelector.getSelectedItemPosition(), magnitude);
         String msg = new JMessage()
                 .putSignal(object)
                 .putFlag(Constants.G)
@@ -183,15 +174,7 @@ public class SignalActivity extends AppCompatActivity {
             if (mChatService.getState() == OriginalChatService.STATE_LISTEN) {
                 connectDevice(true);
             }
-        } else {
-            showToast(msg.getData().getString(Constants.TOAST));
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        stopBTService();
     }
 
     private void stopBTService() {
@@ -200,14 +183,11 @@ public class SignalActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        resumeBluetoothService();
-    }
-
     private void resumeBluetoothService() {
         if (mChatService != null) {
+            startBluetoothService();
+        } else {
+            setupConnection();
             startBluetoothService();
         }
     }
@@ -232,9 +212,39 @@ public class SignalActivity extends AppCompatActivity {
         SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Activity.MODE_PRIVATE);
         String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
         if (mAddress != null) {
-            mConnectedDevice = mBluetoothAdapter.getRemoteDevice(mAddress);
+            BluetoothDevice mConnectedDevice = mBluetoothAdapter.getRemoteDevice(mAddress);
             mChatService.connect(mConnectedDevice, secure);
         }
+    }
+
+    private void sendCancelMessage() {
+        if (mChatService.getState() != OriginalChatService.STATE_CONNECTED) {
+            resumeBluetoothService();
+        }
+
+        String msg = new JMessage().putFlag(Constants.T).asString();
+        mChatService.writeMessage(msg.getBytes());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        checkAdapterStatus();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mBluetoothAdapter != null) {
+            mBluetoothAdapter.cancelDiscovery();
+        }
+        stopBTService();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        resumeBluetoothService();
     }
 
     @Override
@@ -251,10 +261,17 @@ public class SignalActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             case android.R.id.home:
+                sendCancelMessage();
                 finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        sendCancelMessage();
+        finish();
     }
 }

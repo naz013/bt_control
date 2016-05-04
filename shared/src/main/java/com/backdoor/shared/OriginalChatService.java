@@ -194,7 +194,7 @@ public class OriginalChatService {
                             NAME_INSECURE, MY_UUID_INSECURE);
                 }
             } catch (IOException e) {
-                Log.e(TAG, "Socket Type: " + mSocketType + "listen() failed", e);
+                Log.e(TAG, "Socket Type: " + mSocketType + " listen() failed", e);
             }
             mmServerSocket = tmp;
         }
@@ -206,7 +206,7 @@ public class OriginalChatService {
                 try {
                     socket = mmServerSocket.accept();
                 } catch (IOException e) {
-                    Log.e(TAG, "Socket Type: " + mSocketType + "accept() failed", e);
+                    Log.e(TAG, "Socket Type: " + mSocketType + " accept() failed", e);
                     break;
                 }
 
@@ -237,7 +237,7 @@ public class OriginalChatService {
             try {
                 mmServerSocket.close();
             } catch (IOException e) {
-                Log.e(TAG, "Socket Type" + mSocketType + "close() of server failed", e);
+                Log.e(TAG, "Socket Type" + mSocketType + " close() of server failed", e);
             }
         }
     }
@@ -260,7 +260,7 @@ public class OriginalChatService {
                             MY_UUID_INSECURE);
                 }
             } catch (IOException e) {
-                Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
+                Log.e(TAG, "Socket Type: " + mSocketType + " create() failed", e);
             }
             mmSocket = tmp;
         }

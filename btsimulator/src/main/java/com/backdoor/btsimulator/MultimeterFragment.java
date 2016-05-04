@@ -30,6 +30,10 @@ public class MultimeterFragment extends Fragment {
     private EditText currentField;
     private EditText ohmField;
 
+    private Button voltageButton;
+    private Button ohmButton;
+    private Button currentButton;
+
     public MultimeterFragment() {
 
     }
@@ -94,14 +98,14 @@ public class MultimeterFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        initTextFields(view);
         initButtons(view);
+        initTextFields(view);
     }
 
     private void initButtons(View view) {
-        Button voltageButton = (Button) view.findViewById(R.id.voltageButton);
-        Button currentButton = (Button) view.findViewById(R.id.currentButton);
-        Button ohmButton = (Button) view.findViewById(R.id.ohmButton);
+        voltageButton = (Button) view.findViewById(R.id.voltageButton);
+        currentButton = (Button) view.findViewById(R.id.currentButton);
+        ohmButton = (Button) view.findViewById(R.id.ohmButton);
         ohmButton.setOnClickListener(mListener);
         currentButton.setOnClickListener(mListener);
         voltageButton.setOnClickListener(mListener);
@@ -109,10 +113,30 @@ public class MultimeterFragment extends Fragment {
 
     private void initTextFields(View view) {
         TextView meterField = (TextView) view.findViewById(R.id.meterField);
-        meterField.setText(mKey);
+        JMessage jMessage = new JMessage(mKey);
+        if (jMessage.hasFlag()) {
+            mKey = jMessage.getFlag();
+            meterField.setText(mKey);
+            selectButton();
+        } else {
+            meterField.setText(R.string.no_flag);
+        }
         voltageField = (EditText) view.findViewById(R.id.voltageField);
         currentField = (EditText) view.findViewById(R.id.currentField);
         ohmField = (EditText) view.findViewById(R.id.ohmField);
+    }
+
+    private void selectButton() {
+        if (mKey.matches(Constants.R)) {
+            ohmButton.setSelected(true);
+            ohmButton.setEnabled(true);
+        } else if (mKey.matches(Constants.I)) {
+            currentButton.setSelected(true);
+            currentButton.setEnabled(true);
+        } else if (mKey.matches(Constants.V)) {
+            voltageButton.setSelected(true);
+            voltageButton.setEnabled(true);
+        }
     }
 
     private View.OnClickListener mListener = new View.OnClickListener() {
@@ -142,6 +166,7 @@ public class MultimeterFragment extends Fragment {
             showToast(mContext.getString(R.string.empty_resistance_field));
             return;
         }
+        ohmField.setText("");
 
         String msg = new JMessage().putResistance(resistanceString).asString();
         sendMessage(msg.getBytes());
@@ -157,6 +182,7 @@ public class MultimeterFragment extends Fragment {
             showToast(mContext.getString(R.string.empty_current_field));
             return;
         }
+        currentField.setText("");
 
         String msg = new JMessage().putCurrent(currentString).asString();
         sendMessage(msg.getBytes());
@@ -172,6 +198,7 @@ public class MultimeterFragment extends Fragment {
             showToast(mContext.getString(R.string.empty_voltage_field));
             return;
         }
+        voltageField.setText("");
 
         String msg = new JMessage().putVoltage(voltageString).asString();
         sendMessage(msg.getBytes());

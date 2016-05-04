@@ -1,6 +1,5 @@
 package com.example.helio.arduino;
 
-import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -21,15 +20,6 @@ public class MainActivity extends AppCompatActivity {
         sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
         initActionBar();
         initButtons();
-        //checkBluetooth();
-    }
-
-    private void checkBluetooth() {
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (!bluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, 100);
-        }
     }
 
     private void initButtons() {
@@ -89,9 +79,6 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.actionSettings:
                 startActivity(new Intent(this, SettingsActivity.class));
-                return true;
-            case android.R.id.home:
-                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

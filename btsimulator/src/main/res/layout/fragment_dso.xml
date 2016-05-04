@@ -20,6 +20,7 @@
         <EditText
             android:id="@+id/yField"
             android:layout_width="100dp"
+            android:inputType="number"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp" />
 

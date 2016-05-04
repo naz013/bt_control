@@ -282,7 +282,7 @@ public class StartActivity extends AppCompatActivity {
         }
     };
 
-    public void onFinish() {
+    private void onFinish() {
         mDeviceList.setVisibility(View.GONE);
         mPairButton.setVisibility(View.VISIBLE);
         mPairButton.setText(R.string.go_to_main_menu);

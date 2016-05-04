@@ -162,7 +162,7 @@ public class JMessage {
 
     public JMessage putSignal(SignalObject object) {
         try {
-            mObject.put(Constants.SIGNAL, object.toJson().toString());
+            mObject.put(Constants.SIGNAL, object.toJson());
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.backdoor.shared.JMessage;
 import com.backdoor.shared.SignalObject;
@@ -84,12 +85,17 @@ public class SignalFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         TextView meterField = (TextView) view.findViewById(R.id.meterField);
         if (data != null) {
+            Toast.makeText(mContext, "Data " + data, Toast.LENGTH_LONG).show();
             JMessage jMessage = new JMessage(data);
             if (jMessage.hasSignal()) {
                 SignalObject object = jMessage.getSignal();
-                meterField.setText("S " + object.getWaveType() + ", freq " +
-                        object.getFrequency() + ", freqM " + object.getFrequencyModifier() +
-                        ", magn " + object.getMagnitude());
+                String[] waves = mContext.getResources().getStringArray(R.array.wave_types);
+                String[] modifier = mContext.getResources().getStringArray(R.array.frequency_measure);
+                String sb = "Signal type: " + waves[object.getWaveType()] + "\n" +
+                        "Frequency: " + object.getFrequency() + " " + modifier[object.getFrequencyModifier()] + "\n" +
+                        "Magnitude: " + object.getMagnitude();
+
+                meterField.setText(sb);
             }
         }
     }

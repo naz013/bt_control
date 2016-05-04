@@ -41,6 +41,7 @@
             <EditText
                 android:id="@+id/voltageField"
                 android:layout_width="150dp"
+                android:inputType="number"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp" />
 
@@ -49,7 +50,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:background="@drawable/green_drawable"
+                android:enabled="false"
+                android:background="@drawable/green_selector"
                 android:text="@string/send" />
         </TableRow>
 
@@ -64,6 +66,7 @@
             <EditText
                 android:id="@+id/currentField"
                 android:layout_width="150dp"
+                android:inputType="number"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp" />
 
@@ -72,7 +75,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:background="@drawable/blue_drawable"
+                android:enabled="false"
+                android:background="@drawable/blue_selector"
                 android:text="@string/send" />
         </TableRow>
 
@@ -87,6 +91,7 @@
             <EditText
                 android:id="@+id/ohmField"
                 android:layout_width="150dp"
+                android:inputType="number"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp" />
 
@@ -95,7 +100,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:background="@drawable/re_drawable"
+                android:enabled="false"
+                android:background="@drawable/red_selector"
                 android:text="@string/send" />
         </TableRow>
 

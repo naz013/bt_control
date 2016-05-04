@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -33,6 +34,7 @@ import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
@@ -44,8 +46,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class DSOActivity extends AppCompatActivity implements View.OnClickListener, OnChartGestureListener,
-        OnChartValueSelectedListener {
+public class DSOActivity extends AppCompatActivity implements OnChartGestureListener, OnChartValueSelectedListener {
 
     private static final int CHART_VISIBLE = 50;
     private static final int REQUEST_ENABLE_BT = 3;
@@ -54,7 +55,6 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
 
     private LineChart mChart;
 
-    private BluetoothDevice mConnectedDevice = null;
     private BluetoothAdapter mBluetoothAdapter = null;
     private OriginalChatService mChatService = null;
 
@@ -112,6 +112,8 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
         leftAxis.setAxisMinValue(-50f);
         leftAxis.setDrawZeroLine(true);
 
+        LineData data = new LineData();
+        mChart.setData(data);
         mChart.getAxisRight().setEnabled(false);
         mChart.getLegend().setEnabled(false);
         mChart.setVisibleXRangeMaximum(CHART_VISIBLE);
@@ -119,10 +121,10 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     private void initButtons() {
-        findViewById(R.id.captureButton).setOnClickListener(this);
-        findViewById(R.id.screenshotButton).setOnClickListener(this);
-        findViewById(R.id.viewScreenshot).setOnClickListener(this);
-        findViewById(R.id.stopButton).setOnClickListener(this);
+        findViewById(R.id.captureButton).setOnClickListener(mListener);
+        findViewById(R.id.screenshotButton).setOnClickListener(mListener);
+        findViewById(R.id.viewScreenshot).setOnClickListener(mListener);
+        findViewById(R.id.stopButton).setOnClickListener(mListener);
     }
 
     private void initActionBar() {
@@ -134,12 +136,6 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
 
         toolbar.setTitle(R.string.dso);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        checkAdapterStatus();
     }
 
     private void requestBluetoothEnable() {
@@ -161,8 +157,9 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
 
     private void sendMessage(String message) {
         if (mChatService.getState() != OriginalChatService.STATE_CONNECTED) {
-            Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
-            return;
+            //Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
+            resumeBluetoothService();
+            //return;
         }
 
         if (message.length() > 0) {
@@ -181,23 +178,25 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.captureButton:
-                capture();
-                break;
-            case R.id.screenshotButton:
-                takeScreenshot();
-                break;
-            case R.id.viewScreenshot:
-                showScreenshots();
-                break;
-            case R.id.stopButton:
-                stopCapturing();
-                break;
+    private View.OnClickListener mListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.captureButton:
+                    capture();
+                    break;
+                case R.id.screenshotButton:
+                    takeScreenshot();
+                    break;
+                case R.id.viewScreenshot:
+                    showScreenshots();
+                    break;
+                case R.id.stopButton:
+                    stopCapturing();
+                    break;
+            }
         }
-    }
+    };
 
     private void getDeviceName(Message msg) {
         String mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
@@ -214,15 +213,7 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
             if (mChatService.getState() == OriginalChatService.STATE_LISTEN) {
                 connectDevice(true);
             }
-        } else {
-            showToast(msg.getData().getString(Constants.TOAST));
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        stopBTService();
     }
 
     private void stopBTService() {
@@ -233,6 +224,9 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
 
     private void resumeBluetoothService() {
         if (mChatService != null) {
+            startBluetoothService();
+        } else {
+            setupConnection();
             startBluetoothService();
         }
     }
@@ -308,10 +302,28 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
 
     private void addNewEntry(float value) {
         LineData lineData = mChart.getLineData();
-        ILineDataSet set = lineData.getDataSetByIndex(0);
-        lineData.addXValue(lineData.getXValCount() + " ");
-        lineData.addEntry(new Entry(value, set.getEntryCount()), 0);
-        updateChart(lineData.getXValCount());
+        if (lineData != null) {
+            ILineDataSet set = lineData.getDataSetByIndex(0);
+            if (set == null) {
+                set = createSet();
+                lineData.addDataSet(set);
+            }
+            lineData.addXValue(lineData.getXValCount() + " ");
+            lineData.addEntry(new Entry(value, set.getEntryCount()), 0);
+            updateChart(lineData.getXValCount());
+        }
+    }
+
+    private LineDataSet createSet() {
+        LineDataSet set = new LineDataSet(null, "Arduino chart");
+        set.setColor(Color.BLACK);
+        set.setLineWidth(1f);
+        set.setCircleRadius(1f);
+        set.getCircleColor(Color.BLUE);
+        set.setDrawCircleHole(false);
+        set.setValueTextSize(9f);
+        set.setDrawFilled(true);
+        return set;
     }
 
     private void updateChart(int xValCount) {
@@ -328,9 +340,33 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
         SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Activity.MODE_PRIVATE);
         String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
         if (mAddress != null) {
-            mConnectedDevice = mBluetoothAdapter.getRemoteDevice(mAddress);
+            BluetoothDevice mConnectedDevice = mBluetoothAdapter.getRemoteDevice(mAddress);
             mChatService.connect(mConnectedDevice, secure);
         }
+    }
+
+    private void sendCancelMessage() {
+        if (mChatService.getState() != OriginalChatService.STATE_CONNECTED) {
+            resumeBluetoothService();
+        }
+
+        String msg = new JMessage().putFlag(Constants.T).asString();
+        mChatService.writeMessage(msg.getBytes());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        checkAdapterStatus();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mBluetoothAdapter != null) {
+            mBluetoothAdapter.cancelDiscovery();
+        }
+        stopBTService();
     }
 
     @Override
@@ -369,11 +405,18 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             case android.R.id.home:
+                sendCancelMessage();
                 finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        sendCancelMessage();
+        finish();
     }
 
     @Override

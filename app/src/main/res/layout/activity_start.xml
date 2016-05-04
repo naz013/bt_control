@@ -35,7 +35,6 @@
         android:layout_gravity="center"
         android:layout_marginTop="8dp"
         android:background="@drawable/main_button_res"
-        android:backgroundTint="@color/colorAccent"
         android:text="@string/pair_device"
         android:textColor="@color/colorWhite"
         android:textSize="25sp" />

@@ -84,6 +84,7 @@ public class DSOFragment extends Fragment {
             showToast(mContext.getString(R.string.empty_y_field));
             return;
         }
+        yField.setText("");
         sendMessage(yString);
     }
 
