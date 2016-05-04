@@ -38,13 +38,14 @@ public class OriginalChatService {
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
 
     public OriginalChatService(Context context, Handler handler) {
-        mAdapter = BluetoothAdapter.getDefaultAdapter();
-        mState = STATE_NONE;
-        mHandler = handler;
+        this.mAdapter = BluetoothAdapter.getDefaultAdapter();
+        this.mState = STATE_NONE;
+        this.mHandler = handler;
     }
 
     private synchronized void setState(int state) {
-        mState = state;
+        Log.d(TAG, "setState() " + mState + " -> " + state);
+        this.mState = state;
         mHandler.obtainMessage(Constants.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
     }
 
@@ -53,6 +54,7 @@ public class OriginalChatService {
     }
 
     public synchronized void start() {
+        Log.d(TAG, "start");
         if (mConnectThread != null) {
             mConnectThread.cancel();
             mConnectThread = null;
@@ -76,6 +78,7 @@ public class OriginalChatService {
     }
 
     public synchronized void connect(BluetoothDevice device, boolean secure) {
+        Log.d(TAG, "connect to: " + device);
         if (mState == STATE_CONNECTING) {
             if (mConnectThread != null) {
                 mConnectThread.cancel();
@@ -93,8 +96,8 @@ public class OriginalChatService {
         setState(STATE_CONNECTING);
     }
 
-    private synchronized void connected(BluetoothSocket socket, BluetoothDevice
-            device, final String socketType) {
+    private synchronized void connected(BluetoothSocket socket, BluetoothDevice device, final String socketType) {
+        Log.d(TAG, "connected, Socket Type:" + socketType);
         if (mConnectThread != null) {
             mConnectThread.cancel();
             mConnectThread = null;
@@ -127,6 +130,7 @@ public class OriginalChatService {
     }
 
     public synchronized void stop() {
+        Log.d(TAG, "stop");
         if (mConnectThread != null) {
             mConnectThread.cancel();
             mConnectThread = null;
@@ -152,28 +156,12 @@ public class OriginalChatService {
     public void writeMessage(byte[] bundle) {
         ConnectedThread r;
         synchronized (this) {
-            if (mState != STATE_CONNECTED) return;
+            if (mState != STATE_CONNECTED) {
+                return;
+            }
             r = mConnectedThread;
         }
         r.write(bundle);
-    }
-
-    private void connectionFailed() {
-        Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.TOAST, "Unable to connect device");
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
-        OriginalChatService.this.start();
-    }
-
-    private void connectionLost() {
-        Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.TOAST, "Device connection was lost");
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
-        OriginalChatService.this.start();
     }
 
     private class AcceptThread extends Thread {
@@ -200,6 +188,7 @@ public class OriginalChatService {
         }
 
         public void run() {
+            Log.d(TAG, "Socket Type: " + mSocketType + "BEGIN mAcceptThread" + this);
             setName("AcceptThread" + mSocketType);
             while (mState != STATE_CONNECTED) {
                 BluetoothSocket socket;
@@ -230,10 +219,11 @@ public class OriginalChatService {
                     }
                 }
             }
-
+            Log.i(TAG, "END mAcceptThread, socket Type: " + mSocketType);
         }
 
         public void cancel() {
+            Log.d(TAG, "Socket Type" + mSocketType + "cancel " + this);
             try {
                 mmServerSocket.close();
             } catch (IOException e) {
@@ -266,6 +256,7 @@ public class OriginalChatService {
         }
 
         public void run() {
+            Log.i(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
             setName("ConnectThread" + mSocketType);
             mAdapter.cancelDiscovery();
             try {
@@ -277,7 +268,6 @@ public class OriginalChatService {
                     Log.e(TAG, "unable to close() " + mSocketType +
                             " socket during connection failure", e2);
                 }
-                connectionFailed();
                 return;
             }
             synchronized (OriginalChatService.this) {
@@ -301,7 +291,8 @@ public class OriginalChatService {
         private final OutputStream mmOutStream;
 
         public ConnectedThread(BluetoothSocket socket, String socketType) {
-            mmSocket = socket;
+            Log.d(TAG, "create ConnectedThread: " + socketType);
+            this.mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
@@ -312,11 +303,12 @@ public class OriginalChatService {
                 Log.e(TAG, "temp sockets not created", e);
             }
 
-            mmInStream = tmpIn;
-            mmOutStream = tmpOut;
+            this.mmInStream = tmpIn;
+            this.mmOutStream = tmpOut;
         }
 
         public void run() {
+            Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
             int bytes;
             while (true) {
@@ -326,7 +318,6 @@ public class OriginalChatService {
                             .sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
-                    connectionLost();
                     OriginalChatService.this.start();
                     break;
                 }
