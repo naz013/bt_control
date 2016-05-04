@@ -26,7 +26,6 @@ public class MultimeterFragment extends Fragment {
     private Context mContext;
     private String mKey;
 
-    private TextView meterField;
     private EditText voltageField;
     private EditText currentField;
     private EditText ohmField;
@@ -95,17 +94,25 @@ public class MultimeterFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        meterField = (TextView) view.findViewById(R.id.meterField);
-        meterField.setText(mKey);
-        voltageField = (EditText) view.findViewById(R.id.voltageField);
-        currentField = (EditText) view.findViewById(R.id.currentField);
-        ohmField = (EditText) view.findViewById(R.id.ohmField);
+        initTextFields(view);
+        initButtons(view);
+    }
+
+    private void initButtons(View view) {
         Button voltageButton = (Button) view.findViewById(R.id.voltageButton);
         Button currentButton = (Button) view.findViewById(R.id.currentButton);
         Button ohmButton = (Button) view.findViewById(R.id.ohmButton);
         ohmButton.setOnClickListener(mListener);
         currentButton.setOnClickListener(mListener);
         voltageButton.setOnClickListener(mListener);
+    }
+
+    private void initTextFields(View view) {
+        TextView meterField = (TextView) view.findViewById(R.id.meterField);
+        meterField.setText(mKey);
+        voltageField = (EditText) view.findViewById(R.id.voltageField);
+        currentField = (EditText) view.findViewById(R.id.currentField);
+        ohmField = (EditText) view.findViewById(R.id.ohmField);
     }
 
     private View.OnClickListener mListener = new View.OnClickListener() {

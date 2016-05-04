@@ -121,18 +121,22 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
         if (jMessage.hasFlag()) {
             String flag = jMessage.getFlag();
             showToast("Has flag " + flag);
-            if (flag == null) return;
-            if (flag.matches(Constants.I) || flag.matches(Constants.V) || flag.matches(Constants.R)) {
-                replaceFragment(MultimeterFragment.newInstance(msg));
-            } else if (flag.matches(Constants.C)) {
-                replaceFragment(DSOFragment.newInstance());
-            } else if (flag.matches(Constants.G)) {
-                replaceFragment(SignalFragment.newInstance(msg));
-            } else {
-                replaceFragment(EmptyFragment.newInstance());
-            }
+            workWithFlag(flag, msg);
         } else {
             showToast("No flag");
+        }
+    }
+
+    private void workWithFlag(String flag, Message msg) {
+        if (flag == null) return;
+        if (flag.matches(Constants.I) || flag.matches(Constants.V) || flag.matches(Constants.R)) {
+            replaceFragment(MultimeterFragment.newInstance(msg));
+        } else if (flag.matches(Constants.C)) {
+            replaceFragment(DSOFragment.newInstance());
+        } else if (flag.matches(Constants.G)) {
+            replaceFragment(SignalFragment.newInstance(msg));
+        } else {
+            replaceFragment(EmptyFragment.newInstance());
         }
     }
 
@@ -170,8 +174,8 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
         if (mChatService != null) {
             mChatService.stop();
         }

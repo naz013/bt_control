@@ -201,7 +201,6 @@ public class OriginalChatService {
 
         public void run() {
             setName("AcceptThread" + mSocketType);
-
             while (mState != STATE_CONNECTED) {
                 BluetoothSocket socket;
                 try {

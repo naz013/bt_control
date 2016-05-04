@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">BT Simulator</string>
-    <string name="not_connected">Not connected</string>
     <string name="connected_to">Connected to</string>
     <string name="waiting_for_commands">Waiting for commands</string>
     <string name="y_value">Y value:</string>
