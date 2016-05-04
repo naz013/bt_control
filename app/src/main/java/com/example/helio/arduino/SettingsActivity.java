@@ -63,13 +63,6 @@ public class SettingsActivity extends AppCompatActivity {
     };
 
     private void unPairDevice() {
-        /*BluetoothDevice device = mAdapter.getRemoteDevice(mAddress);
-        try {
-            Method m = device.getClass().getMethod("removeBond", (Class[]) null);
-            m.invoke(device, (Object[]) null);
-        } catch (Exception e) {
-            Log.e("TAG", e.getMessage());
-        }*/
         removePrefs();
         startActivity(new Intent(this, StartActivity.class));
         finish();
