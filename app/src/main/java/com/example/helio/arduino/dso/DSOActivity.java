@@ -100,7 +100,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         mChart.setPinchZoom(true);
         mChart.setDescription(getString(R.string.arduino_chart));
 
-        LimitLine llXAxis = new LimitLine(10f, "Index 10");
+        LimitLine llXAxis = new LimitLine(10f, getString(R.string.index_string));
         llXAxis.setLineWidth(4f);
         llXAxis.enableDashedLine(10f, 10f, 0f);
         llXAxis.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
@@ -157,9 +157,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
 
     private void sendMessage(String message) {
         if (mChatService.getState() != OriginalChatService.STATE_CONNECTED) {
-            //Toast.makeText(this, R.string.not_connected, Toast.LENGTH_SHORT).show();
             resumeBluetoothService();
-            //return;
         }
 
         if (message.length() > 0) {
@@ -206,7 +204,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
     private void showMessage(Message msg) {
         String message = msg.getData().getString(Constants.TOAST);
         if (message == null) return;
-        if (message.startsWith("Unable") || message.startsWith("Device")) {
+        if (message.startsWith(Constants.UNABLE) || message.startsWith(Constants.DEVICE)) {
             if (mChatService.getState() == OriginalChatService.STATE_NONE) {
                 mChatService.start();
             }
@@ -315,7 +313,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
     }
 
     private LineDataSet createSet() {
-        LineDataSet set = new LineDataSet(null, "Arduino chart");
+        LineDataSet set = new LineDataSet(null, getString(R.string.arduino_vhart));
         set.setColor(Color.BLACK);
         set.setLineWidth(1f);
         set.setCircleRadius(1f);

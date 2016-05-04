@@ -166,8 +166,10 @@ public class SignalActivity extends AppCompatActivity {
 
     private void showMessage(Message msg) {
         String message = msg.getData().getString(Constants.TOAST);
-        if (message == null) return;
-        if (message.startsWith("Unable") || message.startsWith("Device")) {
+        if (message == null) {
+            return;
+        }
+        if (message.startsWith(Constants.UNABLE) || message.startsWith(Constants.DEVICE)) {
             if (mChatService.getState() == OriginalChatService.STATE_NONE) {
                 mChatService.start();
             }

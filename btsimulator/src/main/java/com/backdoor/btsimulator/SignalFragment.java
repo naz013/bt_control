@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.backdoor.shared.JMessage;
 import com.backdoor.shared.SignalObject;
@@ -85,7 +84,6 @@ public class SignalFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         TextView meterField = (TextView) view.findViewById(R.id.meterField);
         if (data != null) {
-            Toast.makeText(mContext, "Data " + data, Toast.LENGTH_LONG).show();
             JMessage jMessage = new JMessage(data);
             if (jMessage.hasSignal()) {
                 SignalObject object = jMessage.getSignal();

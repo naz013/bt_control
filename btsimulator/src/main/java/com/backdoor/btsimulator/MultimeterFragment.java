@@ -157,10 +157,6 @@ public class MultimeterFragment extends Fragment {
     };
 
     private void sendResistance() {
-        if (!mKey.matches(Constants.R)) {
-            showToast("You need to send another data");
-            return;
-        }
         String resistanceString = ohmField.getText().toString().trim();
         if (resistanceString.matches("")) {
             showToast(mContext.getString(R.string.empty_resistance_field));
@@ -173,10 +169,6 @@ public class MultimeterFragment extends Fragment {
     }
 
     private void sendCurrent() {
-        if (!mKey.matches(Constants.I)) {
-            showToast("You need to send another data");
-            return;
-        }
         String currentString = currentField.getText().toString().trim();
         if (currentString.matches("")) {
             showToast(mContext.getString(R.string.empty_current_field));
@@ -189,10 +181,6 @@ public class MultimeterFragment extends Fragment {
     }
 
     private void sendVoltage() {
-        if (!mKey.matches(Constants.V)) {
-            showToast("You need to send another data");
-            return;
-        }
         String voltageString = voltageField.getText().toString().trim();
         if (voltageString.matches("")) {
             showToast(mContext.getString(R.string.empty_voltage_field));

@@ -48,4 +48,7 @@
     <string name="empty_frequency">Empty frequency!</string>
     <string name="empty_magnitude">Empty magnitude!</string>
     <string name="go_to_main_menu">Go to main menu</string>
+    <string name="no_key">No key</string>
+    <string name="arduino_vhart">Arduino chart</string>
+    <string name="index_string">Index 10</string>
 </resources>

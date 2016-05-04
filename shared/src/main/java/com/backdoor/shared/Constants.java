@@ -13,6 +13,9 @@ public class Constants {
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
 
+    public static final String UNABLE = "Unable";
+    public static final String DEVICE = "Device";
+
     public static final String FLAG = "flag";
     public static final String R = "r";
     public static final String I = "i";

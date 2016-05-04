@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
         if (message == null) {
             return;
         }
-        if (message.startsWith("Unable") || message.startsWith("Device")) {
+        if (message.startsWith(Constants.UNABLE) || message.startsWith(Constants.DEVICE)) {
             if (mChatService.getState() == OriginalChatService.STATE_NONE) {
                 mChatService.start();
             }

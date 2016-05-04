@@ -158,7 +158,7 @@ public class MultimeterActivity extends AppCompatActivity {
         } else if (jMessage.hasResistance()) {
             v = jMessage.getResistance();
         } else {
-            v = "No key";
+            v = getString(R.string.no_key);
         }
         meterField.setText(v);
     }
@@ -173,7 +173,7 @@ public class MultimeterActivity extends AppCompatActivity {
         if (message == null) {
             return;
         }
-        if (message.startsWith("Unable") || message.startsWith("Device")) {
+        if (message.startsWith(Constants.UNABLE) || message.startsWith(Constants.DEVICE)) {
             if (mChatService.getState() == OriginalChatService.STATE_NONE) {
                 mChatService.start();
             }
