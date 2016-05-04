@@ -13,6 +13,7 @@
     <string name="empty_current_field">Empty current field</string>
     <string name="empty_voltage_field">Empty voltage field</string>
     <string name="no_flag">No flag</string>
+    <string name="send_random_data">Send random data</string>
 
     <array name="wave_types">
         <item>Square Wave</item>

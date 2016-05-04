@@ -4,21 +4,36 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.backdoor.shared.JMessage;
+
+import java.util.Random;
 
 public class DSOFragment extends Fragment {
 
     private MultimeterListener mMultimeterListener;
     private Context mContext;
     private EditText yField;
+
+    private Handler mHandler = new Handler();
+    private Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            float randomY = new Random().nextFloat() * (180f - 1f) + 1f;
+            sendYValue("" + randomY);
+            mHandler.postDelayed(mRunnable, 1000);
+        }
+    };
 
     public DSOFragment() {
 
@@ -69,23 +84,35 @@ public class DSOFragment extends Fragment {
         yField = (EditText) view.findViewById(R.id.yField);
         Button yButton = (Button) view.findViewById(R.id.yButton);
         yButton.setOnClickListener(mListener);
+        ((CheckBox) view.findViewById(R.id.randomCheck)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    yField.setEnabled(false);
+                    mHandler.postDelayed(mRunnable, 1000);
+                } else {
+                    yField.setEnabled(true);
+                    mHandler.removeCallbacks(mRunnable);
+                }
+            }
+        });
     }
 
     private View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            sendYValue();
+            String yString = yField.getText().toString().trim();
+            if (yString.matches("")) {
+                showToast(mContext.getString(R.string.empty_y_field));
+                return;
+            }
+            yField.setText("");
+            sendYValue(yString);
         }
     };
 
-    private void sendYValue() {
-        String yString = yField.getText().toString().trim();
-        if (yString.matches("")) {
-            showToast(mContext.getString(R.string.empty_y_field));
-            return;
-        }
-        yField.setText("");
-        sendMessage(yString);
+    private void sendYValue(String value) {
+        sendMessage(value);
     }
 
     private void sendMessage(String message) {
@@ -99,5 +126,11 @@ public class DSOFragment extends Fragment {
         if (getActivity() != null) {
             Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mHandler.removeCallbacks(mRunnable);
     }
 }
