@@ -136,7 +136,7 @@ public class MultimeterActivity extends AppCompatActivity {
         }
 
         String msg = new JMessage().putFlag(message).asString();
-        mChatService.writeBundle(msg.getBytes());
+        mChatService.writeMessage(msg.getBytes());
     }
 
     private void postResponse(Message msg) {

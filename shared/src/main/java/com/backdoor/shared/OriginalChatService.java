@@ -149,7 +149,7 @@ public class OriginalChatService {
         setState(STATE_NONE);
     }
 
-    public void writeBundle(byte[] bundle) {
+    public void writeMessage(byte[] bundle) {
         ConnectedThread r;
         synchronized (this) {
             if (mState != STATE_CONNECTED) return;

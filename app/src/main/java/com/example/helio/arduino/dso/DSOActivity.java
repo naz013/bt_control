@@ -167,13 +167,18 @@ public class DSOActivity extends AppCompatActivity implements View.OnClickListen
 
         if (message.length() > 0) {
             String msg = new JMessage().putFlag(message).asString();
-            mChatService.writeBundle(msg.getBytes());
+            mChatService.writeMessage(msg.getBytes());
         }
     }
 
     private void readDso(Message msg) {
-        float value = Float.parseFloat(msg.getData().getString(Constants.Y));
-        if (mCapturing) addNewEntry(value);
+        byte[] readBuff = (byte[]) msg.obj;
+        String data = new String(readBuff, 0, msg.arg1);
+        JMessage jMessage = new JMessage(data);
+        if (jMessage.hasYValue()) {
+            float value = Float.parseFloat(jMessage.getYValue());
+            if (mCapturing) addNewEntry(value);
+        }
     }
 
     @Override

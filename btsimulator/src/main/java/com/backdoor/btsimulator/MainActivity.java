@@ -8,9 +8,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import com.backdoor.shared.Constants;
+import com.backdoor.shared.JMessage;
 import com.backdoor.shared.OriginalChatService;
 
 public class MainActivity extends AppCompatActivity implements MultimeterListener {
@@ -42,9 +44,20 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initActionBar();
         initBluetoothAdapter();
         checkBluetoothAvailability();
         replaceFragment(EmptyFragment.newInstance());
+    }
+
+    private void initActionBar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        }
+        toolbar.setTitle(R.string.app_name);
     }
 
     private void initBluetoothAdapter() {
@@ -102,9 +115,11 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     }
 
     private void readMessage(Message msg) {
-        Bundle bundle = msg.getData();
-        if (bundle.containsKey(Constants.FLAG)) {
-            String flag = bundle.getString(Constants.FLAG);
+        byte[] readBuff = (byte[]) msg.obj;
+        String data = new String(readBuff, 0, msg.arg1);
+        JMessage jMessage = new JMessage(data);
+        if (jMessage.hasFlag()) {
+            String flag = jMessage.getFlag();
             showToast("Has flag " + flag);
             if (flag == null) return;
             if (flag.matches(Constants.I) || flag.matches(Constants.V) || flag.matches(Constants.R)) {
@@ -170,6 +185,6 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
 
     @Override
     public void obtainData(byte[] value) {
-        mChatService.writeBundle(value);
+        mChatService.writeMessage(value);
     }
 }

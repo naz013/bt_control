@@ -100,6 +100,14 @@ public class JMessage {
         return mObject.has(Constants.R);
     }
 
+    public boolean hasSignal() {
+        return mObject.has(Constants.SIGNAL);
+    }
+
+    public boolean hasYValue() {
+        return mObject.has(Constants.Y);
+    }
+
     public String getVoltage() {
         if (!isNull) {
             try {

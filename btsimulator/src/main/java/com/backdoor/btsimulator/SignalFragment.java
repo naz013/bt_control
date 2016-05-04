@@ -11,15 +11,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.backdoor.shared.Constants;
 import com.backdoor.shared.JMessage;
 import com.backdoor.shared.SignalObject;
 
 public class SignalFragment extends Fragment {
 
+    private static final String ARG = "arg";
+
     private MultimeterListener mMultimeterListener;
     private Context mContext;
-    private Bundle bundle;
+    private String data;
 
     public SignalFragment() {
 
@@ -27,7 +28,11 @@ public class SignalFragment extends Fragment {
 
     public static SignalFragment newInstance(Message msg) {
         SignalFragment fragment = new SignalFragment();
-        fragment.setArguments(msg.getData());
+        byte[] readBuff = (byte[]) msg.obj;
+        String data = new String(readBuff, 0, msg.arg1);
+        Bundle bundle = new Bundle();
+        bundle.putString(ARG, data);
+        fragment.setArguments(bundle);
         return fragment;
     }
 
@@ -35,7 +40,7 @@ public class SignalFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            bundle = getArguments();
+            data = getArguments().getString(ARG);
         }
     }
 
@@ -78,10 +83,10 @@ public class SignalFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         TextView meterField = (TextView) view.findViewById(R.id.meterField);
-        if (bundle != null) {
-            if (bundle.containsKey(Constants.SIGNAL)) {
-                JMessage message = new JMessage(bundle.getString(Constants.SIGNAL));
-                SignalObject object = message.getSignal();
+        if (data != null) {
+            JMessage jMessage = new JMessage(data);
+            if (jMessage.hasSignal()) {
+                SignalObject object = jMessage.getSignal();
                 meterField.setText("S " + object.getWaveType() + ", freq " +
                         object.getFrequency() + ", freqM " + object.getFrequencyModifier() +
                         ", magn " + object.getMagnitude());

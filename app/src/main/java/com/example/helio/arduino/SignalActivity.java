@@ -137,7 +137,7 @@ public class SignalActivity extends AppCompatActivity {
         }
 
         String msg = new JMessage().putFlag(Constants.T).asString();
-        mChatService.writeBundle(msg.getBytes());
+        mChatService.writeMessage(msg.getBytes());
     }
 
     private void sendSignal() {
@@ -161,8 +161,11 @@ public class SignalActivity extends AppCompatActivity {
         int magn = Integer.parseInt(magnitudeString);
 
         SignalObject object = new SignalObject(waveType.getSelectedItemPosition(), freq, freqSelector.getSelectedItemPosition(), magn);
-        String msg = new JMessage().putSignal(object).asString();
-        mChatService.writeBundle(msg.getBytes());
+        String msg = new JMessage()
+                .putSignal(object)
+                .putFlag(Constants.G)
+                .asString();
+        mChatService.writeMessage(msg.getBytes());
     }
 
     private void getDeviceName(Message msg) {
