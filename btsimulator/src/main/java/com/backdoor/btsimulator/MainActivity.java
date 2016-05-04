@@ -127,7 +127,9 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     }
 
     private void workWithFlag(String flag, Message msg) {
-        if (flag == null) return;
+        if (flag == null) {
+            return;
+        }
         if (flag.matches(Constants.I) || flag.matches(Constants.V) || flag.matches(Constants.R)) {
             replaceFragment(MultimeterFragment.newInstance(msg));
         } else if (flag.matches(Constants.C)) {
@@ -152,7 +154,9 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
 
     private void showMessage(Message msg) {
         String message = msg.getData().getString(Constants.TOAST);
-        if (message == null) return;
+        if (message == null) {
+            return;
+        }
         if (message.startsWith("Unable") || message.startsWith("Device")) {
             if (mChatService.getState() == OriginalChatService.STATE_NONE) {
                 mChatService.start();
@@ -193,6 +197,14 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
 
     @Override
     public void obtainData(byte[] value) {
-        mChatService.writeMessage(value);
+        if (mChatService != null) {
+            if (mChatService.getState() == OriginalChatService.STATE_CONNECTED) {
+                mChatService.writeMessage(value);
+            } else {
+                mChatService.start();
+            }
+        } else {
+            refreshService();
+        }
     }
 }

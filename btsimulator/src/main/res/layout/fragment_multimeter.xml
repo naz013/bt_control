@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp">
 
-        <TableRow>
+        <TableRow android:padding="5dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -41,21 +41,24 @@
             <EditText
                 android:id="@+id/voltageField"
                 android:layout_width="150dp"
-                android:inputType="number"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp" />
+                android:layout_marginLeft="16dp"
+                android:inputType="numberDecimal"
+                android:digits="0123456789." />
 
             <Button
                 android:id="@+id/voltageButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:enabled="false"
                 android:background="@drawable/green_selector"
+                android:enabled="false"
                 android:text="@string/send" />
         </TableRow>
 
-        <TableRow android:layout_marginTop="16dp">
+        <TableRow
+            android:layout_marginTop="16dp"
+            android:padding="5dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -66,21 +69,24 @@
             <EditText
                 android:id="@+id/currentField"
                 android:layout_width="150dp"
-                android:inputType="number"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp" />
+                android:layout_marginLeft="16dp"
+                android:inputType="numberDecimal"
+                android:digits="0123456789." />
 
             <Button
                 android:id="@+id/currentButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:enabled="false"
                 android:background="@drawable/blue_selector"
+                android:enabled="false"
                 android:text="@string/send" />
         </TableRow>
 
-        <TableRow android:layout_marginTop="16dp">
+        <TableRow
+            android:layout_marginTop="16dp"
+            android:padding="5dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -91,17 +97,18 @@
             <EditText
                 android:id="@+id/ohmField"
                 android:layout_width="150dp"
-                android:inputType="number"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp" />
+                android:layout_marginLeft="16dp"
+                android:inputType="numberDecimal"
+                android:digits="0123456789." />
 
             <Button
                 android:id="@+id/ohmButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:enabled="false"
                 android:background="@drawable/red_selector"
+                android:enabled="false"
                 android:text="@string/send" />
         </TableRow>
 

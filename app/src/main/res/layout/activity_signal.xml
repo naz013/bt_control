@@ -94,7 +94,8 @@
                             android:layout_width="150dp"
                             android:layout_height="wrap_content"
                             android:hint="@string/frequency"
-                            android:inputType="number" />
+                            android:inputType="numberDecimal"
+                            android:digits="0123456789." />
 
                         <Spinner
                             android:id="@+id/freqSelector"
@@ -143,7 +144,8 @@
                         android:layout_marginRight="8dp"
                         android:layout_marginTop="8dp"
                         android:hint="@string/magnitude"
-                        android:inputType="number" />
+                        android:inputType="numberDecimal"
+                        android:digits="0123456789."/>
 
                 </LinearLayout>
 
@@ -154,6 +156,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:gravity="center"
+                android:paddingBottom="10dp"
                 android:orientation="horizontal">
 
                 <Button
