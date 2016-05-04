@@ -94,6 +94,7 @@ public class MultimeterActivity extends AppCompatActivity {
         public void onClick(View v) {
             if (mSelectedId == v.getId()) {
                 v.setSelected(false);
+                mSelectedId = -1;
                 return;
             } else {
                 deselectAll();

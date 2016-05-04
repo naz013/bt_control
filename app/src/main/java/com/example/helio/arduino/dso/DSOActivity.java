@@ -48,8 +48,9 @@ import java.util.Locale;
 
 public class DSOActivity extends AppCompatActivity implements OnChartGestureListener, OnChartValueSelectedListener {
 
-    private static final int CHART_VISIBLE = 50;
+    private static final int CHART_VISIBLE = 40;
     private static final int REQUEST_ENABLE_BT = 3;
+    private static final float CHART_MAX_Y = 220f;
 
     private boolean mCapturing = false;
 
@@ -108,7 +109,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
 
         YAxis leftAxis = mChart.getAxisLeft();
         leftAxis.removeAllLimitLines();
-        leftAxis.setAxisMaxValue(220f);
+        leftAxis.setAxisMaxValue(CHART_MAX_Y);
         leftAxis.setAxisMinValue(-50f);
         leftAxis.setDrawZeroLine(true);
 
@@ -117,7 +118,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         mChart.getAxisRight().setEnabled(false);
         mChart.getLegend().setEnabled(false);
         mChart.setVisibleXRangeMaximum(CHART_VISIBLE);
-        mChart.animateX(2500, Easing.EasingOption.EaseInOutQuart);
+        mChart.animateX(2000, Easing.EasingOption.EaseInOutQuart);
     }
 
     private void initButtons() {
