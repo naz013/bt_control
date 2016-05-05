@@ -67,7 +67,10 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void removeBtDevice() {
         removePrefs();
-        startActivity(new Intent(this, StartActivity.class));
+        Intent intent = new Intent(getApplicationContext(), SplashActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("EXIT", true);
+        startActivity(intent);
         finish();
     }
 
