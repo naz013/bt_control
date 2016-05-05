@@ -312,8 +312,15 @@ public class StartActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK) {
-            doDiscovery(REQUEST_AUTO);
+        if (requestCode == REQUEST_ENABLE_BT) {
+            if (resultCode == RESULT_OK) {
+                doDiscovery(REQUEST_AUTO);
+            } else requestBtEnabling(REQUEST_ENABLE_BT);
+        }
+        if (requestCode == REQUEST_ENABLE_BT_AUTO) {
+            if (resultCode == RESULT_OK) {
+                doDiscovery(REQUEST_AUTO);
+            } else requestBtEnabling(REQUEST_ENABLE_BT_AUTO);
         }
     }
 }

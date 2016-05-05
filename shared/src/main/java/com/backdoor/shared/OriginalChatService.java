@@ -198,8 +198,8 @@ public class OriginalChatService {
                     tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord(
                             NAME_INSECURE, MY_UUID_INSECURE);
                 }
-            } catch (IOException e) {
-                Log.e(TAG, "Socket Type: " + mSocketType + " listen() failed", e);
+            } catch (IOException|NullPointerException e) {
+                Log.d(TAG, "Socket Type: " + mSocketType + " listen() failed", e);
             }
             mmServerSocket = tmp;
         }
@@ -212,7 +212,7 @@ public class OriginalChatService {
                 try {
                     socket = mmServerSocket.accept();
                 } catch (IOException|NullPointerException e) {
-                    Log.e(TAG, "Socket Type: " + mSocketType + " accept() failed", e);
+                    Log.d(TAG, "Socket Type: " + mSocketType + " accept() failed", e);
                     break;
                 }
 
@@ -228,8 +228,8 @@ public class OriginalChatService {
                             case STATE_CONNECTED:
                                 try {
                                     socket.close();
-                                } catch (IOException e) {
-                                    Log.e(TAG, "Could not close unwanted socket", e);
+                                } catch (IOException|NullPointerException e) {
+                                    Log.d(TAG, "Could not close unwanted socket", e);
                                 }
                                 break;
                         }
@@ -243,8 +243,8 @@ public class OriginalChatService {
             Log.d(TAG, "Socket Type" + mSocketType + "cancel " + this);
             try {
                 mmServerSocket.close();
-            } catch (IOException e) {
-                Log.e(TAG, "Socket Type" + mSocketType + " close() of server failed", e);
+            } catch (IOException|NullPointerException e) {
+                Log.d(TAG, "Socket Type" + mSocketType + " close() of server failed", e);
             }
         }
     }
@@ -266,8 +266,8 @@ public class OriginalChatService {
                     tmp = device.createInsecureRfcommSocketToServiceRecord(
                             MY_UUID_INSECURE);
                 }
-            } catch (IOException e) {
-                Log.e(TAG, "Socket Type: " + mSocketType + " create() failed", e);
+            } catch (IOException|NullPointerException e) {
+                Log.d(TAG, "Socket Type: " + mSocketType + " create() failed", e);
             }
             mmSocket = tmp;
         }
@@ -282,8 +282,8 @@ public class OriginalChatService {
                 connectionFailed();
                 try {
                     mmSocket.close();
-                } catch (IOException e2) {
-                    Log.e(TAG, "unable to close() " + mSocketType +
+                } catch (IOException|NullPointerException e2) {
+                    Log.d(TAG, "unable to close() " + mSocketType +
                             " socket during connection failure", e2);
                 }
                 return;
@@ -297,8 +297,8 @@ public class OriginalChatService {
         public void cancel() {
             try {
                 mmSocket.close();
-            } catch (IOException e) {
-                Log.e(TAG, "close() of connect " + mSocketType + " socket failed", e);
+            } catch (IOException|NullPointerException e) {
+                Log.d(TAG, "close() of connect " + mSocketType + " socket failed", e);
             }
         }
     }
@@ -317,8 +317,8 @@ public class OriginalChatService {
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
-            } catch (IOException e) {
-                Log.e(TAG, "temp sockets not created", e);
+            } catch (IOException|NullPointerException e) {
+                Log.d(TAG, "temp sockets not created", e);
             }
 
             this.mmInStream = tmpIn;
@@ -337,8 +337,8 @@ public class OriginalChatService {
                     bytes = mmInStream.read(buffer);
                     mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
-                } catch (IOException e) {
-                    Log.e(TAG, "disconnected", e);
+                } catch (IOException|NullPointerException e) {
+                    Log.d(TAG, "disconnected", e);
                     connectionLost();
                     OriginalChatService.this.start();
                     break;
@@ -349,7 +349,7 @@ public class OriginalChatService {
         public void write(byte[] bundle) {
             try {
                 mmOutStream.write(bundle);
-            } catch (IOException e) {
+            } catch (IOException|NullPointerException e) {
                 e.printStackTrace();
             }
         }
@@ -357,7 +357,7 @@ public class OriginalChatService {
         public void cancel() {
             try {
                 mmSocket.close();
-            } catch (IOException e) {
+            } catch (IOException|NullPointerException e) {
                 Log.e(TAG, "close() of connect socket failed", e);
             }
         }
