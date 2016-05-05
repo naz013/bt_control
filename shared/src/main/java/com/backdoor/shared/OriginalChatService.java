@@ -31,6 +31,7 @@ public class OriginalChatService {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private int mState;
+    private Context mContext;
 
     public static final int STATE_NONE = 0;       // we're doing nothing
     public static final int STATE_LISTEN = 1;     // now listening for incoming connections
@@ -41,6 +42,7 @@ public class OriginalChatService {
         this.mAdapter = BluetoothAdapter.getDefaultAdapter();
         this.mState = STATE_NONE;
         this.mHandler = handler;
+        this.mContext = context;
     }
 
     private synchronized void setState(int state) {
@@ -164,8 +166,25 @@ public class OriginalChatService {
         r.write(bundle);
     }
 
+    private void connectionFailed() {
+        setState(STATE_LISTEN);
+        Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
+        Bundle bundle = new Bundle();
+        bundle.putString(Constants.TOAST, "Unable to connect device");
+        msg.setData(bundle);
+        mHandler.sendMessage(msg);
+    }
+
+    private void connectionLost() {
+        setState(STATE_LISTEN);
+        Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
+        Bundle bundle = new Bundle();
+        bundle.putString(Constants.TOAST, "Device connection was lost");
+        msg.setData(bundle);
+        mHandler.sendMessage(msg);
+    }
+
     private class AcceptThread extends Thread {
-        // The local server socket
         private final BluetoothServerSocket mmServerSocket;
         private final String mSocketType;
 
@@ -262,6 +281,7 @@ public class OriginalChatService {
             try {
                 mmSocket.connect();
             } catch (IOException e) {
+                connectionFailed();
                 try {
                     mmSocket.close();
                 } catch (IOException e2) {
@@ -311,6 +331,9 @@ public class OriginalChatService {
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
             int bytes;
+            if (mmSocket == null || !mmSocket.isConnected()) {
+                return;
+            }
             while (true) {
                 try {
                     bytes = mmInStream.read(buffer);
@@ -318,7 +341,7 @@ public class OriginalChatService {
                             .sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
-                    OriginalChatService.this.start();
+                    connectionLost();
                     break;
                 }
             }
