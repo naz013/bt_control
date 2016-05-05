@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.backdoor.shared.Constants;
+import com.example.helio.arduino.dso.DSOActivity;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -67,10 +68,19 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void removeBtDevice() {
         removePrefs();
-        Intent intent = new Intent(getApplicationContext(), SplashActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra("EXIT", true);
-        startActivity(intent);
+        if (DSOActivity.a != null) {
+            DSOActivity.a.finish();
+        }
+        if (MainActivity.a != null) {
+            MainActivity.a.finish();
+        }
+        if (SignalActivity.a != null) {
+            SignalActivity.a.finish();
+        }
+        if (MultimeterActivity.a != null) {
+            MultimeterActivity.a.finish();
+        }
+        startActivity(new Intent(getApplicationContext(), SplashActivity.class));
         finish();
     }
 

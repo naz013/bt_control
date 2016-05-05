@@ -38,6 +38,8 @@ public class SignalActivity extends AppCompatActivity {
     private EditText mMagnitudeField;
     private TextView mBlockView;
 
+    public static Activity a;
+
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -55,6 +57,7 @@ public class SignalActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        a = this;
         setContentView(R.layout.activity_signal);
         initBtAdapter();
         initActionBar();

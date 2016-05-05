@@ -61,6 +61,8 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
     private BluetoothAdapter mBtAdapter = null;
     private OriginalChatService mBtService = null;
 
+    public static Activity a;
+
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -81,6 +83,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        a = this;
         setContentView(R.layout.activity_dso);
         initBtAdapter();
         initActionBar();

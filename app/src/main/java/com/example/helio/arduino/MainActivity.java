@@ -1,5 +1,6 @@
 package com.example.helio.arduino;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,9 +14,12 @@ import com.example.helio.arduino.dso.DSOActivity;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static Activity a;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        a = this;
         setContentView(R.layout.activity_main);
         sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
         initActionBar();

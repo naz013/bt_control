@@ -33,6 +33,8 @@ public class MultimeterActivity extends AppCompatActivity {
     private BluetoothAdapter mBtAdapter = null;
     private OriginalChatService mBtService = null;
 
+    public static Activity a;
+
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -53,6 +55,7 @@ public class MultimeterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        a = this;
         setContentView(R.layout.activity_multimeter);
         initBluetoothAdapter();
         initActionBar();
