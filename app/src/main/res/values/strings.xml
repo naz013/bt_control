@@ -51,4 +51,5 @@
     <string name="no_key">No key</string>
     <string name="arduino_vhart">Arduino chart</string>
     <string name="index_string">Index 10</string>
+    <string name="wait_while_connection_was_established">Wait while connection was established</string>
 </resources>

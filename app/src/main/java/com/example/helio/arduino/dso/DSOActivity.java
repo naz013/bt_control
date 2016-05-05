@@ -21,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.backdoor.shared.Constants;
@@ -55,6 +56,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
     private boolean mCapturing = false;
 
     private LineChart mChart;
+    private TextView blockView;
 
     private BluetoothAdapter mBluetoothAdapter = null;
     private OriginalChatService mChatService = null;
@@ -84,6 +86,18 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         initActionBar();
         initButtons();
         initChart();
+        initBlockView();
+    }
+
+    private void initBlockView() {
+        blockView = (TextView) findViewById(R.id.blockView);
+        blockView.setVisibility(View.VISIBLE);
+        blockView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
     }
 
     private void initBluetoothAdapter() {
@@ -200,6 +214,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
     private void getDeviceName(Message msg) {
         String mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
         showToast(getString(R.string.connected_to) + " " + mConnectedDeviceName);
+        blockView.setVisibility(View.GONE);
     }
 
     private void showMessage(Message msg) {

@@ -246,9 +246,16 @@ public class StartActivity extends AppCompatActivity {
     private void connectDevice(BluetoothDevice device) {
         if (mDeviceAddress != null) {
             while (true) {
-                if (mChatService.getState() == OriginalChatService.STATE_LISTEN) {
-                    mChatService.connect(device, true);
-                    break;
+                if (mChatService != null) {
+                    if (mChatService.getState() == OriginalChatService.STATE_LISTEN) {
+                        mChatService.connect(device, true);
+                        break;
+                    }
+                    if (mChatService.getState() == OriginalChatService.STATE_NONE) {
+                        mChatService.start();
+                    }
+                } else {
+                    setupService();
                 }
             }
         }

@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ public class MultimeterActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT = 3;
 
     private TextView meterField;
+    private TextView blockView;
     private int mSelectedId;
 
     private BluetoothAdapter mBluetoothAdapter = null;
@@ -56,6 +58,18 @@ public class MultimeterActivity extends AppCompatActivity {
         initActionBar();
         initButtons();
         meterField = (TextView) findViewById(R.id.meterField);
+        initBlockView();
+    }
+
+    private void initBlockView() {
+        blockView = (TextView) findViewById(R.id.blockView);
+        blockView.setVisibility(View.VISIBLE);
+        blockView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
     }
 
     private void initBluetoothAdapter() {
@@ -167,6 +181,7 @@ public class MultimeterActivity extends AppCompatActivity {
     private void getDeviceName(Message msg) {
         String mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
         showToast(getString(R.string.connected_to) + " " + mConnectedDeviceName);
+        blockView.setVisibility(View.GONE);
     }
 
     private void showMessage(Message msg) {
