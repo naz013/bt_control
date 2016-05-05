@@ -189,7 +189,7 @@ public class MultimeterActivity extends AppCompatActivity {
         if (message == null) {
             return;
         }
-        if (message.startsWith(Constants.UNABLE) || message.startsWith(Constants.DEVICE)) {
+        if (message.startsWith(Constants.UNABLE)) {
             if (mChatService.getState() == OriginalChatService.STATE_NONE) {
                 mChatService.start();
             }

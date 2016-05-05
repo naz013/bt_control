@@ -32,6 +32,9 @@ import java.util.Set;
 public class StartActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 15;
+    private static final int REQUEST_ENABLE_BT_AUTO = 16;
+    private static final int REQUEST_CLICK = 105;
+    private static final int REQUEST_AUTO = 102;
     private String mDeviceAddress;
     private String mDeviceName;
 
@@ -95,23 +98,26 @@ public class StartActivity extends AppCompatActivity {
         }
     }
 
-    private void doDiscovery() {
-        if (!checkLocationPermission()) {
+    private void doDiscovery(int code) {
+        if (!checkLocationPermission(code)) {
             return;
         }
-        if (mBtAdapter.isDiscovering()) {
-            mBtAdapter.cancelDiscovery();
+        if (!mBtAdapter.isEnabled()) {
+            requestBluetoothEnabling(REQUEST_ENABLE_BT);
         }
-        mBtAdapter.startDiscovery();
-        mPairButton.setVisibility(View.GONE);
-        mDeviceList.setVisibility(View.VISIBLE);
+        cancelDiscovering();
+        if (code == REQUEST_CLICK) {
+            mBtAdapter.startDiscovery();
+            mPairButton.setVisibility(View.GONE);
+            mDeviceList.setVisibility(View.VISIBLE);
+        }
     }
 
     private final View.OnClickListener visibleClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             v.setVisibility(View.GONE);
-            doDiscovery();
+            doDiscovery(REQUEST_CLICK);
         }
     };
 
@@ -176,10 +182,10 @@ public class StartActivity extends AppCompatActivity {
         }
     }
 
-    private boolean checkLocationPermission() {
+    private boolean checkLocationPermission(int requestCode) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 102);
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, requestCode);
                 return false;
             }
             return true;
@@ -191,25 +197,29 @@ public class StartActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         if (!mBtAdapter.isEnabled()) {
-            requestBluetoothEnabling();
+            requestBluetoothEnabling(REQUEST_ENABLE_BT_AUTO);
         } else if (mChatService == null) {
             setupService();
         }
     }
 
-    private void requestBluetoothEnabling() {
+    private void requestBluetoothEnabling(int requestCode) {
         Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-        startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+        startActivityForResult(enableIntent, requestCode);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         stopChatService();
-        if (mBtAdapter != null) {
+        cancelDiscovering();
+        this.unregisterReceiver(mReceiver);
+    }
+
+    private void cancelDiscovering() {
+        if (mBtAdapter != null && mBtAdapter.isDiscovering()) {
             mBtAdapter.cancelDiscovery();
         }
-        this.unregisterReceiver(mReceiver);
     }
 
     private void stopChatService() {
@@ -264,9 +274,14 @@ public class StartActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
-            case 102:
+            case REQUEST_AUTO:
+                if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                    checkLocationPermission(REQUEST_AUTO);
+                }
+                break;
+            case REQUEST_CLICK:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    doDiscovery();
+                    doDiscovery(REQUEST_CLICK);
                 }
                 break;
         }
@@ -275,7 +290,7 @@ public class StartActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK) {
-            doDiscovery();
+            doDiscovery(REQUEST_AUTO);
         }
     }
 

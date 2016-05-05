@@ -220,7 +220,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
     private void showMessage(Message msg) {
         String message = msg.getData().getString(Constants.TOAST);
         if (message == null) return;
-        if (message.startsWith(Constants.UNABLE) || message.startsWith(Constants.DEVICE)) {
+        if (message.startsWith(Constants.UNABLE)) {
             if (mChatService.getState() == OriginalChatService.STATE_NONE) {
                 mChatService.start();
             }

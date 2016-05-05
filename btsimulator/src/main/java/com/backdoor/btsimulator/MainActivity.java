@@ -160,9 +160,10 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
         if (message == null) {
             return;
         }
-        if (message.startsWith(Constants.UNABLE) || message.startsWith(Constants.DEVICE)) {
+        if (message.startsWith(Constants.UNABLE)) {
             if (mChatService.getState() == OriginalChatService.STATE_NONE) {
                 mChatService.start();
+                ensureDiscoverable();
             }
         }
     }
@@ -216,6 +217,8 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
                 checkBluetoothAvailability();
                 if (!checkAdapterStatus()) {
                     requestBluetoothEnable();
+                } else {
+                    ensureDiscoverable();
                 }
                 isCreateCheck = false;
                 break;
