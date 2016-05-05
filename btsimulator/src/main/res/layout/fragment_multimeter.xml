@@ -28,9 +28,12 @@
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_gravity="center"
         android:layout_margin="16dp">
 
-        <TableRow android:padding="5dp">
+        <TableRow android:layout_width="match_parent"
+            android:gravity="center_horizontal" android:padding="5dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -40,7 +43,7 @@
 
             <EditText
                 android:id="@+id/voltageField"
-                android:layout_width="150dp"
+                android:layout_width="110dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:inputType="numberSigned|numberDecimal"
@@ -57,6 +60,8 @@
         </TableRow>
 
         <TableRow
+            android:layout_width="match_parent"
+            android:gravity="center_horizontal"
             android:layout_marginTop="16dp"
             android:padding="5dp">
 
@@ -68,7 +73,7 @@
 
             <EditText
                 android:id="@+id/currentField"
-                android:layout_width="150dp"
+                android:layout_width="110dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:inputType="numberSigned|numberDecimal"
@@ -85,6 +90,8 @@
         </TableRow>
 
         <TableRow
+            android:layout_width="match_parent"
+            android:gravity="center_horizontal"
             android:layout_marginTop="16dp"
             android:padding="5dp">
 
@@ -96,7 +103,7 @@
 
             <EditText
                 android:id="@+id/ohmField"
-                android:layout_width="150dp"
+                android:layout_width="110dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:inputType="numberSigned|numberDecimal"
