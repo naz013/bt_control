@@ -23,10 +23,10 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
 
     private static final int REQUEST_ENABLE_BT = 3;
 
-    private BluetoothAdapter mBluetoothAdapter = null;
-    private OriginalChatService mChatService = null;
+    private BluetoothAdapter mBtAdapter = null;
+    private OriginalChatService mBtService = null;
 
-    private boolean isCreateCheck;
+    private boolean mIsCreateCheck;
 
     private final Handler mHandler = new Handler() {
         @Override
@@ -48,13 +48,13 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
         setContentView(R.layout.activity_main);
         initActionBar();
         if (checkLocationPermission(103)) {
-            initBluetoothAdapter();
-            checkBluetoothAvailability();
-            if (!checkAdapterStatus()) {
-                requestBluetoothEnable();
+            initBtAdapter();
+            checkBtAvailability();
+            if (!checkBtAdapterStatus()) {
+                requestBtEnable();
             }
-            isCreateCheck = false;
-        } else isCreateCheck = true;
+            mIsCreateCheck = false;
+        } else mIsCreateCheck = true;
         replaceFragment(EmptyFragment.newInstance());
     }
 
@@ -65,44 +65,46 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
             getSupportActionBar().setDisplayShowTitleEnabled(false);
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
-        toolbar.setTitle(R.string.app_name);
+        if (toolbar != null) {
+            toolbar.setTitle(R.string.app_name);
+        }
     }
 
-    private void initBluetoothAdapter() {
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    private void initBtAdapter() {
+        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
-    private void checkBluetoothAvailability() {
-        if (mBluetoothAdapter == null) {
+    private void checkBtAvailability() {
+        if (mBtAdapter == null) {
             showToast(getString(R.string.bluetooth_is_not_available));
             finish();
         }
     }
 
-    private boolean checkAdapterStatus() {
-        return mBluetoothAdapter.isEnabled();
+    private boolean checkBtAdapterStatus() {
+        return mBtAdapter.isEnabled();
     }
 
-    private void requestBluetoothEnable() {
+    private void requestBtEnable() {
         Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
     }
 
-    private void startBluetoothService() {
-        if (mChatService == null) {
-            setupService();
+    private void startBtService() {
+        if (mBtService == null) {
+            setupBtService();
         }
-        if (!checkAdapterStatus()) {
+        if (!checkBtAdapterStatus()) {
             return;
         }
-        if (mChatService.getState() == OriginalChatService.STATE_NONE) {
-            mChatService.start();
+        if (mBtService.getState() == OriginalChatService.STATE_NONE) {
+            mBtService.start();
             ensureDiscoverable();
         }
     }
 
     private void ensureDiscoverable() {
-        if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+        if (mBtAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
             discoverRequest();
         }
     }
@@ -113,8 +115,8 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
         startActivity(discoverableIntent);
     }
 
-    private void setupService() {
-        mChatService = new OriginalChatService(this, mHandler);
+    private void setupBtService() {
+        mBtService = new OriginalChatService(this, mHandler);
     }
 
     private void readMessage(Message msg) {
@@ -139,12 +141,8 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
             replaceFragment(SignalFragment.newInstance(msg));
         } else {
             replaceFragment(EmptyFragment.newInstance());
-            refreshService();
+            startBtService();
         }
-    }
-
-    private void refreshService() {
-        startBluetoothService();
     }
 
     private void getDeviceName(Message msg) {
@@ -181,16 +179,16 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mChatService != null) {
-            mChatService.stop();
+        if (mBtService != null) {
+            mBtService.stop();
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (!isCreateCheck && checkLocationPermission(102)) {
-            startBluetoothService();
+        if (!mIsCreateCheck && checkLocationPermission(102)) {
+            startBtService();
         }
     }
 
@@ -198,17 +196,17 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case 102:
-                startBluetoothService();
+                startBtService();
                 break;
             case 103:
-                initBluetoothAdapter();
-                checkBluetoothAvailability();
-                if (!checkAdapterStatus()) {
-                    requestBluetoothEnable();
+                initBtAdapter();
+                checkBtAvailability();
+                if (!checkBtAdapterStatus()) {
+                    requestBtEnable();
                 } else {
                     ensureDiscoverable();
                 }
-                isCreateCheck = false;
+                mIsCreateCheck = false;
                 break;
         }
     }
@@ -218,8 +216,8 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
         switch (requestCode) {
             case REQUEST_ENABLE_BT:
                 if (resultCode == RESULT_OK) {
-                    if (checkAdapterStatus()) {
-                        setupService();
+                    if (checkBtAdapterStatus()) {
+                        setupBtService();
                     }
                 }
                 break;
@@ -228,14 +226,14 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
 
     @Override
     public void obtainData(byte[] value) {
-        if (mChatService != null) {
-            if (mChatService.getState() == OriginalChatService.STATE_CONNECTED) {
-                mChatService.writeMessage(value);
+        if (mBtService != null) {
+            if (mBtService.getState() == OriginalChatService.STATE_CONNECTED) {
+                mBtService.writeMessage(value);
             } else {
-                mChatService.start();
+                mBtService.start();
             }
         } else {
-            refreshService();
+            startBtService();
         }
     }
 }

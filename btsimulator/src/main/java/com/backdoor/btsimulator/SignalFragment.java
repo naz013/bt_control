@@ -20,7 +20,7 @@ public class SignalFragment extends Fragment {
 
     private MultimeterListener mMultimeterListener;
     private Context mContext;
-    private String data;
+    private String mData;
 
     public SignalFragment() {
 
@@ -40,7 +40,7 @@ public class SignalFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            data = getArguments().getString(ARG);
+            mData = getArguments().getString(ARG);
         }
     }
 
@@ -83,8 +83,8 @@ public class SignalFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         TextView meterField = (TextView) view.findViewById(R.id.meterField);
-        if (data != null) {
-            JMessage jMessage = new JMessage(data);
+        if (mData != null) {
+            JMessage jMessage = new JMessage(mData);
             if (jMessage.hasSignal()) {
                 SignalObject object = jMessage.getSignal();
                 String[] waves = mContext.getResources().getStringArray(R.array.wave_types);

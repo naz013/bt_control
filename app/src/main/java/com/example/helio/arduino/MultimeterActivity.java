@@ -30,8 +30,8 @@ public class MultimeterActivity extends AppCompatActivity {
     private TextView mBlockView;
     private int mSelectedId;
 
-    private BluetoothAdapter mBTAdapter = null;
-    private OriginalChatService mBTService = null;
+    private BluetoothAdapter mBtAdapter = null;
+    private OriginalChatService mBtService = null;
 
     private final Handler mHandler = new Handler() {
         @Override
@@ -73,7 +73,7 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private void initBluetoothAdapter() {
-        mBTAdapter = BluetoothAdapter.getDefaultAdapter();
+        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
     private void initButtons() {
@@ -138,29 +138,29 @@ public class MultimeterActivity extends AppCompatActivity {
         findViewById(R.id.currentButton).setSelected(false);
     }
 
-    private void requestBTEnable() {
+    private void requestBtEnable() {
         Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
     }
 
-    private void checkBTAdapterStatus() {
-        if (!mBTAdapter.isEnabled()) {
-            requestBTEnable();
-        } else if (mBTService == null) {
-            setupBTService();
+    private void checkBtAdapterStatus() {
+        if (!mBtAdapter.isEnabled()) {
+            requestBtEnable();
+        } else if (mBtService == null) {
+            setupBtService();
         }
     }
 
-    private void setupBTService() {
-        mBTService = new OriginalChatService(this, mHandler);
+    private void setupBtService() {
+        mBtService = new OriginalChatService(this, mHandler);
     }
 
     private void sendMessage(String message) {
-        if (mBTService.getState() != OriginalChatService.STATE_CONNECTED) {
-            resumeBTService();
+        if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
+            resumeBtService();
         }
         String msg = new JMessage().putFlag(message).asString();
-        mBTService.writeMessage(msg.getBytes());
+        mBtService.writeMessage(msg.getBytes());
     }
 
     private void postResponse(Message msg) {
@@ -192,36 +192,36 @@ public class MultimeterActivity extends AppCompatActivity {
             return;
         }
         if (message.startsWith(Constants.UNABLE)) {
-            if (mBTService.getState() == OriginalChatService.STATE_NONE) {
-                mBTService.start();
+            if (mBtService.getState() == OriginalChatService.STATE_NONE) {
+                mBtService.start();
             }
-            if (mBTService.getState() == OriginalChatService.STATE_LISTEN) {
-                connectToBTDevice(true);
+            if (mBtService.getState() == OriginalChatService.STATE_LISTEN) {
+                connectToBtDevice(true);
             }
         }
     }
 
-    private void stopBTService() {
-        if (mBTService != null) {
-            mBTService.stop();
+    private void stopBtService() {
+        if (mBtService != null) {
+            mBtService.stop();
         }
     }
 
-    private void resumeBTService() {
-        if (mBTService != null) {
-            startBTService();
+    private void resumeBtService() {
+        if (mBtService != null) {
+            startBtService();
         } else {
-            setupBTService();
-            startBTService();
+            setupBtService();
+            startBtService();
         }
     }
 
-    private void startBTService() {
-        if (mBTService.getState() == OriginalChatService.STATE_NONE) {
-            mBTService.start();
+    private void startBtService() {
+        if (mBtService.getState() == OriginalChatService.STATE_NONE) {
+            mBtService.start();
             while (true) {
-                if (mBTService.getState() == OriginalChatService.STATE_LISTEN) {
-                    connectToBTDevice(true);
+                if (mBtService.getState() == OriginalChatService.STATE_LISTEN) {
+                    connectToBtDevice(true);
                     break;
                 }
             }
@@ -232,21 +232,21 @@ public class MultimeterActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    private void connectToBTDevice(boolean secure) {
+    private void connectToBtDevice(boolean secure) {
         SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Activity.MODE_PRIVATE);
         String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
         if (mAddress != null) {
-            BluetoothDevice mConnectedDevice = mBTAdapter.getRemoteDevice(mAddress);
-            mBTService.connect(mConnectedDevice, secure);
+            BluetoothDevice mConnectedDevice = mBtAdapter.getRemoteDevice(mAddress);
+            mBtService.connect(mConnectedDevice, secure);
         }
     }
 
     private void sendCancelMessage() {
-        if (mBTService.getState() != OriginalChatService.STATE_CONNECTED) {
-            resumeBTService();
+        if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
+            resumeBtService();
         }
         String msg = new JMessage().putFlag(Constants.T).asString();
-        mBTService.writeMessage(msg.getBytes());
+        mBtService.writeMessage(msg.getBytes());
     }
 
     private void closeScreen() {
@@ -257,22 +257,22 @@ public class MultimeterActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        checkBTAdapterStatus();
+        checkBtAdapterStatus();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mBTAdapter != null) {
-            mBTAdapter.cancelDiscovery();
+        if (mBtAdapter != null) {
+            mBtAdapter.cancelDiscovery();
         }
-        stopBTService();
+        stopBtService();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        resumeBTService();
+        resumeBtService();
     }
 
     @Override

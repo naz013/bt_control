@@ -23,7 +23,7 @@ public class DSOFragment extends Fragment {
 
     private MultimeterListener mMultimeterListener;
     private Context mContext;
-    private EditText yField;
+    private EditText mYField;
 
     private Handler mHandler = new Handler();
     private Runnable mRunnable = new Runnable() {
@@ -81,17 +81,17 @@ public class DSOFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        yField = (EditText) view.findViewById(R.id.yField);
+        mYField = (EditText) view.findViewById(R.id.yField);
         Button yButton = (Button) view.findViewById(R.id.yButton);
         yButton.setOnClickListener(mListener);
         ((CheckBox) view.findViewById(R.id.randomCheck)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    yField.setEnabled(false);
+                    mYField.setEnabled(false);
                     mHandler.postDelayed(mRunnable, 1000);
                 } else {
-                    yField.setEnabled(true);
+                    mYField.setEnabled(true);
                     mHandler.removeCallbacks(mRunnable);
                 }
             }
@@ -101,12 +101,12 @@ public class DSOFragment extends Fragment {
     private View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            String yString = yField.getText().toString().trim();
+            String yString = mYField.getText().toString().trim();
             if (yString.matches("")) {
                 showToast(mContext.getString(R.string.empty_y_field));
                 return;
             }
-            yField.setText("");
+            mYField.setText("");
             sendYValue(yString);
         }
     };
