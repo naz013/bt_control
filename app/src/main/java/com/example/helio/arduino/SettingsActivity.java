@@ -26,7 +26,7 @@ public class SettingsActivity extends AppCompatActivity {
         initActionBar();
         initViews();
 
-        loadDevice();
+        loadBTDevice();
     }
 
     private void initViews() {
@@ -38,13 +38,16 @@ public class SettingsActivity extends AppCompatActivity {
     private void initActionBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null)
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setTitle(R.string.settings);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        }
+        if (toolbar != null) {
+            toolbar.setTitle(R.string.settings);
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        }
     }
 
-    private void loadDevice() {
+    private void loadBTDevice() {
         BluetoothAdapter mAdapter = BluetoothAdapter.getDefaultAdapter();
         SharedPreferences preferences = getSharedPreferences(Constants.PREFS, MODE_PRIVATE);
         String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
@@ -58,11 +61,11 @@ public class SettingsActivity extends AppCompatActivity {
     private final View.OnClickListener buttonClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            unPairDevice();
+            removeBTDevice();
         }
     };
 
-    private void unPairDevice() {
+    private void removeBTDevice() {
         removePrefs();
         startActivity(new Intent(this, StartActivity.class));
         finish();

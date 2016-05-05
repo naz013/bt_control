@@ -34,15 +34,18 @@ public class StartActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT_AUTO = 16;
     private static final int REQUEST_CLICK = 105;
     private static final int REQUEST_AUTO = 102;
+
     private String mDeviceAddress;
     private String mDeviceName;
 
     private Button mPairButton;
     private RecyclerView mDeviceList;
+
     private ProgressDialog mDialog;
     private final List<BluetoothDevice> mDevices = new ArrayList<>();
+
     private DevicesRecyclerAdapter mAdapter;
-    private OriginalChatService mChatService = null;
+    private OriginalChatService mBTService = null;
     private BluetoothAdapter mBtAdapter;
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -71,7 +74,6 @@ public class StartActivity extends AppCompatActivity {
     private void initReceiver() {
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         this.registerReceiver(mReceiver, filter);
-
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         this.registerReceiver(mReceiver, filter);
     }
@@ -87,6 +89,10 @@ public class StartActivity extends AppCompatActivity {
         mDeviceList.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new DevicesRecyclerAdapter(StartActivity.this, mListener);
         mDeviceList.setAdapter(mAdapter);
+        addBoundedDevicesToList();
+    }
+
+    private void addBoundedDevicesToList() {
         if (mBtAdapter != null) {
             Set<BluetoothDevice> devices = mBtAdapter.getBondedDevices();
             for (BluetoothDevice device : devices) {
@@ -132,15 +138,15 @@ public class StartActivity extends AppCompatActivity {
         mAdapter.addDevice(device.getName() + "\n" + device.getAddress());
     }
 
-    private void saveDevice(String address) {
+    private void saveBTDevice(String address) {
         SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(Constants.DEVICE_ADDRESS, address);
         editor.commit();
     }
 
-    private void setupService() {
-        mChatService = new OriginalChatService(this, mHandler);
+    private void setupBTService() {
+        mBTService = new OriginalChatService(this, mHandler);
     }
 
     private final Handler mHandler = new Handler() {
@@ -161,11 +167,9 @@ public class StartActivity extends AppCompatActivity {
     private void obtainConnectionMessage(Message msg) {
         switch (msg.arg1) {
             case OriginalChatService.STATE_CONNECTED:
-                if (mDialog != null && mDialog.isShowing()) {
-                    mDialog.dismiss();
-                }
-                saveDevice(mDeviceAddress);
-                onFinish();
+                hideDialog();
+                saveBTDevice(mDeviceAddress);
+                showMainButton();
                 break;
             case OriginalChatService.STATE_CONNECTING:
                 mDialog = ProgressDialog.show(this, getString(R.string.bluetooth),
@@ -175,6 +179,12 @@ public class StartActivity extends AppCompatActivity {
                 break;
             case OriginalChatService.STATE_NONE:
                 break;
+        }
+    }
+
+    private void hideDialog() {
+        if (mDialog != null && mDialog.isShowing()) {
+            mDialog.dismiss();
         }
     }
 
@@ -189,27 +199,9 @@ public class StartActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (!mBtAdapter.isEnabled()) {
-            requestBluetoothEnabling(REQUEST_ENABLE_BT_AUTO);
-        } else if (mChatService == null) {
-            setupService();
-        }
-    }
-
     private void requestBluetoothEnabling(int requestCode) {
         Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableIntent, requestCode);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        stopChatService();
-        cancelDiscovering();
-        this.unregisterReceiver(mReceiver);
     }
 
     private void cancelDiscovering() {
@@ -218,23 +210,19 @@ public class StartActivity extends AppCompatActivity {
         }
     }
 
-    private void stopChatService() {
-        if (mChatService != null) {
-            mChatService.stop();
+    private void stopBTService() {
+        if (mBTService != null) {
+            mBTService.stop();
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        startChatService();
-    }
-
-    private void startChatService() {
-        if (mChatService != null) {
-            if (mChatService.getState() == OriginalChatService.STATE_NONE) {
-                mChatService.start();
+    private void startBTService() {
+        if (mBTService != null) {
+            if (mBTService.getState() == OriginalChatService.STATE_NONE) {
+                mBTService.start();
             }
+        } else {
+            setupBTService();
         }
     }
 
@@ -245,26 +233,65 @@ public class StartActivity extends AppCompatActivity {
             BluetoothDevice device = mDevices.get(position);
             mDeviceAddress = device.getAddress();
             mDeviceName = device.getName();
-            connectDevice(device);
+            connectToBTDevice(device);
         }
     };
 
-    private void connectDevice(BluetoothDevice device) {
+    private void connectToBTDevice(BluetoothDevice device) {
         if (mDeviceAddress != null) {
             while (true) {
-                if (mChatService != null) {
-                    if (mChatService.getState() == OriginalChatService.STATE_LISTEN) {
-                        mChatService.connect(device, true);
+                if (mBTService != null) {
+                    if (mBTService.getState() == OriginalChatService.STATE_LISTEN) {
+                        mBTService.connect(device, true);
                         break;
                     }
-                    if (mChatService.getState() == OriginalChatService.STATE_NONE) {
-                        mChatService.start();
+                    if (mBTService.getState() == OriginalChatService.STATE_NONE) {
+                        mBTService.start();
                     }
                 } else {
-                    setupService();
+                    setupBTService();
                 }
             }
         }
+    }
+
+    private final View.OnClickListener mClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            startActivity(new Intent(StartActivity.this, MainActivity.class));
+            finish();
+        }
+    };
+
+    private void showMainButton() {
+        mDeviceList.setVisibility(View.GONE);
+        mPairButton.setVisibility(View.VISIBLE);
+        mPairButton.setText(R.string.go_to_main_menu);
+        mPairButton.setOnClickListener(mClick);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (!mBtAdapter.isEnabled()) {
+            requestBluetoothEnabling(REQUEST_ENABLE_BT_AUTO);
+        } else if (mBTService == null) {
+            setupBTService();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopBTService();
+        cancelDiscovering();
+        this.unregisterReceiver(mReceiver);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        startBTService();
     }
 
     @Override
@@ -288,20 +315,5 @@ public class StartActivity extends AppCompatActivity {
         if (requestCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK) {
             doDiscovery(REQUEST_AUTO);
         }
-    }
-
-    private final View.OnClickListener mClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            startActivity(new Intent(StartActivity.this, MainActivity.class));
-            finish();
-        }
-    };
-
-    private void onFinish() {
-        mDeviceList.setVisibility(View.GONE);
-        mPairButton.setVisibility(View.VISIBLE);
-        mPairButton.setText(R.string.go_to_main_menu);
-        mPairButton.setOnClickListener(mClick);
     }
 }
