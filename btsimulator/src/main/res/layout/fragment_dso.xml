@@ -23,8 +23,8 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
-            android:inputType="numberDecimal"
-            android:digits="0123456789." />
+            android:inputType="numberSigned|numberDecimal"
+            android:digits="0123456789.-" />
 
         <Button
             android:id="@+id/yButton"

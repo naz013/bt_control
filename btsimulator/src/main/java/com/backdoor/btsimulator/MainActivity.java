@@ -26,6 +26,8 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     private BluetoothAdapter mBluetoothAdapter = null;
     private OriginalChatService mChatService = null;
 
+    private boolean isCreateCheck;
+
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -48,8 +50,14 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initActionBar();
-        initBluetoothAdapter();
-        checkBluetoothAvailability();
+        if (checkLocationPermission(103)) {
+            initBluetoothAdapter();
+            checkBluetoothAvailability();
+            if (!checkAdapterStatus()) {
+                requestBluetoothEnable();
+            }
+            isCreateCheck = false;
+        } else isCreateCheck = true;
         replaceFragment(EmptyFragment.newInstance());
     }
 
@@ -74,12 +82,8 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
         }
     }
 
-    private void checkAdapterStatus() {
-        if (!mBluetoothAdapter.isEnabled()) {
-            requestBluetoothEnable();
-        } else if (mChatService == null) {
-            setupService();
-        }
+    private boolean checkAdapterStatus() {
+        return mBluetoothAdapter.isEnabled();
     }
 
     private void requestBluetoothEnable() {
@@ -87,16 +91,13 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
         startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
     }
 
-    private void resumeBluetoothService() {
-        if (mChatService != null) {
-            startBluetoothService();
-        } else {
-            checkAdapterStatus();
-            startBluetoothService();
-        }
-    }
-
     private void startBluetoothService() {
+        if (mChatService == null) {
+            setupService();
+        }
+        if (!checkAdapterStatus()) {
+            return;
+        }
         if (mChatService.getState() == OriginalChatService.STATE_NONE) {
             mChatService.start();
             ensureDiscoverable();
@@ -104,8 +105,7 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     }
 
     private void ensureDiscoverable() {
-        if (mBluetoothAdapter.getScanMode() !=
-                BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+        if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
             discoverRequest();
         }
     }
@@ -147,8 +147,7 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     }
 
     private void refreshService() {
-        setupService();
-        resumeBluetoothService();
+        startBluetoothService();
     }
 
     private void getDeviceName(Message msg) {
@@ -179,21 +178,15 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
         ft.commit();
     }
 
-    private boolean checkLocationPermission() {
+    private boolean checkLocationPermission(int requestCode) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 102);
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, requestCode);
                 return false;
             }
             return true;
         }
         return true;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        checkAdapterStatus();
     }
 
     @Override
@@ -207,8 +200,8 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     @Override
     public void onResume() {
         super.onResume();
-        if (checkLocationPermission()) {
-            resumeBluetoothService();
+        if (!isCreateCheck && checkLocationPermission(102)) {
+            startBluetoothService();
         }
     }
 
@@ -216,7 +209,28 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case 102:
-                resumeBluetoothService();
+                startBluetoothService();
+                break;
+            case 103:
+                initBluetoothAdapter();
+                checkBluetoothAvailability();
+                if (!checkAdapterStatus()) {
+                    requestBluetoothEnable();
+                }
+                isCreateCheck = false;
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_ENABLE_BT:
+                if (resultCode == RESULT_OK) {
+                    if (checkAdapterStatus()) {
+                        setupService();
+                    }
+                }
                 break;
         }
     }
