@@ -38,9 +38,6 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
                 case Constants.MESSAGE_DEVICE_NAME:
                     getDeviceName(msg);
                     break;
-                case Constants.MESSAGE_TOAST:
-                    showMessage(msg);
-                    break;
             }
         }
     };
@@ -155,19 +152,6 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
         showToast(getString(R.string.connected_to) + " " + mConnectedDeviceName);
     }
 
-    private void showMessage(Message msg) {
-        String message = msg.getData().getString(Constants.TOAST);
-        if (message == null) {
-            return;
-        }
-        if (message.startsWith(Constants.UNABLE)) {
-            if (mChatService.getState() == OriginalChatService.STATE_NONE) {
-                mChatService.start();
-                ensureDiscoverable();
-            }
-        }
-    }
-
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
@@ -176,7 +160,11 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.content_fragment, fragment);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        ft.commit();
+        try {
+            ft.commitAllowingStateLoss();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean checkLocationPermission(int requestCode) {

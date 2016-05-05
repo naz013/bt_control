@@ -31,7 +31,6 @@ public class OriginalChatService {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private int mState;
-    private Context mContext;
 
     public static final int STATE_NONE = 0;       // we're doing nothing
     public static final int STATE_LISTEN = 1;     // now listening for incoming connections
@@ -42,7 +41,6 @@ public class OriginalChatService {
         this.mAdapter = BluetoothAdapter.getDefaultAdapter();
         this.mState = STATE_NONE;
         this.mHandler = handler;
-        this.mContext = context;
     }
 
     private synchronized void setState(int state) {
@@ -213,7 +211,7 @@ public class OriginalChatService {
                 BluetoothSocket socket;
                 try {
                     socket = mmServerSocket.accept();
-                } catch (IOException e) {
+                } catch (IOException|NullPointerException e) {
                     Log.e(TAG, "Socket Type: " + mSocketType + " accept() failed", e);
                     break;
                 }
@@ -342,6 +340,7 @@ public class OriginalChatService {
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
+                    OriginalChatService.this.start();
                     break;
                 }
             }
