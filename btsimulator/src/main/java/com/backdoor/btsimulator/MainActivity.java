@@ -1,12 +1,16 @@
 package com.backdoor.btsimulator;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
@@ -175,6 +179,17 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
         ft.commit();
     }
 
+    private boolean checkLocationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 102);
+                return false;
+            }
+            return true;
+        }
+        return true;
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -192,7 +207,18 @@ public class MainActivity extends AppCompatActivity implements MultimeterListene
     @Override
     public void onResume() {
         super.onResume();
-        resumeBluetoothService();
+        if (checkLocationPermission()) {
+            resumeBluetoothService();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 102:
+                resumeBluetoothService();
+                break;
+        }
     }
 
     @Override
