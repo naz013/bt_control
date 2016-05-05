@@ -20,7 +20,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.backdoor.shared.Constants;
 import com.backdoor.shared.OriginalChatService;
@@ -155,9 +154,6 @@ public class StartActivity extends AppCompatActivity {
         switch (msg.what) {
             case Constants.MESSAGE_STATE_CHANGE:
                 obtainConnectionMessage(msg);
-                break;
-            case Constants.MESSAGE_TOAST:
-                Toast.makeText(this, msg.getData().getString(Constants.TOAST), Toast.LENGTH_SHORT).show();
                 break;
         }
     }
