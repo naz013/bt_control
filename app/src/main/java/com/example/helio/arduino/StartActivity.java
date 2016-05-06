@@ -110,10 +110,11 @@ public class StartActivity extends AppCompatActivity {
         }
         if (!mBtAdapter.isEnabled()) {
             requestBtEnabling(REQUEST_ENABLE_BT);
-        }
-        cancelDiscovering();
-        if (code == REQUEST_CLICK_AUTO || code == REQUEST_CLICK) {
-            mBtAdapter.startDiscovery();
+        } else {
+            cancelDiscovering();
+            if (code == REQUEST_CLICK_AUTO || code == REQUEST_CLICK) {
+                mBtAdapter.startDiscovery();
+            }
         }
         if (code == REQUEST_CLICK) {
             mPairButton.setVisibility(View.GONE);
@@ -220,6 +221,9 @@ public class StartActivity extends AppCompatActivity {
     }
 
     private void startBtService() {
+        if (!mBtAdapter.isEnabled()) {
+            return;
+        }
         if (mBtService != null) {
             if (mBtService.getState() == OriginalChatService.STATE_NONE) {
                 mBtService.start();
@@ -323,7 +327,7 @@ public class StartActivity extends AppCompatActivity {
         if (requestCode == REQUEST_ENABLE_BT_AUTO) {
             if (resultCode == RESULT_OK) {
                 doDiscovery(REQUEST_AUTO);
-            } else requestBtEnabling(REQUEST_ENABLE_BT_AUTO);
+            }
         }
     }
 }
