@@ -27,7 +27,7 @@ import com.backdoor.shared.SignalObject;
 
 public class SignalActivity extends AppCompatActivity {
 
-    private static final int REQUEST_ENABLE_BT = 3;
+    private static final int REQUEST_ENABLE_BT = 15;
 
     private BluetoothAdapter mBtAdapter = null;
     private OriginalChatService mBtService = null;
@@ -278,6 +278,15 @@ public class SignalActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ENABLE_BT) {
+            if (resultCode != RESULT_OK) {
+                requestBtEnable();
+            }
         }
     }
 

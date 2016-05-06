@@ -300,6 +300,15 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ENABLE_BT) {
+            if (resultCode != RESULT_OK) {
+                requestBtEnable();
+            }
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         closeScreen();
     }

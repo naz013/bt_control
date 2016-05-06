@@ -33,6 +33,7 @@ public class StartActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT = 15;
     private static final int REQUEST_ENABLE_BT_AUTO = 16;
     private static final int REQUEST_CLICK = 105;
+    private static final int REQUEST_CLICK_AUTO = 106;
     private static final int REQUEST_AUTO = 102;
 
     private String mDeviceAddress;
@@ -111,8 +112,10 @@ public class StartActivity extends AppCompatActivity {
             requestBtEnabling(REQUEST_ENABLE_BT);
         }
         cancelDiscovering();
-        if (code == REQUEST_CLICK) {
+        if (code == REQUEST_CLICK_AUTO || code == REQUEST_CLICK) {
             mBtAdapter.startDiscovery();
+        }
+        if (code == REQUEST_CLICK) {
             mPairButton.setVisibility(View.GONE);
             mDeviceList.setVisibility(View.VISIBLE);
         }
@@ -314,7 +317,7 @@ public class StartActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ENABLE_BT) {
             if (resultCode == RESULT_OK) {
-                doDiscovery(REQUEST_AUTO);
+                doDiscovery(REQUEST_CLICK_AUTO);
             } else requestBtEnabling(REQUEST_ENABLE_BT);
         }
         if (requestCode == REQUEST_ENABLE_BT_AUTO) {
