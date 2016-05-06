@@ -56,8 +56,6 @@ public class StartActivity extends AppCompatActivity {
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 addDeviceToList(device);
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                addNoDevicesToList();
             }
         }
     };
@@ -177,7 +175,7 @@ public class StartActivity extends AppCompatActivity {
                 break;
             case OriginalChatService.STATE_CONNECTING:
                 mDialog = ProgressDialog.show(this, getString(R.string.bluetooth),
-                        getString(R.string.title_connecting) + " " + mDeviceName, true, false);
+                        getString(R.string.title_connecting) + " " + mDeviceName, true, true);
                 break;
             case OriginalChatService.STATE_LISTEN:
                 break;
