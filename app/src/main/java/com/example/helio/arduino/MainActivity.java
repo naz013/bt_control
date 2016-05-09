@@ -14,16 +14,20 @@ import com.example.helio.arduino.dso.DSOActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static Activity a;
+    private static Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        a = this;
+        activity = this;
         setContentView(R.layout.activity_main);
         sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
         initActionBar();
         initButtons();
+    }
+
+    public static Activity getActivity() {
+        return activity;
     }
 
     private void initButtons() {

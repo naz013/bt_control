@@ -38,14 +38,14 @@ public class SignalActivity extends AppCompatActivity {
     private EditText mMagnitudeField;
     private TextView mBlockView;
 
-    public static Activity a;
+    private static Activity activity;
 
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case Constants.MESSAGE_DEVICE_NAME:
-                    getDeviceName(msg);
+                    showConnectedDeviceName(msg);
                     break;
                 case Constants.MESSAGE_TOAST:
                     showMessage(msg);
@@ -57,13 +57,17 @@ public class SignalActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        a = this;
+        activity = this;
         setContentView(R.layout.activity_signal);
         initBtAdapter();
         initActionBar();
         initViews();
         initButtons();
         initBlockView();
+    }
+
+    public static Activity getActivity() {
+        return activity;
     }
 
     private void initViews() {
@@ -173,7 +177,7 @@ public class SignalActivity extends AppCompatActivity {
         mBtService.writeMessage(msg.getBytes());
     }
 
-    private void getDeviceName(Message msg) {
+    private void showConnectedDeviceName(Message msg) {
         String mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
         showToast(getString(R.string.connected_to) + " " + mConnectedDeviceName);
         mBlockView.setVisibility(View.GONE);
@@ -283,10 +287,8 @@ public class SignalActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_ENABLE_BT) {
-            if (resultCode != RESULT_OK) {
-                requestBtEnable();
-            }
+        if (requestCode == REQUEST_ENABLE_BT && resultCode != RESULT_OK) {
+            requestBtEnable();
         }
     }
 

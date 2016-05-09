@@ -68,17 +68,17 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void removeBtDevice() {
         removePrefs();
-        if (DSOActivity.a != null) {
-            DSOActivity.a.finish();
+        if (DSOActivity.getActivity() != null) {
+            DSOActivity.getActivity().finish();
         }
-        if (MainActivity.a != null) {
-            MainActivity.a.finish();
+        if (MainActivity.getActivity() != null) {
+            MainActivity.getActivity().finish();
         }
-        if (SignalActivity.a != null) {
-            SignalActivity.a.finish();
+        if (SignalActivity.getActivity() != null) {
+            SignalActivity.getActivity().finish();
         }
-        if (MultimeterActivity.a != null) {
-            MultimeterActivity.a.finish();
+        if (MultimeterActivity.getActivity() != null) {
+            MultimeterActivity.getActivity().finish();
         }
         startActivity(new Intent(getApplicationContext(), SplashActivity.class));
         finish();

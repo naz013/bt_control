@@ -61,14 +61,14 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
     private BluetoothAdapter mBtAdapter = null;
     private OriginalChatService mBtService = null;
 
-    public static Activity a;
+    private static Activity activity;
 
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case Constants.MESSAGE_DEVICE_NAME:
-                    getDeviceName(msg);
+                    showConnectedDeviceName(msg);
                     break;
                 case Constants.MESSAGE_TOAST:
                     showMessage(msg);
@@ -83,13 +83,17 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        a = this;
+        activity = this;
         setContentView(R.layout.activity_dso);
         initBtAdapter();
         initActionBar();
         initButtons();
         initChart();
         initBlockView();
+    }
+
+    public static Activity getActivity() {
+        return activity;
     }
 
     private void initBlockView() {
@@ -214,7 +218,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         }
     };
 
-    private void getDeviceName(Message msg) {
+    private void showConnectedDeviceName(Message msg) {
         String mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
         showToast(getString(R.string.connected_to) + " " + mConnectedDeviceName);
         mBlockView.setVisibility(View.GONE);
@@ -435,10 +439,8 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_ENABLE_BT) {
-            if (resultCode != RESULT_OK) {
-                requestBtEnable();
-            }
+        if (requestCode == REQUEST_ENABLE_BT && resultCode != RESULT_OK) {
+            requestBtEnable();
         }
     }
 

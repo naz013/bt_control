@@ -128,13 +128,6 @@ public class StartActivity extends AppCompatActivity {
         }
     };
 
-    private void addNoDevicesToList() {
-        if (mRecyclerAdapter.getItemCount() == 0) {
-            String noDevices = getString(R.string.none_found);
-            mRecyclerAdapter.addDevice(noDevices);
-        }
-    }
-
     private void addDeviceToList(BluetoothDevice device) {
         mDevices.add(device);
         mRecyclerAdapter.addDevice(device.getName() + "\n" + device.getAddress());
@@ -322,10 +315,8 @@ public class StartActivity extends AppCompatActivity {
                 doDiscovery(REQUEST_CLICK_AUTO);
             } else requestBtEnabling(REQUEST_ENABLE_BT);
         }
-        if (requestCode == REQUEST_ENABLE_BT_AUTO) {
-            if (resultCode == RESULT_OK) {
-                doDiscovery(REQUEST_AUTO);
-            }
+        if (requestCode == REQUEST_ENABLE_BT_AUTO && resultCode == RESULT_OK) {
+            doDiscovery(REQUEST_AUTO);
         }
     }
 }
