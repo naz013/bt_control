@@ -32,7 +32,6 @@
         <item>MHz</item>
     </array>
 
-    <string name="not_connected">You are not connected to a device</string>
     <string name="title_connecting">Connecting to</string>
 
     <string name="none_found">No devices found</string>
@@ -52,5 +51,4 @@
     <string name="arduino_vhart">Arduino chart</string>
     <string name="index_string">Index 10</string>
     <string name="wait_while_connection_was_established">Wait while connection was established</string>
-    <string name="exit_key">EXIT</string>
 </resources>
