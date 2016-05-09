@@ -3,6 +3,7 @@ package com.example.helio.arduino;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
+import com.backdoor.shared.Constants;
+import com.example.helio.arduino.dso.DSOActivity;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -23,7 +27,7 @@ public class SettingsActivity extends AppCompatActivity {
         initActionBar();
         initViews();
 
-        loadDevice();
+        loadBtDevice();
     }
 
     private void initViews() {
@@ -35,13 +39,16 @@ public class SettingsActivity extends AppCompatActivity {
     private void initActionBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null)
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setTitle(R.string.settings);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        }
+        if (toolbar != null) {
+            toolbar.setTitle(R.string.settings);
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        }
     }
 
-    private void loadDevice() {
+    private void loadBtDevice() {
         BluetoothAdapter mAdapter = BluetoothAdapter.getDefaultAdapter();
         SharedPreferences preferences = getSharedPreferences(Constants.PREFS, MODE_PRIVATE);
         String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
@@ -55,19 +62,25 @@ public class SettingsActivity extends AppCompatActivity {
     private final View.OnClickListener buttonClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            unPairDevice();
+            removeBtDevice();
         }
     };
 
-    private void unPairDevice() {
-        /*BluetoothDevice device = mAdapter.getRemoteDevice(mAddress);
-        try {
-            Method m = device.getClass().getMethod("removeBond", (Class[]) null);
-            m.invoke(device, (Object[]) null);
-        } catch (Exception e) {
-            Log.e("TAG", e.getMessage());
-        }*/
+    private void removeBtDevice() {
         removePrefs();
+        if (DSOActivity.getActivity() != null) {
+            DSOActivity.getActivity().finish();
+        }
+        if (MainActivity.getActivity() != null) {
+            MainActivity.getActivity().finish();
+        }
+        if (SignalActivity.getActivity() != null) {
+            SignalActivity.getActivity().finish();
+        }
+        if (MultimeterActivity.getActivity() != null) {
+            MultimeterActivity.getActivity().finish();
+        }
+        startActivity(new Intent(getApplicationContext(), SplashActivity.class));
         finish();
     }
 

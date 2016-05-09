@@ -9,12 +9,10 @@ import java.util.List;
 
 public class ImagesPagerAdapter extends FragmentPagerAdapter {
 
-    private final Context mContext;
     private final List<String> mPathList;
 
-    public ImagesPagerAdapter(Context context, FragmentManager fm, List<String> pathList) {
+    public ImagesPagerAdapter(FragmentManager fm, List<String> pathList) {
         super(fm);
-        this.mContext = context;
         this.mPathList = pathList;
     }
 

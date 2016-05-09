@@ -1,6 +1,6 @@
 package com.example.helio.arduino;
 
-import android.bluetooth.BluetoothAdapter;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,22 +14,20 @@ import com.example.helio.arduino.dso.DSOActivity;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static Activity activity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = this;
         setContentView(R.layout.activity_main);
         sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
         initActionBar();
         initButtons();
-        //checkBluetooth();
     }
 
-    private void checkBluetooth() {
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (!bluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, 100);
-        }
+    public static Activity getActivity() {
+        return activity;
     }
 
     private void initButtons() {
@@ -41,10 +39,11 @@ public class MainActivity extends AppCompatActivity {
     private void initActionBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null)
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setHomeButtonEnabled(false);
+        }
         toolbar.setTitle(R.string.main_menu);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
     }
 
     private void openSignal() {
@@ -88,9 +87,6 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.actionSettings:
                 startActivity(new Intent(this, SettingsActivity.class));
-                return true;
-            case android.R.id.home:
-                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

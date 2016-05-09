@@ -6,7 +6,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.example.helio.arduino.Constants;
+import com.backdoor.shared.Constants;
 import com.example.helio.arduino.R;
 
 import java.io.File;
@@ -27,10 +27,9 @@ public class ImagePreviewActivity extends AppCompatActivity {
     }
 
     private void initImage() {
-        ImagesPagerAdapter adapter = new ImagesPagerAdapter(this, getFragmentManager(), loadFiles());
+        ImagesPagerAdapter adapter = new ImagesPagerAdapter(getFragmentManager(), loadFiles());
         ViewPager mViewPager = (ViewPager) findViewById(R.id.pagerView);
         mViewPager.setAdapter(adapter);
-
         int pos = getPhotoPosition();
         if (pos >= 0) {
             mViewPager.setCurrentItem(pos);
@@ -40,7 +39,9 @@ public class ImagePreviewActivity extends AppCompatActivity {
     private int getPhotoPosition() {
         if (mList.size() > 0) {
             return mList.indexOf(mPhotoPath);
-        } else return 0;
+        } else {
+            return 0;
+        }
     }
 
     private List<String> loadFiles() {
@@ -48,8 +49,9 @@ public class ImagePreviewActivity extends AppCompatActivity {
         File folder = new File(Environment.getExternalStorageDirectory().getPath() + "/" + Constants.SCREENS_FOLDER);
         if (folder.exists()) {
             File[] files = folder.listFiles();
-            for (File f : files)
+            for (File f : files) {
                 mList.add(f.toString());
+            }
         }
         return mList;
     }

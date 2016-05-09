@@ -44,7 +44,7 @@ public class ImagesRecyclerAdapter extends RecyclerView.Adapter<ImagesRecyclerAd
 
     @Override
     public int getItemCount() {
-        return mDataList != null ? mDataList.size() : 0;
+        return mDataList.size();
     }
 
     public class ImageViewHolder extends RecyclerView.ViewHolder{

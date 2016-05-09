@@ -8,7 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.example.helio.arduino.Constants;
+import com.backdoor.shared.Constants;
 import com.example.helio.arduino.R;
 
 import java.io.File;
@@ -38,8 +38,9 @@ public class ImagesActivity extends AppCompatActivity {
         File folder = new File(Environment.getExternalStorageDirectory().getPath() + "/" + Constants.SCREENS_FOLDER);
         if (folder.exists()) {
             File[] files = folder.listFiles();
-            for (File f : files)
+            for (File f : files) {
                 list.add(f.toString());
+            }
         }
         return list;
     }
@@ -47,10 +48,13 @@ public class ImagesActivity extends AppCompatActivity {
     private void initActionBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null)
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
-        toolbar.setTitle(R.string.screenshots);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        }
+        if (toolbar != null) {
+            toolbar.setTitle(R.string.screenshots);
+            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        }
     }
 
     @Override

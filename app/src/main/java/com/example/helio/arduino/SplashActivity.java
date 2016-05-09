@@ -3,8 +3,11 @@ package com.example.helio.arduino;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
+import com.backdoor.shared.Constants;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -16,7 +19,9 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void selectScreen() {
-        if (loadDevice() != null && !loadDevice().matches("")) {
+        if (Build.FINGERPRINT.contains("generic")) {
+            startActivity(new Intent(this, MainActivity.class));
+        } else if (loadDevice() != null && !loadDevice().matches("")) {
             startActivity(new Intent(this, MainActivity.class));
         } else {
             startActivity(new Intent(this, StartActivity.class));
