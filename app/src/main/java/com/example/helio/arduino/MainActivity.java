@@ -10,7 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.helio.arduino.dso.DSOActivity;
+import com.example.helio.arduino.dso.DsoActivity;
 import com.example.helio.arduino.signal.SignalActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openDSO() {
-        startActivity(new Intent(this, DSOActivity.class));
+        startActivity(new Intent(this, DsoActivity.class));
     }
 
     private void openMultimeter() {

@@ -38,7 +38,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".dso.DSOActivity"
+            android:name=".dso.DsoActivity"
             android:screenOrientation="portrait" />
 
         <activity
