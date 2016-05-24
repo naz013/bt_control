@@ -22,6 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,6 +61,8 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
 
     private ScatterChart mChart;
     private TextView mBlockView;
+    private Button mStopButton;
+    private Button mCaptureButton;
 
     private BluetoothAdapter mBtAdapter = null;
     private OriginalChatService mBtService = null;
@@ -172,10 +175,14 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
     }
 
     private void initButtons() {
-        findViewById(R.id.captureButton).setOnClickListener(mListener);
+        mCaptureButton = (Button) findViewById(R.id.captureButton);
+        mStopButton = (Button) findViewById(R.id.stopButton);
+        mCaptureButton.setOnClickListener(mListener);
         findViewById(R.id.screenshotButton).setOnClickListener(mListener);
         findViewById(R.id.viewScreenshot).setOnClickListener(mListener);
-        findViewById(R.id.stopButton).setOnClickListener(mListener);
+        mStopButton.setOnClickListener(mListener);
+        mStopButton.setEnabled(false);
+        mCaptureButton.setEnabled(true);
     }
 
     private void initActionBar() {
@@ -300,6 +307,8 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
     private void stopCapturing() {
         sendMessage(Constants.S);
         mCapturing = false;
+        mCaptureButton.setEnabled(true);
+        mStopButton.setEnabled(false);
     }
 
     private void showScreenshots() {
@@ -311,6 +320,8 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
     private void capture() {
         sendMessage(Constants.C);
         mCapturing = true;
+        mCaptureButton.setEnabled(false);
+        mStopButton.setEnabled(true);
     }
 
     private boolean checkPermission() {
