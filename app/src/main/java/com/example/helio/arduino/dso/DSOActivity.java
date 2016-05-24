@@ -25,8 +25,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.helio.arduino.Constants;
-import com.example.helio.arduino.OriginalChatService;
+import com.example.helio.arduino.core.Constants;
+import com.example.helio.arduino.core.OriginalChatService;
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.SettingsActivity;
 import com.github.mikephil.charting.charts.ScatterChart;

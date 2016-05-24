@@ -18,6 +18,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.helio.arduino.core.Constants;
+import com.example.helio.arduino.core.OriginalChatService;
+
 public class MultimeterActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 3;

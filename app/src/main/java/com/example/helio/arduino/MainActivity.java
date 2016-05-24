@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.helio.arduino.dso.DSOActivity;
+import com.example.helio.arduino.signal.SignalActivity;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -12,7 +12,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.dso.DSOActivity;
+import com.example.helio.arduino.signal.SignalActivity;
 
 public class SettingsActivity extends AppCompatActivity {
 

@@ -21,6 +21,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.helio.arduino.core.Constants;
+import com.example.helio.arduino.core.OriginalChatService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

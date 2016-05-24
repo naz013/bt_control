@@ -1,4 +1,4 @@
-package com.example.helio.arduino;
+package com.example.helio.arduino.signal;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -19,6 +19,11 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.helio.arduino.core.Constants;
+import com.example.helio.arduino.core.OriginalChatService;
+import com.example.helio.arduino.R;
+import com.example.helio.arduino.SettingsActivity;
 
 public class SignalActivity extends AppCompatActivity {
 

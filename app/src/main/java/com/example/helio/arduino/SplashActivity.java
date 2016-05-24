@@ -7,7 +7,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.example.helio.arduino.dso.DSOActivity;
+import com.example.helio.arduino.core.Constants;
+import com.example.helio.arduino.signal.SignalActivity;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -15,7 +16,7 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //selectScreen();
-        startActivity(new Intent(this, DSOActivity.class));
+        startActivity(new Intent(this, SignalActivity.class));
         finish();
     }
 

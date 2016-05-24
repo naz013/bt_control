@@ -1,4 +1,4 @@
-package com.example.helio.arduino;
+package com.example.helio.arduino.core;
 
 public class Constants {
 
