@@ -79,7 +79,7 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
 
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
-        mBlockView.setVisibility(View.GONE);
+        mBlockView.setVisibility(View.VISIBLE);
         mBlockView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
