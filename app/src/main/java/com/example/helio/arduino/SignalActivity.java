@@ -20,11 +20,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.backdoor.shared.Constants;
-import com.backdoor.shared.JMessage;
-import com.backdoor.shared.OriginalChatService;
-import com.backdoor.shared.SignalObject;
-
 public class SignalActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 15;
@@ -35,7 +30,6 @@ public class SignalActivity extends AppCompatActivity {
     private Spinner mWaveSelector;
     private Spinner mFrequencySelector;
     private EditText mFrequencyField;
-    private EditText mMagnitudeField;
     private TextView mBlockView;
 
     private static Activity activity;
@@ -74,7 +68,6 @@ public class SignalActivity extends AppCompatActivity {
         mWaveSelector = (Spinner) findViewById(R.id.waveType);
         mFrequencySelector = (Spinner) findViewById(R.id.freqSelector);
         mFrequencyField = (EditText) findViewById(R.id.freqField);
-        mMagnitudeField = (EditText) findViewById(R.id.magnitudeField);
     }
 
     private void initBlockView() {
@@ -148,7 +141,7 @@ public class SignalActivity extends AppCompatActivity {
         if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
             resumeBtService();
         }
-        String msg = new JMessage().putFlag(Constants.T).asString();
+        String msg = Constants.T;
         mBtService.writeMessage(msg.getBytes());
     }
 
@@ -161,19 +154,13 @@ public class SignalActivity extends AppCompatActivity {
             showToast(getString(R.string.empty_frequency));
             return;
         }
-        String magnitudeString = mMagnitudeField.getText().toString().trim();
-        if (magnitudeString.matches("")) {
-            showToast(getString(R.string.empty_magnitude));
+        int frequency = Integer.parseInt(freqString);
+        if (frequency > 20 || frequency < 0) {
+            showToast(getString(R.string.max_frequency4));
+            mFrequencyField.setText("0");
             return;
         }
-        int frequency = Integer.parseInt(freqString);
-        int magnitude = Integer.parseInt(magnitudeString);
-        SignalObject object = new SignalObject(mWaveSelector.getSelectedItemPosition(), frequency,
-                mFrequencySelector.getSelectedItemPosition(), magnitude);
-        String msg = new JMessage()
-                .putSignal(object)
-                .putFlag(Constants.G)
-                .asString();
+        String msg = Constants.G;
         mBtService.writeMessage(msg.getBytes());
     }
 

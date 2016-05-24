@@ -18,10 +18,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.backdoor.shared.Constants;
-import com.backdoor.shared.JMessage;
-import com.backdoor.shared.OriginalChatService;
-
 public class MultimeterActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 3;
@@ -166,21 +162,22 @@ public class MultimeterActivity extends AppCompatActivity {
         if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
             resumeBtService();
         }
-        String msg = new JMessage().putFlag(message).asString();
-        mBtService.writeMessage(msg.getBytes());
+        mBtService.writeMessage(message.getBytes());
     }
 
     private void postResponse(Message msg) {
         byte[] readBuff = (byte[]) msg.obj;
         String data = new String(readBuff, 0, msg.arg1);
-        JMessage jMessage = new JMessage(data);
         String v;
-        if (jMessage.hasVoltage()) {
-            v = jMessage.getVoltage();
-        } else if (jMessage.hasCurrent()) {
-            v = jMessage.getCurrent();
-        } else if (jMessage.hasResistance()) {
-            v = jMessage.getResistance();
+        if (data.startsWith(Constants.rV)) {
+            data = data.replace(Constants.rV, "");
+            v = data.trim();
+        } else if (data.startsWith(Constants.rI)) {
+            data = data.replace(Constants.rI, "");
+            v = data.trim();
+        } else if (data.startsWith(Constants.rR)) {
+            data = data.replace(Constants.rR, "");
+            v = data.trim();
         } else {
             v = getString(R.string.no_key);
         }
@@ -248,16 +245,7 @@ public class MultimeterActivity extends AppCompatActivity {
         }
     }
 
-    private void sendCancelMessage() {
-        if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
-            resumeBtService();
-        }
-        String msg = new JMessage().putFlag(Constants.T).asString();
-        mBtService.writeMessage(msg.getBytes());
-    }
-
     private void closeScreen() {
-        sendCancelMessage();
         finish();
     }
 

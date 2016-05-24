@@ -6,7 +6,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.backdoor.shared.Constants;
+import com.example.helio.arduino.Constants;
 import com.example.helio.arduino.R;
 
 import java.io.File;

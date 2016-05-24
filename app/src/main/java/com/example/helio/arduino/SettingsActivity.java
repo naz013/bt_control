@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.backdoor.shared.Constants;
 import com.example.helio.arduino.dso.DSOActivity;
 
 public class SettingsActivity extends AppCompatActivity {

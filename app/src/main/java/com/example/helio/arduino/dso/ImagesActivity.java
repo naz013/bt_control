@@ -8,7 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.backdoor.shared.Constants;
+import com.example.helio.arduino.Constants;
 import com.example.helio.arduino.R;
 
 import java.io.File;

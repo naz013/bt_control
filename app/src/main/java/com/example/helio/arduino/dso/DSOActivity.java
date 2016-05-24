@@ -16,6 +16,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,44 +25,57 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.backdoor.shared.Constants;
-import com.backdoor.shared.JMessage;
-import com.backdoor.shared.OriginalChatService;
+import com.example.helio.arduino.Constants;
+import com.example.helio.arduino.OriginalChatService;
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.SettingsActivity;
-import com.github.mikephil.charting.animation.Easing;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.LimitLine;
+import com.github.mikephil.charting.charts.ScatterChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.ScatterData;
+import com.github.mikephil.charting.data.ScatterDataSet;
 import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 
 public class DSOActivity extends AppCompatActivity implements OnChartGestureListener, OnChartValueSelectedListener {
 
-    private static final int CHART_VISIBLE = 40;
+    private static final int CHART_VISIBLE = 100;
     private static final int REQUEST_ENABLE_BT = 3;
     private static final float CHART_MAX_Y = 220f;
+    private static final String TAG = "TAG";
 
     private boolean mCapturing = false;
 
-    private LineChart mChart;
+    private ScatterChart mChart;
     private TextView mBlockView;
 
     private BluetoothAdapter mBtAdapter = null;
     private OriginalChatService mBtService = null;
 
     private static Activity activity;
+
+    private Handler mDataHandler = new Handler();
+    private Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            int x = new Random().nextInt(50 - 1 + 1) + 1;
+            float y = new Random().nextFloat() * (150 - (-25)) + 150;
+            addNewEntry(x, y);
+            mDataHandler.postDelayed(mRunnable, 500);
+        }
+    };
 
     private final Handler mHandler = new Handler() {
         @Override
@@ -90,6 +104,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         initButtons();
         initChart();
         initBlockView();
+        mDataHandler.postDelayed(mRunnable, 500);
     }
 
     public static Activity getActivity() {
@@ -98,7 +113,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
 
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
-        mBlockView.setVisibility(View.VISIBLE);
+        mBlockView.setVisibility(View.GONE);
         mBlockView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -112,7 +127,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
     }
 
     private void initChart() {
-        mChart = (LineChart) findViewById(R.id.chart1);
+        mChart = (ScatterChart) findViewById(R.id.chart1);
         mChart.setOnChartGestureListener(this);
         mChart.setOnChartValueSelectedListener(this);
         mChart.setDrawGridBackground(false);
@@ -120,13 +135,28 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         mChart.setDragEnabled(true);
         mChart.setScaleEnabled(true);
         mChart.setPinchZoom(true);
+        mChart.setNoDataText(getString(R.string.no_data_available));
+        mChart.setMaxVisibleValueCount(200);
+        mChart.setAutoScaleMinMaxEnabled(true);
         mChart.setDescription(getString(R.string.arduino_chart));
 
-        LimitLine llXAxis = new LimitLine(10f, getString(R.string.index_string));
-        llXAxis.setLineWidth(4f);
-        llXAxis.enableDashedLine(10f, 10f, 0f);
-        llXAxis.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
-        llXAxis.setTextSize(10f);
+        ArrayList<String> xVals = new ArrayList<>();
+        for (int i = 0; i < 50 + 1; i++) {
+            xVals.add((i) + "");
+        }
+        ArrayList<Entry> entries = new ArrayList<>();
+        entries.add(new Entry(0f, 0));
+        ScatterDataSet dataSet = new ScatterDataSet(entries, getString(R.string.arduino_vhart));
+        dataSet.setColor(Color.BLACK);
+        dataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
+        dataSet.setScatterShapeHoleRadius(0f);
+        dataSet.setScatterShapeSize(5f);
+        dataSet.setValueTextSize(9f);
+        ScatterData data = new ScatterData(xVals, dataSet);
+        mChart.setData(data);
+
+        Legend l = mChart.getLegend();
+        l.setPosition(Legend.LegendPosition.RIGHT_OF_CHART);
 
         YAxis leftAxis = mChart.getAxisLeft();
         leftAxis.removeAllLimitLines();
@@ -134,12 +164,11 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         leftAxis.setAxisMinValue(-50f);
         leftAxis.setDrawZeroLine(true);
 
-        LineData data = new LineData();
-        mChart.setData(data);
         mChart.getAxisRight().setEnabled(false);
-        mChart.getLegend().setEnabled(false);
-        mChart.setVisibleXRangeMaximum(CHART_VISIBLE);
-        mChart.animateX(2000, Easing.EasingOption.EaseInOutQuart);
+
+        XAxis xl = mChart.getXAxis();
+        xl.setDrawGridLines(false);
+        mChart.invalidate();
     }
 
     private void initButtons() {
@@ -182,19 +211,23 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
             resumeBtService();
         }
-        if (message.length() > 0) {
-            String msg = new JMessage().putFlag(message).asString();
-            mBtService.writeMessage(msg.getBytes());
-        }
+        mBtService.writeMessage(message.getBytes());
     }
 
     private void readDso(Message msg) {
         byte[] readBuff = (byte[]) msg.obj;
         String data = new String(readBuff, 0, msg.arg1);
-        JMessage jMessage = new JMessage(data);
-        if (jMessage.hasYValue()) {
-            float value = Float.parseFloat(jMessage.getYValue());
-            if (mCapturing) addNewEntry(value);
+        if (data.contains(Constants.rX) && data.contains(Constants.rY)) {
+            String[] parts = data.split(Constants.DIV);
+            String xVal = parts[0].replace(Constants.rX, "");
+            int x = Integer.parseInt(xVal.trim());
+            String yVal = parts[1].replace(Constants.rY, "");
+            float y = Float.parseFloat(yVal.trim());
+            if (mCapturing) addNewEntry(x, y);
+        } else if (data.contains(Constants.rY)) {
+
+        } else if (data.contains(Constants.rX)) {
+
         }
     }
 
@@ -321,36 +354,42 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         Toast.makeText(this, R.string.screenshot_saved, Toast.LENGTH_SHORT).show();
     }
 
-    private void addNewEntry(float value) {
-        LineData lineData = mChart.getLineData();
-        if (lineData != null) {
-            ILineDataSet set = lineData.getDataSetByIndex(0);
-            if (set == null) {
+    private void addNewEntry(int x, float y) {
+        ScatterData scatterData = mChart.getScatterData();
+        Log.d(TAG, "addNewEntry: get scatter data x " + x + ", y "+ y);
+        if (scatterData != null) {
+            IScatterDataSet set;
+            try {
+                set = scatterData.getDataSetByIndex(0);
+                if (set == null) {
+                    set = createSet();
+                    scatterData.addDataSet(set);
+                }
+            } catch (ArrayIndexOutOfBoundsException e) {
                 set = createSet();
-                lineData.addDataSet(set);
+                scatterData.addDataSet(set);
             }
-            lineData.addXValue(lineData.getXValCount() + " ");
-            lineData.addEntry(new Entry(value, set.getEntryCount()), 0);
-            updateChart(lineData.getXValCount());
+            scatterData.addXValue(x + "");
+            scatterData.addEntry(new Entry(y, set.getEntryCount()), 0);
+            updateChart(scatterData.getXValCount());
         }
     }
 
-    private LineDataSet createSet() {
-        LineDataSet set = new LineDataSet(null, getString(R.string.arduino_vhart));
+    private ScatterDataSet createSet() {
+        ScatterDataSet set = new ScatterDataSet(null, getString(R.string.arduino_vhart));
         set.setColor(Color.BLACK);
-        set.setLineWidth(1f);
-        set.setCircleRadius(1f);
-        set.getCircleColor(Color.BLUE);
-        set.setDrawCircleHole(false);
+        set.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
+        set.setScatterShapeHoleRadius(0f);
+        set.setScatterShapeSize(5f);
         set.setValueTextSize(9f);
-        set.setDrawFilled(true);
         return set;
     }
 
     private void updateChart(int xValCount) {
         mChart.notifyDataSetChanged();
         mChart.setVisibleXRangeMaximum(CHART_VISIBLE);
-        mChart.moveViewToX(xValCount - CHART_VISIBLE);
+        mChart.invalidate();
+        //mChart.moveViewToX(xValCount - CHART_VISIBLE);
     }
 
     private void showToast(String message) {
@@ -362,7 +401,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
         if (mAddress != null) {
             BluetoothDevice mConnectedDevice = mBtAdapter.getRemoteDevice(mAddress);
-            mBtService.connect(mConnectedDevice, secure);
+            //mBtService.connect(mConnectedDevice, secure);
         }
     }
 
@@ -370,7 +409,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
             resumeBtService();
         }
-        String msg = new JMessage().putFlag(Constants.T).asString();
+        String msg = Constants.S;
         mBtService.writeMessage(msg.getBytes());
     }
 
@@ -391,6 +430,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         if (mBtAdapter != null) {
             mBtAdapter.cancelDiscovery();
         }
+        mDataHandler.removeCallbacks(mRunnable);
         stopBtService();
     }
 

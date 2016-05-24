@@ -1,4 +1,4 @@
-package com.backdoor.shared;
+package com.example.helio.arduino;
 
 public class Constants {
 

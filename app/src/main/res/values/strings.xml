@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MULTI LAB</string>
+    <string name="app_name">DATA LAB</string>
     <string name="pair_device">Pair device</string>
     <string name="forgot">Disconnect</string>
     <string name="multimeter">Multimeter</string>
@@ -51,4 +51,6 @@
     <string name="arduino_vhart">Arduino chart</string>
     <string name="index_string">Index 10</string>
     <string name="wait_while_connection_was_established">Wait while connection was established</string>
+    <string name="max_frequency4">Maximum frequency is 20MHz</string>
+    <string name="no_data_available">No data available</string>
 </resources>
