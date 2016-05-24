@@ -2,6 +2,11 @@ package com.example.helio.arduino.core;
 
 public class Constants {
 
+    public static final int HZ = 1;
+    public static final int kHZ = HZ * 1000;
+    public static final int MHZ = kHZ * 1000;
+    public static final int MAX_HZ = MHZ * 20;
+
     // Message types sent from the BluetoothChatService Handler
     public static final int MESSAGE_STATE_CHANGE = 1;
     public static final int MESSAGE_READ = 2;

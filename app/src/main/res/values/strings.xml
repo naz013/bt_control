@@ -53,4 +53,9 @@
     <string name="wait_while_connection_was_established">Wait while connection was established</string>
     <string name="max_frequency4">Maximum frequency is 20MHz</string>
     <string name="no_data_available">No data available</string>
+
+    <string name="duty_cycle">Duty cycle</string>
+    <string name="pwm">PWM</string>
+    <string name="must_be_less_than">Must be less than 100!</string>
+    <string name="must_be_not_empty">Must be not empty!</string>
 </resources>

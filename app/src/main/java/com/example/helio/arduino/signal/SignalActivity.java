@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -15,27 +17,25 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.helio.arduino.core.Constants;
-import com.example.helio.arduino.core.OriginalChatService;
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.SettingsActivity;
+import com.example.helio.arduino.core.Constants;
+import com.example.helio.arduino.core.OriginalChatService;
 
-public class SignalActivity extends AppCompatActivity {
+public class SignalActivity extends AppCompatActivity implements FragmentListener {
 
     private static final int REQUEST_ENABLE_BT = 15;
 
     private BluetoothAdapter mBtAdapter = null;
     private OriginalChatService mBtService = null;
 
-    private Spinner mWaveSelector;
-    private Spinner mFrequencySelector;
-    private EditText mFrequencyField;
     private TextView mBlockView;
+    private ViewPager mViewPager;
+
+    private PagerAdapter mPagerAdapter;
 
     private static Activity activity;
 
@@ -60,24 +60,26 @@ public class SignalActivity extends AppCompatActivity {
         setContentView(R.layout.activity_signal);
         initBtAdapter();
         initActionBar();
-        initViews();
-        initButtons();
+        initTabNavigation();
         initBlockView();
+    }
+
+    private void initTabNavigation() {
+        mPagerAdapter = new PagerAdapter(this, getFragmentManager());
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mPagerAdapter);
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(mViewPager);
     }
 
     public static Activity getActivity() {
         return activity;
     }
 
-    private void initViews() {
-        mWaveSelector = (Spinner) findViewById(R.id.waveType);
-        mFrequencySelector = (Spinner) findViewById(R.id.freqSelector);
-        mFrequencyField = (EditText) findViewById(R.id.freqField);
-    }
-
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
-        mBlockView.setVisibility(View.VISIBLE);
+        mBlockView.setVisibility(View.GONE);
         mBlockView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -88,11 +90,6 @@ public class SignalActivity extends AppCompatActivity {
 
     private void initBtAdapter() {
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-    }
-
-    private void initButtons() {
-        findViewById(R.id.generateButton).setOnClickListener(mListener);
-        findViewById(R.id.terminateButton).setOnClickListener(mListener);
     }
 
     private void initActionBar() {
@@ -106,24 +103,6 @@ public class SignalActivity extends AppCompatActivity {
             toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         }
     }
-
-    private void generateSignal() {
-        sendSignal();
-    }
-
-    private final View.OnClickListener mListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.generateButton:
-                    generateSignal();
-                    break;
-                case R.id.terminateButton:
-                    sendTerminateMessage();
-                    break;
-            }
-        }
-    };
 
     private void requestBtEnable() {
         Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -140,33 +119,6 @@ public class SignalActivity extends AppCompatActivity {
 
     private void setupBtService() {
         mBtService = new OriginalChatService(this, mHandler);
-    }
-
-    private void sendTerminateMessage() {
-        if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
-            resumeBtService();
-        }
-        String msg = Constants.T;
-        mBtService.writeMessage(msg.getBytes());
-    }
-
-    private void sendSignal() {
-        if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
-            resumeBtService();
-        }
-        String freqString = mFrequencyField.getText().toString().trim();
-        if (freqString.matches("")) {
-            showToast(getString(R.string.empty_frequency));
-            return;
-        }
-        int frequency = Integer.parseInt(freqString);
-        if (frequency > 20 || frequency < 0) {
-            showToast(getString(R.string.max_frequency4));
-            mFrequencyField.setText("0");
-            return;
-        }
-        String msg = Constants.G;
-        mBtService.writeMessage(msg.getBytes());
     }
 
     private void showConnectedDeviceName(Message msg) {
@@ -230,11 +182,6 @@ public class SignalActivity extends AppCompatActivity {
         }
     }
 
-    private void closeScreen() {
-        sendTerminateMessage();
-        finish();
-    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -270,7 +217,7 @@ public class SignalActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             case android.R.id.home:
-                closeScreen();
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -285,7 +232,10 @@ public class SignalActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        closeScreen();
+    public void onAction(String message) {
+        if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
+            resumeBtService();
+        }
+        mBtService.writeMessage(message.getBytes());
     }
 }
