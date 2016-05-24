@@ -64,10 +64,10 @@ public class StartActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         initDeviceList();
         initButtons();
         initReceiver();
-        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
     private void initReceiver() {
@@ -97,7 +97,7 @@ public class StartActivity extends AppCompatActivity {
             for (BluetoothDevice device : devices) {
                 String name = device.getName();
                 String address = device.getAddress();
-                mRecyclerAdapter.addDevice(name + "\n" + address);
+                mRecyclerAdapter.addDevice(name + "\n" + address, address);
             }
         }
     }
@@ -130,7 +130,7 @@ public class StartActivity extends AppCompatActivity {
 
     private void addDeviceToList(BluetoothDevice device) {
         mDevices.add(device);
-        mRecyclerAdapter.addDevice(device.getName() + "\n" + device.getAddress());
+        mRecyclerAdapter.addDevice(device.getName() + "\n" + device.getAddress(), device.getAddress());
     }
 
     private void saveBtDevice(String address) {
@@ -228,7 +228,7 @@ public class StartActivity extends AppCompatActivity {
         @Override
         public void onClick(View view, int position) {
             mBtAdapter.cancelDiscovery();
-            BluetoothDevice device = mDevices.get(position);
+            BluetoothDevice device = mBtAdapter.getRemoteDevice(mRecyclerAdapter.getDevice(position));
             mDeviceAddress = device.getAddress();
             mDeviceName = device.getName();
             connectToBtDevice(device);
