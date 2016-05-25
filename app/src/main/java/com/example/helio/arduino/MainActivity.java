@@ -1,6 +1,7 @@
 package com.example.helio.arduino;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,14 +16,17 @@ import com.example.helio.arduino.signal.SignalActivity;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_ENABLE_BT_AUTO = 16;
+
     private static Activity activity;
+    private BluetoothAdapter mBtAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this;
         setContentView(R.layout.activity_main);
-        sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
+        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         initActionBar();
         initButtons();
     }
@@ -76,11 +80,31 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private void requestBtEnabling(int requestCode) {
+        Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(enableIntent, requestCode);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (!mBtAdapter.isEnabled()) {
+            requestBtEnabling(REQUEST_ENABLE_BT_AUTO);
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ENABLE_BT_AUTO && resultCode != RESULT_OK) {
+            requestBtEnabling(REQUEST_ENABLE_BT_AUTO);
+        }
     }
 
     @Override

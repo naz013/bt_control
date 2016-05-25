@@ -197,19 +197,21 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private void setupConnector() {
-        stopConnection();
-        try {
-            String emptyName = "None";
-            SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Activity.MODE_PRIVATE);
-            String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
-            if (mAddress != null) {
-                BluetoothDevice mConnectedDevice = mBtAdapter.getRemoteDevice(mAddress);
-                DeviceData data = new DeviceData(mConnectedDevice, emptyName);
-                mBtService = new OriginalChatService(data, mHandler);
-                mBtService.connect();
+        if (mBtAdapter.isEnabled()) {
+            stopConnection();
+            try {
+                String emptyName = "None";
+                SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Activity.MODE_PRIVATE);
+                String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
+                if (mAddress != null) {
+                    BluetoothDevice mConnectedDevice = mBtAdapter.getRemoteDevice(mAddress);
+                    DeviceData data = new DeviceData(mConnectedDevice, emptyName);
+                    mBtService = new OriginalChatService(data, mHandler);
+                    mBtService.connect();
+                }
+            } catch (IllegalArgumentException e) {
+                Log.d("TAG", "setupConnector failed: " + e.getMessage());
             }
-        } catch (IllegalArgumentException e) {
-            Log.d("TAG", "setupConnector failed: " + e.getMessage());
         }
     }
 
