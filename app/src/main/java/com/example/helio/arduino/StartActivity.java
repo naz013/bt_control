@@ -18,10 +18,12 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.example.helio.arduino.core.Constants;
+import com.example.helio.arduino.core.DeviceData;
 import com.example.helio.arduino.core.OriginalChatService;
 
 import java.util.ArrayList;
@@ -140,10 +142,6 @@ public class StartActivity extends AppCompatActivity {
         editor.commit();
     }
 
-    private void setupBtService() {
-        mBtService = new OriginalChatService(this, mHandler);
-    }
-
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -169,8 +167,6 @@ public class StartActivity extends AppCompatActivity {
             case OriginalChatService.STATE_CONNECTING:
                 mDialog = ProgressDialog.show(this, getString(R.string.bluetooth),
                         getString(R.string.title_connecting) + " " + mDeviceName, true, true);
-                break;
-            case OriginalChatService.STATE_LISTEN:
                 break;
             case OriginalChatService.STATE_NONE:
                 break;
@@ -211,19 +207,6 @@ public class StartActivity extends AppCompatActivity {
         }
     }
 
-    private void startBtService() {
-        if (!mBtAdapter.isEnabled()) {
-            return;
-        }
-        if (mBtService != null) {
-            if (mBtService.getState() == OriginalChatService.STATE_NONE) {
-                mBtService.start();
-            }
-        } else {
-            setupBtService();
-        }
-    }
-
     private final DeviceClickListener mListener = new DeviceClickListener() {
         @Override
         public void onClick(View view, int position) {
@@ -231,25 +214,26 @@ public class StartActivity extends AppCompatActivity {
             BluetoothDevice device = mBtAdapter.getRemoteDevice(mRecyclerAdapter.getDevice(position));
             mDeviceAddress = device.getAddress();
             mDeviceName = device.getName();
-            connectToBtDevice(device);
+            setupConnector(device);
         }
     };
 
-    private void connectToBtDevice(BluetoothDevice device) {
-        if (mDeviceAddress != null) {
-            while (true) {
-                if (mBtService != null) {
-                    if (mBtService.getState() == OriginalChatService.STATE_LISTEN) {
-                        mBtService.connect(device, true);
-                        break;
-                    }
-                    if (mBtService.getState() == OriginalChatService.STATE_NONE) {
-                        mBtService.start();
-                    }
-                } else {
-                    setupBtService();
-                }
-            }
+    private void stopConnection() {
+        if (mBtService != null) {
+            mBtService.stop();
+            mBtService = null;
+        }
+    }
+
+    private void setupConnector(BluetoothDevice connectedDevice) {
+        stopConnection();
+        try {
+            String emptyName = "None";
+            DeviceData data = new DeviceData(connectedDevice, emptyName);
+            mBtService = new OriginalChatService(data, mHandler);
+            mBtService.connect();
+        } catch (IllegalArgumentException e) {
+            Log.d("TAG", "setupConnector failed: " + e.getMessage());
         }
     }
 
@@ -273,8 +257,6 @@ public class StartActivity extends AppCompatActivity {
         super.onStart();
         if (!mBtAdapter.isEnabled()) {
             requestBtEnabling(REQUEST_ENABLE_BT_AUTO);
-        } else if (mBtService == null) {
-            setupBtService();
         }
     }
 
@@ -284,12 +266,6 @@ public class StartActivity extends AppCompatActivity {
         stopBtService();
         cancelDiscovering();
         this.unregisterReceiver(mReceiver);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        startBtService();
     }
 
     @Override

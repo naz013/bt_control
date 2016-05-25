@@ -118,14 +118,15 @@ public class SignalFragment extends Fragment {
         long frequency = Long.parseLong(freqString);
         int wave = mWaveSelector.getSelectedItemPosition();
         int multi = mFrequencySelector.getSelectedItemPosition();
+        long eval = 1;
         if (multi == 0) {
-            multi = multi * Constants.HZ;
+            eval = Constants.HZ;
         } else if (multi == 1) {
-            multi = multi * Constants.kHZ;
+            eval = Constants.kHZ;
         } else if (multi == 2) {
-            multi = multi * Constants.MHZ;
+            eval = Constants.MHZ;
         }
-        frequency = frequency * multi;
+        frequency = frequency * eval;
         if (frequency > Constants.MAX_HZ) {
             showToast(getString(R.string.max_frequency4));
             mFrequencyField.setText("0");

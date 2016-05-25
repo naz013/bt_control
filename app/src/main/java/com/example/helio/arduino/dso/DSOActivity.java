@@ -26,36 +26,37 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.helio.arduino.core.Constants;
-import com.example.helio.arduino.core.OriginalChatService;
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.SettingsActivity;
+import com.example.helio.arduino.core.Constants;
+import com.example.helio.arduino.core.DeviceData;
+import com.example.helio.arduino.core.OriginalChatService;
 import com.github.mikephil.charting.charts.ScatterChart;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Random;
 
-public class DSOActivity extends AppCompatActivity implements OnChartGestureListener, OnChartValueSelectedListener {
+public class DsoActivity extends AppCompatActivity implements OnChartGestureListener, OnChartValueSelectedListener {
 
-    private static final int CHART_VISIBLE = 100;
     private static final int REQUEST_ENABLE_BT = 3;
     private static final float CHART_MAX_Y = 220f;
-    private static final String TAG = "TAG";
+    private static final float CHART_MIN_Y = -50f;
+    private static final float CHART_MAX_X = 100;
 
     private boolean mCapturing = false;
 
@@ -69,26 +70,15 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
 
     private static Activity activity;
 
-    private Handler mDataHandler = new Handler();
-    private Runnable mRunnable = new Runnable() {
-        @Override
-        public void run() {
-            int x = new Random().nextInt(50 - 1 + 1) + 1;
-            float y = new Random().nextFloat() * (150 - (-25)) + 150;
-            addNewEntry(x, y);
-            mDataHandler.postDelayed(mRunnable, 500);
-        }
-    };
-
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case Constants.MESSAGE_DEVICE_NAME:
-                    showConnectedDeviceName(msg);
+                case Constants.MESSAGE_STATE_CHANGE:
+                    obtainConnectionMessage(msg);
                     break;
-                case Constants.MESSAGE_TOAST:
-                    showMessage(msg);
+                case Constants.MESSAGE_DEVICE_NAME:
+                    mBlockView.setVisibility(View.GONE);
                     break;
                 case Constants.MESSAGE_READ:
                     readDso(msg);
@@ -96,6 +86,14 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
             }
         }
     };
+
+    private void obtainConnectionMessage(Message msg) {
+        switch (msg.arg1) {
+            case OriginalChatService.STATE_CONNECTED:
+                mBlockView.setVisibility(View.GONE);
+                break;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +105,6 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         initButtons();
         initChart();
         initBlockView();
-        mDataHandler.postDelayed(mRunnable, 500);
     }
 
     public static Activity getActivity() {
@@ -116,7 +113,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
 
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
-        mBlockView.setVisibility(View.GONE);
+        mBlockView.setVisibility(View.VISIBLE);
         mBlockView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -139,12 +136,11 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         mChart.setScaleEnabled(true);
         mChart.setPinchZoom(true);
         mChart.setNoDataText(getString(R.string.no_data_available));
-        mChart.setMaxVisibleValueCount(200);
         mChart.setAutoScaleMinMaxEnabled(true);
         mChart.setDescription(getString(R.string.arduino_chart));
 
         ArrayList<String> xVals = new ArrayList<>();
-        for (int i = 0; i < 50 + 1; i++) {
+        for (int i = 0; i < CHART_MAX_X + 1; i++) {
             xVals.add((i) + "");
         }
         ArrayList<Entry> entries = new ArrayList<>();
@@ -155,22 +151,23 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         dataSet.setScatterShapeHoleRadius(0f);
         dataSet.setScatterShapeSize(5f);
         dataSet.setValueTextSize(9f);
-        ScatterData data = new ScatterData(xVals, dataSet);
-        mChart.setData(data);
+        ScatterData scatterData = new ScatterData(xVals, dataSet);
+        scatterData.setValueFormatter(new MyValueFormatter());
+        mChart.setData(scatterData);
 
-        Legend l = mChart.getLegend();
-        l.setPosition(Legend.LegendPosition.RIGHT_OF_CHART);
+        mChart.getLegend().setEnabled(false);
 
-        YAxis leftAxis = mChart.getAxisLeft();
-        leftAxis.removeAllLimitLines();
-        leftAxis.setAxisMaxValue(CHART_MAX_Y);
-        leftAxis.setAxisMinValue(-50f);
-        leftAxis.setDrawZeroLine(true);
+        YAxis yAxis = mChart.getAxisLeft();
+        yAxis.removeAllLimitLines();
+        yAxis.setAxisMaxValue(CHART_MAX_Y);
+        yAxis.setAxisMinValue(CHART_MIN_Y);
+        yAxis.setDrawZeroLine(true);
 
         mChart.getAxisRight().setEnabled(false);
 
-        XAxis xl = mChart.getXAxis();
-        xl.setDrawGridLines(false);
+        XAxis xAxis = mChart.getXAxis();
+        xAxis.setDrawGridLines(false);
+        xAxis.setAxisMaxValue(CHART_MAX_X);
         mChart.invalidate();
     }
 
@@ -178,9 +175,9 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         mCaptureButton = (Button) findViewById(R.id.captureButton);
         mStopButton = (Button) findViewById(R.id.stopButton);
         mCaptureButton.setOnClickListener(mListener);
+        mStopButton.setOnClickListener(mListener);
         findViewById(R.id.screenshotButton).setOnClickListener(mListener);
         findViewById(R.id.viewScreenshot).setOnClickListener(mListener);
-        mStopButton.setOnClickListener(mListener);
         mStopButton.setEnabled(false);
         mCaptureButton.setEnabled(true);
     }
@@ -205,25 +202,18 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
     private void checkBtAdapterStatus() {
         if (!mBtAdapter.isEnabled()) {
             requestBtEnable();
-        } else if (mBtService == null) {
-            setupBtService();
         }
-    }
-
-    private void setupBtService() {
-        mBtService = new OriginalChatService(this, mHandler);
     }
 
     private void sendMessage(String message) {
         if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
-            resumeBtService();
+            setupConnector();
         }
         mBtService.writeMessage(message.getBytes());
     }
 
     private void readDso(Message msg) {
-        byte[] readBuff = (byte[]) msg.obj;
-        String data = new String(readBuff, 0, msg.arg1);
+        String data = (String) msg.obj;
         if (data.contains(Constants.rX) && data.contains(Constants.rY)) {
             String[] parts = data.split(Constants.DIV);
             String xVal = parts[0].replace(Constants.rX, "");
@@ -231,10 +221,6 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
             String yVal = parts[1].replace(Constants.rY, "");
             float y = Float.parseFloat(yVal.trim());
             if (mCapturing) addNewEntry(x, y);
-        } else if (data.contains(Constants.rY)) {
-
-        } else if (data.contains(Constants.rX)) {
-
         }
     }
 
@@ -258,49 +244,27 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         }
     };
 
-    private void showConnectedDeviceName(Message msg) {
-        String mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
-        showToast(getString(R.string.connected_to) + " " + mConnectedDeviceName);
-        mBlockView.setVisibility(View.GONE);
-    }
-
-    private void showMessage(Message msg) {
-        String message = msg.getData().getString(Constants.TOAST);
-        if (message == null) return;
-        if (message.startsWith(Constants.UNABLE)) {
-            if (mBtService.getState() == OriginalChatService.STATE_NONE) {
-                mBtService.start();
-            }
-            if (mBtService.getState() == OriginalChatService.STATE_LISTEN) {
-                connectToBtDevice(true);
-            }
-        }
-    }
-
-    private void stopBtService() {
+    private void stopConnection() {
         if (mBtService != null) {
             mBtService.stop();
+            mBtService = null;
         }
     }
 
-    private void resumeBtService() {
-        if (mBtService != null) {
-            startBtService();
-        } else {
-            setupBtService();
-            startBtService();
-        }
-    }
-
-    private void startBtService() {
-        if (mBtService.getState() == OriginalChatService.STATE_NONE) {
-            mBtService.start();
-            while (true) {
-                if (mBtService.getState() == OriginalChatService.STATE_LISTEN) {
-                    connectToBtDevice(true);
-                    break;
-                }
+    private void setupConnector() {
+        stopConnection();
+        try {
+            String emptyName = "None";
+            SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Activity.MODE_PRIVATE);
+            String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
+            if (mAddress != null) {
+                BluetoothDevice mConnectedDevice = mBtAdapter.getRemoteDevice(mAddress);
+                DeviceData data = new DeviceData(mConnectedDevice, emptyName);
+                mBtService = new OriginalChatService(data, mHandler);
+                mBtService.connect();
             }
+        } catch (IllegalArgumentException e) {
+            Log.d("TAG", "setupConnector failed: " + e.getMessage());
         }
     }
 
@@ -322,6 +286,7 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         mCapturing = true;
         mCaptureButton.setEnabled(false);
         mStopButton.setEnabled(true);
+        mChart.getScatterData().clearValues();
     }
 
     private boolean checkPermission() {
@@ -367,58 +332,39 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
 
     private void addNewEntry(int x, float y) {
         ScatterData scatterData = mChart.getScatterData();
-        Log.d(TAG, "addNewEntry: get scatter data x " + x + ", y "+ y);
         if (scatterData != null) {
-            IScatterDataSet set;
+            IScatterDataSet scatterDataSet;
             try {
-                set = scatterData.getDataSetByIndex(0);
-                if (set == null) {
-                    set = createSet();
-                    scatterData.addDataSet(set);
+                scatterDataSet = scatterData.getDataSetByIndex(0);
+                if (scatterDataSet == null) {
+                    scatterDataSet = createSet();
+                    scatterData.addDataSet(scatterDataSet);
                 }
             } catch (ArrayIndexOutOfBoundsException e) {
-                set = createSet();
-                scatterData.addDataSet(set);
+                scatterDataSet = createSet();
+                scatterData.addDataSet(scatterDataSet);
             }
-            scatterData.addXValue(x + "");
-            scatterData.addEntry(new Entry(y, set.getEntryCount()), 0);
-            updateChart(scatterData.getXValCount());
+            scatterData.setValueFormatter(new MyValueFormatter());
+            Entry entry = new Entry(y, x);
+            scatterData.addEntry(entry, 0);
+            mChart.notifyDataSetChanged();
+            mChart.invalidate();
         }
     }
 
     private ScatterDataSet createSet() {
-        ScatterDataSet set = new ScatterDataSet(null, getString(R.string.arduino_vhart));
-        set.setColor(Color.BLACK);
-        set.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
-        set.setScatterShapeHoleRadius(0f);
-        set.setScatterShapeSize(5f);
-        set.setValueTextSize(9f);
-        return set;
-    }
-
-    private void updateChart(int xValCount) {
-        mChart.notifyDataSetChanged();
-        mChart.setVisibleXRangeMaximum(CHART_VISIBLE);
-        mChart.invalidate();
-        //mChart.moveViewToX(xValCount - CHART_VISIBLE);
-    }
-
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    private void connectToBtDevice(boolean secure) {
-        SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Activity.MODE_PRIVATE);
-        String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
-        if (mAddress != null) {
-            BluetoothDevice mConnectedDevice = mBtAdapter.getRemoteDevice(mAddress);
-            //mBtService.connect(mConnectedDevice, secure);
-        }
+        ScatterDataSet dataSet = new ScatterDataSet(null, getString(R.string.arduino_vhart));
+        dataSet.setColor(Color.BLACK);
+        dataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
+        dataSet.setScatterShapeHoleRadius(0f);
+        dataSet.setScatterShapeSize(5f);
+        dataSet.setValueTextSize(9f);
+        return dataSet;
     }
 
     private void sendCancelMessage() {
         if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
-            resumeBtService();
+            setupConnector();
         }
         String msg = Constants.S;
         mBtService.writeMessage(msg.getBytes());
@@ -441,14 +387,13 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
         if (mBtAdapter != null) {
             mBtAdapter.cancelDiscovery();
         }
-        mDataHandler.removeCallbacks(mRunnable);
-        stopBtService();
+        stopConnection();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        resumeBtService();
+        setupConnector();
     }
 
     @Override
@@ -492,6 +437,13 @@ public class DSOActivity extends AppCompatActivity implements OnChartGestureList
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ENABLE_BT && resultCode != RESULT_OK) {
             requestBtEnable();
+        }
+    }
+
+    class MyValueFormatter implements ValueFormatter {
+        @Override
+        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+            return Math.round(value)+"";
         }
     }
 

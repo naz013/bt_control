@@ -2,7 +2,6 @@ package com.example.helio.arduino.signal;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -78,7 +77,7 @@ public class PwmFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                checkData(s);
+                checkData();
             }
 
             @Override
@@ -96,7 +95,7 @@ public class PwmFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                checkData(s);
+                checkData();
             }
 
             @Override
@@ -106,11 +105,11 @@ public class PwmFragment extends Fragment {
         });
     }
 
-    private void checkData(CharSequence s) {
-        if (s.length() == 0) {
-            mGenerate.setEnabled(false);
-        } else {
+    private void checkData() {
+        if (mFrequencyField.getText().length() > 0 && mDutyField.getText().length() > 0) {
             mGenerate.setEnabled(true);
+        } else {
+            mGenerate.setEnabled(false);
         }
     }
 
@@ -150,14 +149,15 @@ public class PwmFragment extends Fragment {
         }
         long frequency = Long.parseLong(freqString);
         int multi = mFrequencySelector.getSelectedItemPosition();
+        long eval = 1;
         if (multi == 0) {
-            multi = multi * Constants.HZ;
+            eval = Constants.HZ;
         } else if (multi == 1) {
-            multi = multi * Constants.kHZ;
+            eval = Constants.kHZ;
         } else if (multi == 2) {
-            multi = multi * Constants.MHZ;
+            eval = Constants.MHZ;
         }
-        frequency = frequency * multi;
+        frequency = frequency * eval;
         if (frequency > Constants.MAX_HZ) {
             showToast(getString(R.string.max_frequency4));
             mFrequencyField.setText("0");

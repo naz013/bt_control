@@ -10,15 +10,16 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.helio.arduino.core.Constants;
+import com.example.helio.arduino.core.DeviceData;
 import com.example.helio.arduino.core.OriginalChatService;
 
 public class MultimeterActivity extends AppCompatActivity {
@@ -38,11 +39,11 @@ public class MultimeterActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case Constants.MESSAGE_DEVICE_NAME:
-                    showConnectedDeviceName(msg);
+                case Constants.MESSAGE_STATE_CHANGE:
+                    obtainConnectionMessage(msg);
                     break;
-                case Constants.MESSAGE_TOAST:
-                    showMessage(msg);
+                case Constants.MESSAGE_DEVICE_NAME:
+                    mBlockView.setVisibility(View.GONE);
                     break;
                 case Constants.MESSAGE_READ:
                     postResponse(msg);
@@ -50,6 +51,14 @@ public class MultimeterActivity extends AppCompatActivity {
             }
         }
     };
+
+    private void obtainConnectionMessage(Message msg) {
+        switch (msg.arg1) {
+            case OriginalChatService.STATE_CONNECTED:
+                mBlockView.setVisibility(View.GONE);
+                break;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,25 +161,18 @@ public class MultimeterActivity extends AppCompatActivity {
     private void checkBtAdapterStatus() {
         if (!mBtAdapter.isEnabled()) {
             requestBtEnable();
-        } else if (mBtService == null) {
-            setupBtService();
         }
-    }
-
-    private void setupBtService() {
-        mBtService = new OriginalChatService(this, mHandler);
     }
 
     private void sendMessage(String message) {
         if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
-            resumeBtService();
+            setupConnector();
         }
         mBtService.writeMessage(message.getBytes());
     }
 
     private void postResponse(Message msg) {
-        byte[] readBuff = (byte[]) msg.obj;
-        String data = new String(readBuff, 0, msg.arg1);
+        String data = (String) msg.obj;
         String v;
         if (data.startsWith(Constants.rV)) {
             data = data.replace(Constants.rV, "");
@@ -187,64 +189,27 @@ public class MultimeterActivity extends AppCompatActivity {
         mMeterField.setText(v);
     }
 
-    private void showConnectedDeviceName(Message msg) {
-        String mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
-        showToast(getString(R.string.connected_to) + " " + mConnectedDeviceName);
-        mBlockView.setVisibility(View.GONE);
-    }
-
-    private void showMessage(Message msg) {
-        String message = msg.getData().getString(Constants.TOAST);
-        if (message == null) {
-            return;
-        }
-        if (message.startsWith(Constants.UNABLE)) {
-            if (mBtService.getState() == OriginalChatService.STATE_NONE) {
-                mBtService.start();
-            }
-            if (mBtService.getState() == OriginalChatService.STATE_LISTEN) {
-                connectToBtDevice(true);
-            }
-        }
-    }
-
-    private void stopBtService() {
+    private void stopConnection() {
         if (mBtService != null) {
             mBtService.stop();
+            mBtService = null;
         }
     }
 
-    private void resumeBtService() {
-        if (mBtService != null) {
-            startBtService();
-        } else {
-            setupBtService();
-            startBtService();
-        }
-    }
-
-    private void startBtService() {
-        if (mBtService.getState() == OriginalChatService.STATE_NONE) {
-            mBtService.start();
-            while (true) {
-                if (mBtService.getState() == OriginalChatService.STATE_LISTEN) {
-                    connectToBtDevice(true);
-                    break;
-                }
+    private void setupConnector() {
+        stopConnection();
+        try {
+            String emptyName = "None";
+            SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Activity.MODE_PRIVATE);
+            String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
+            if (mAddress != null) {
+                BluetoothDevice mConnectedDevice = mBtAdapter.getRemoteDevice(mAddress);
+                DeviceData data = new DeviceData(mConnectedDevice, emptyName);
+                mBtService = new OriginalChatService(data, mHandler);
+                mBtService.connect();
             }
-        }
-    }
-
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    private void connectToBtDevice(boolean secure) {
-        SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Activity.MODE_PRIVATE);
-        String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
-        if (mAddress != null) {
-            BluetoothDevice mConnectedDevice = mBtAdapter.getRemoteDevice(mAddress);
-            mBtService.connect(mConnectedDevice, secure);
+        } catch (IllegalArgumentException e) {
+            Log.d("TAG", "setupConnector failed: " + e.getMessage());
         }
     }
 
@@ -264,13 +229,13 @@ public class MultimeterActivity extends AppCompatActivity {
         if (mBtAdapter != null) {
             mBtAdapter.cancelDiscovery();
         }
-        stopBtService();
+        stopConnection();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        resumeBtService();
+        setupConnector();
     }
 
     @Override
