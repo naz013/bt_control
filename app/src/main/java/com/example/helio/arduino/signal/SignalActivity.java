@@ -53,6 +53,27 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
             }
         }
     };
+    private ViewPager.OnPageChangeListener mPageListener = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            sendCancelSignal();
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
+    };
+
+    private void sendCancelSignal() {
+        onAction(Constants.E);
+        onAction(Constants.T);
+    }
 
     private void obtainConnectionMessage(Message msg) {
         switch (msg.arg1) {
@@ -77,6 +98,7 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
         mPagerAdapter = new PagerAdapter(this, getFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.addOnPageChangeListener(mPageListener);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
@@ -160,6 +182,7 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
         if (mBtAdapter != null) {
             mBtAdapter.cancelDiscovery();
         }
+        sendCancelSignal();
         stopConnection();
     }
 

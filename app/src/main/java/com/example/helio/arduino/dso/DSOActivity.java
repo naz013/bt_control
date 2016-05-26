@@ -286,7 +286,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         mCapturing = true;
         mCaptureButton.setEnabled(false);
         mStopButton.setEnabled(true);
-        mChart.getScatterData().clearValues();
+        //mChart.getScatterData().clearValues();
     }
 
     private boolean checkPermission() {
@@ -379,6 +379,12 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     public void onStart() {
         super.onStart();
         checkBtAdapterStatus();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopCapturing();
     }
 
     @Override
