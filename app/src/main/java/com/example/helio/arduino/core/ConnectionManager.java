@@ -14,7 +14,7 @@ import java.io.OutputStream;
 
 public class ConnectionManager {
 
-    private static final String TAG = "BluetoothChatService";
+    private static final String TAG = "BluetoothService";
     private static final boolean D = false;
 
     public static final int STATE_NONE = 0;
@@ -49,7 +49,6 @@ public class ConnectionManager {
 
     public synchronized void connect() {
         if (D) Log.d(TAG, "connect to: " + connectedDevice);
-
         if (mState == STATE_CONNECTING) {
             if (mConnectThread != null) {
                 if (D) Log.d(TAG, "cancel mConnectThread");
@@ -57,14 +56,11 @@ public class ConnectionManager {
                 mConnectThread = null;
             }
         }
-
         if (mConnectedThread != null) {
             if (D) Log.d(TAG, "cancel mConnectedThread");
             mConnectedThread.cancel();
             mConnectedThread = null;
         }
-
-        // Start the thread to connect with the given device
         mConnectThread = new ConnectThread(connectedDevice);
         mConnectThread.start();
         setState(STATE_CONNECTING);
@@ -72,8 +68,6 @@ public class ConnectionManager {
 
     public synchronized void connected(BluetoothSocket socket) {
         if (D) Log.d(TAG, "connected");
-
-        // Cancel the thread that completed the connection
         if (mConnectThread != null) {
             if (D) Log.d(TAG, "cancel mConnectThread");
             mConnectThread.cancel();
@@ -85,14 +79,9 @@ public class ConnectionManager {
             mConnectedThread.cancel();
             mConnectedThread = null;
         }
-
         setState(STATE_CONNECTED);
-
-        // Send the name of the connected device back to the UI Activity
         Message msg = mHandler.obtainMessage(Constants.MESSAGE_DEVICE_NAME, deviceName);
         mHandler.sendMessage(msg);
-
-        // Start the thread to manage the connection and perform transmissions
         mConnectedThread = new ConnectedThread(socket);
         mConnectedThread.start();
     }
@@ -105,33 +94,26 @@ public class ConnectionManager {
             mConnectThread.cancel();
             mConnectThread = null;
         }
-
         if (mConnectedThread != null) {
             if (D) Log.d(TAG, "cancel mConnectedThread");
             mConnectedThread.cancel();
             mConnectedThread = null;
         }
-
         setState(STATE_NONE);
     }
 
     public void writeMessage(byte[] data) {
         ConnectedThread r;
-        // Synchronize a copy of the ConnectedThread
         synchronized (this) {
             if (mState != STATE_CONNECTED) return;
             r = mConnectedThread;
         }
-
-        // Perform the write unsynchronized
         if (data.length == 1) r.write(data[0]);
         else r.writeData(data);
     }
 
     private void connectionFailed() {
         if (D) Log.d(TAG, "connectionFailed");
-
-        // Send a failure message back to the Activity
         Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
         msg.setData(bundle);
@@ -140,7 +122,6 @@ public class ConnectionManager {
     }
 
     private void connectionLost() {
-        // Send a failure message back to the Activity
         Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
         msg.setData(bundle);
@@ -170,14 +151,9 @@ public class ConnectionManager {
                 connectionFailed();
                 return;
             }
-
-            // Make a connection to the BluetoothSocket
             try {
-                // This is a blocking call and will only return on a
-                // successful connection or an exception
                 mmSocket.connect();
             } catch (IOException e) {
-                // Close the socket
                 try {
                     mmSocket.close();
                 } catch (IOException e2) {
@@ -186,13 +162,9 @@ public class ConnectionManager {
                 connectionFailed();
                 return;
             }
-
-            // Reset the ConnectThread because we're done
             synchronized (ConnectionManager.this) {
                 mConnectThread = null;
             }
-
-            // Start the connected thread
             connected(mmSocket);
         }
 
@@ -221,19 +193,15 @@ public class ConnectionManager {
 
         public ConnectedThread(BluetoothSocket socket) {
             if (D) Log.d(TAG, "create ConnectedThread");
-
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
-
-            // Get the BluetoothSocket input and output streams
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
             } catch (IOException e) {
                 if (D) Log.e(TAG, "temp sockets not created", e);
             }
-
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
         }
@@ -245,12 +213,9 @@ public class ConnectionManager {
             StringBuilder readMessage = new StringBuilder();
             while (true) {
                 try {
-                    // считываю входящие данные из потока и собираю в строку ответа
                     bytes = mmInStream.read(buffer);
                     String readed = new String(buffer, 0, bytes);
                     readMessage.append(readed);
-
-                    // маркер конца команды - вернуть ответ в главный поток
                     if (readed.contains("\n")) {
                         mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
                         readMessage.setLength(0);
@@ -268,7 +233,6 @@ public class ConnectionManager {
             try {
                 mmOutStream.write(chunk);
                 mmOutStream.flush();
-                // Share the sent message back to the UI Activity
                 mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, chunk).sendToTarget();
             } catch (IOException e) {
                 if (D) Log.e(TAG, "Exception during write", e);
@@ -278,11 +242,8 @@ public class ConnectionManager {
         public void write(byte command) {
             byte[] buffer = new byte[1];
             buffer[0] = command;
-
             try {
                 mmOutStream.write(buffer);
-
-                // Share the sent message back to the UI Activity
                 mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer).sendToTarget();
             } catch (IOException e) {
                 if (D) Log.e(TAG, "Exception during write", e);
