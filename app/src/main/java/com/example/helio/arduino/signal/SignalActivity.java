@@ -20,6 +20,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.helio.arduino.BuildConfig;
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.SettingsActivity;
 import com.example.helio.arduino.core.Constants;
@@ -29,6 +30,8 @@ import com.example.helio.arduino.core.ConnectionManager;
 public class SignalActivity extends AppCompatActivity implements FragmentListener {
 
     private static final int REQUEST_ENABLE_BT = 15;
+    private static final String TAG = "SignalActivity";
+    private static final boolean D = BuildConfig.DEBUG;
 
     private BluetoothAdapter mBtAdapter = null;
     private ConnectionManager mBtService = null;
@@ -162,7 +165,7 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
                 mBtService.connect();
             }
         } catch (IllegalArgumentException e) {
-            Log.d("TAG", "setupConnector failed: " + e.getMessage());
+            if (D) Log.d(TAG, "setupConnector failed: " + e.getMessage());
         }
     }
 
@@ -221,6 +224,7 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
         if (mBtService.getState() != ConnectionManager.STATE_CONNECTED) {
             setupConnector();
         }
+        if (D) Log.d(TAG, "onAction: " + message);
         mBtService.writeMessage(message.getBytes());
     }
 }

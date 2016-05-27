@@ -141,7 +141,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
             xVals.add((i) + "");
         }
         ArrayList<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(0f, 0));
+        //entries.add(new Entry(0f, 0));
         ScatterDataSet dataSet = new ScatterDataSet(entries, getString(R.string.arduino_vhart));
         dataSet.setColor(Color.BLACK);
         dataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
