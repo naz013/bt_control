@@ -34,9 +34,6 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
     private ConnectionManager mBtService = null;
 
     private TextView mBlockView;
-    private ViewPager mViewPager;
-
-    private PagerAdapter mPagerAdapter;
 
     private static Activity activity;
 
@@ -95,8 +92,8 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
     }
 
     private void initTabNavigation() {
-        mPagerAdapter = new PagerAdapter(this, getFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        PagerAdapter mPagerAdapter = new PagerAdapter(this, getFragmentManager());
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.addOnPageChangeListener(mPageListener);
 
@@ -130,7 +127,6 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
         if (toolbar != null) {
-            //toolbar.setTitle(R.string.signal_generator);
             toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         }
     }
