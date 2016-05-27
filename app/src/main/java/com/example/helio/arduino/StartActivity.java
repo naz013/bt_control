@@ -22,9 +22,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.helio.arduino.core.ConnectionManager;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.DeviceData;
-import com.example.helio.arduino.core.OriginalChatService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class StartActivity extends AppCompatActivity {
     private final List<BluetoothDevice> mDevices = new ArrayList<>();
 
     private DevicesRecyclerAdapter mRecyclerAdapter;
-    private OriginalChatService mBtService = null;
+    private ConnectionManager mBtService = null;
     private BluetoothAdapter mBtAdapter;
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -96,10 +96,9 @@ public class StartActivity extends AppCompatActivity {
     private void addBoundedDevicesToList() {
         if (mBtAdapter != null) {
             Set<BluetoothDevice> devices = mBtAdapter.getBondedDevices();
+            mDevices.clear();
             for (BluetoothDevice device : devices) {
-                String name = device.getName();
-                String address = device.getAddress();
-                mRecyclerAdapter.addDevice(name + "\n" + address, address);
+                addDeviceToList(device);
             }
         }
     }
@@ -131,8 +130,10 @@ public class StartActivity extends AppCompatActivity {
     };
 
     private void addDeviceToList(BluetoothDevice device) {
+        String name = device.getName();
+        String address = device.getAddress();
         mDevices.add(device);
-        mRecyclerAdapter.addDevice(device.getName() + "\n" + device.getAddress(), device.getAddress());
+        mRecyclerAdapter.addDevice(name + "\n" + address, address);
     }
 
     private void saveBtDevice(String address) {
@@ -159,16 +160,16 @@ public class StartActivity extends AppCompatActivity {
 
     private void obtainConnectionMessage(Message msg) {
         switch (msg.arg1) {
-            case OriginalChatService.STATE_CONNECTED:
+            case ConnectionManager.STATE_CONNECTED:
                 hideDialog();
                 saveBtDevice(mDeviceAddress);
                 showMainButton();
                 break;
-            case OriginalChatService.STATE_CONNECTING:
+            case ConnectionManager.STATE_CONNECTING:
                 mDialog = ProgressDialog.show(this, getString(R.string.bluetooth),
                         getString(R.string.title_connecting) + " " + mDeviceName, true, true);
                 break;
-            case OriginalChatService.STATE_NONE:
+            case ConnectionManager.STATE_NONE:
                 break;
         }
     }
@@ -230,7 +231,7 @@ public class StartActivity extends AppCompatActivity {
         try {
             String emptyName = "None";
             DeviceData data = new DeviceData(connectedDevice, emptyName);
-            mBtService = new OriginalChatService(data, mHandler);
+            mBtService = new ConnectionManager(data, mHandler);
             mBtService.connect();
         } catch (IllegalArgumentException e) {
             Log.d("TAG", "setupConnector failed: " + e.getMessage());

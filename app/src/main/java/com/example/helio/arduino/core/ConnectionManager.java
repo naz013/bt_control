@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class OriginalChatService {
+public class ConnectionManager {
 
     private static final String TAG = "BluetoothChatService";
     private static final boolean D = false;
@@ -29,7 +29,7 @@ public class OriginalChatService {
     private ConnectedThread mConnectedThread;
     private int mState;
 
-    public OriginalChatService(DeviceData deviceData, Handler handler) {
+    public ConnectionManager(DeviceData deviceData, Handler handler) {
         mHandler = handler;
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         connectedDevice = btAdapter.getRemoteDevice(deviceData.getAddress());
@@ -188,7 +188,7 @@ public class OriginalChatService {
             }
 
             // Reset the ConnectThread because we're done
-            synchronized (OriginalChatService.this) {
+            synchronized (ConnectionManager.this) {
                 mConnectThread = null;
             }
 

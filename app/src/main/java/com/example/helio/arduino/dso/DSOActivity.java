@@ -30,7 +30,7 @@ import com.example.helio.arduino.R;
 import com.example.helio.arduino.SettingsActivity;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.DeviceData;
-import com.example.helio.arduino.core.OriginalChatService;
+import com.example.helio.arduino.core.ConnectionManager;
 import com.github.mikephil.charting.charts.ScatterChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -66,7 +66,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     private Button mCaptureButton;
 
     private BluetoothAdapter mBtAdapter = null;
-    private OriginalChatService mBtService = null;
+    private ConnectionManager mBtService = null;
 
     private static Activity activity;
 
@@ -89,7 +89,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
 
     private void obtainConnectionMessage(Message msg) {
         switch (msg.arg1) {
-            case OriginalChatService.STATE_CONNECTED:
+            case ConnectionManager.STATE_CONNECTED:
                 mBlockView.setVisibility(View.GONE);
                 break;
         }
@@ -206,7 +206,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     }
 
     private void sendMessage(String message) {
-        if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
+        if (mBtService.getState() != ConnectionManager.STATE_CONNECTED) {
             setupConnector();
         }
         mBtService.writeMessage(message.getBytes());
@@ -260,7 +260,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
             if (mAddress != null) {
                 BluetoothDevice mConnectedDevice = mBtAdapter.getRemoteDevice(mAddress);
                 DeviceData data = new DeviceData(mConnectedDevice, emptyName);
-                mBtService = new OriginalChatService(data, mHandler);
+                mBtService = new ConnectionManager(data, mHandler);
                 mBtService.connect();
             }
         } catch (IllegalArgumentException e) {
@@ -363,7 +363,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     }
 
     private void sendCancelMessage() {
-        if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
+        if (mBtService.getState() != ConnectionManager.STATE_CONNECTED) {
             setupConnector();
         }
         String msg = Constants.S;

@@ -24,14 +24,14 @@ import com.example.helio.arduino.R;
 import com.example.helio.arduino.SettingsActivity;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.DeviceData;
-import com.example.helio.arduino.core.OriginalChatService;
+import com.example.helio.arduino.core.ConnectionManager;
 
 public class SignalActivity extends AppCompatActivity implements FragmentListener {
 
     private static final int REQUEST_ENABLE_BT = 15;
 
     private BluetoothAdapter mBtAdapter = null;
-    private OriginalChatService mBtService = null;
+    private ConnectionManager mBtService = null;
 
     private TextView mBlockView;
     private ViewPager mViewPager;
@@ -77,7 +77,7 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
 
     private void obtainConnectionMessage(Message msg) {
         switch (msg.arg1) {
-            case OriginalChatService.STATE_CONNECTED:
+            case ConnectionManager.STATE_CONNECTED:
                 mBlockView.setVisibility(View.GONE);
                 break;
         }
@@ -162,7 +162,7 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
             if (mAddress != null) {
                 BluetoothDevice mConnectedDevice = mBtAdapter.getRemoteDevice(mAddress);
                 DeviceData data = new DeviceData(mConnectedDevice, emptyName);
-                mBtService = new OriginalChatService(data, mHandler);
+                mBtService = new ConnectionManager(data, mHandler);
                 mBtService.connect();
             }
         } catch (IllegalArgumentException e) {
@@ -222,7 +222,7 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
 
     @Override
     public void onAction(String message) {
-        if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
+        if (mBtService.getState() != ConnectionManager.STATE_CONNECTED) {
             setupConnector();
         }
         mBtService.writeMessage(message.getBytes());
