@@ -1,8 +1,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.example.helio.arduino.signal.SignalFragment">
 
     <LinearLayout
@@ -55,6 +55,7 @@
                         android:id="@+id/freqSelector"
                         android:layout_width="100dp"
                         android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
                         android:layout_marginLeft="8dp"
                         android:layout_toRightOf="@+id/freqField"
                         android:entries="@array/frequency_measure" />
@@ -110,11 +111,11 @@
                         android:id="@+id/titleCycle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:textSize="20sp"
                         android:layout_centerVertical="true"
+                        android:layout_marginLeft="16dp"
                         android:layout_toRightOf="@+id/cycleField"
-                        android:text="%"/>
+                        android:text="%"
+                        android:textSize="20sp" />
 
                 </RelativeLayout>
 

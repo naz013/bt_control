@@ -28,9 +28,9 @@ import android.widget.Toast;
 
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.SettingsActivity;
+import com.example.helio.arduino.core.ConnectionManager;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.DeviceData;
-import com.example.helio.arduino.core.ConnectionManager;
 import com.github.mikephil.charting.charts.ScatterChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -43,7 +43,6 @@ import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -128,11 +127,9 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
 
     private void initChart() {
         mChart = (ScatterChart) findViewById(R.id.chart1);
-        mChart.setOnChartGestureListener(this);
         mChart.setOnChartValueSelectedListener(this);
         mChart.setDrawGridBackground(false);
         mChart.setTouchEnabled(true);
-        mChart.setDragEnabled(true);
         mChart.setScaleEnabled(true);
         mChart.setPinchZoom(true);
         mChart.setNoDataText(getString(R.string.no_data_available));
@@ -152,19 +149,15 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         dataSet.setScatterShapeSize(5f);
         dataSet.setValueTextSize(9f);
         ScatterData scatterData = new ScatterData(xVals, dataSet);
-        scatterData.setValueFormatter(new MyValueFormatter());
+        scatterData.setValueFormatter(new PlotValueFormatter());
         mChart.setData(scatterData);
-
         mChart.getLegend().setEnabled(false);
-
         YAxis yAxis = mChart.getAxisLeft();
         yAxis.removeAllLimitLines();
         yAxis.setAxisMaxValue(CHART_MAX_Y);
         yAxis.setAxisMinValue(CHART_MIN_Y);
         yAxis.setDrawZeroLine(true);
-
         mChart.getAxisRight().setEnabled(false);
-
         XAxis xAxis = mChart.getXAxis();
         xAxis.setDrawGridLines(false);
         xAxis.setAxisMaxValue(CHART_MAX_X);
@@ -344,7 +337,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
                 scatterDataSet = createSet();
                 scatterData.addDataSet(scatterDataSet);
             }
-            scatterData.setValueFormatter(new MyValueFormatter());
+            scatterData.setValueFormatter(new PlotValueFormatter());
             Entry entry = new Entry(y, x);
             scatterData.addEntry(entry, 0);
             mChart.notifyDataSetChanged();
@@ -385,6 +378,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     protected void onPause() {
         super.onPause();
         stopCapturing();
+        stopConnection();
     }
 
     @Override
@@ -443,13 +437,6 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ENABLE_BT && resultCode != RESULT_OK) {
             requestBtEnable();
-        }
-    }
-
-    class MyValueFormatter implements ValueFormatter {
-        @Override
-        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-            return Math.round(value)+"";
         }
     }
 
