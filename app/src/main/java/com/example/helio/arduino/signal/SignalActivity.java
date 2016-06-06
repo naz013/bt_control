@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.helio.arduino.BuildConfig;
 import com.example.helio.arduino.R;
@@ -169,6 +170,10 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
         }
     }
 
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -226,5 +231,6 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
         }
         if (D) Log.d(TAG, "onAction: " + message);
         mBtService.writeMessage(message.getBytes());
+        showToast(getString(R.string.request_sent));
     }
 }
