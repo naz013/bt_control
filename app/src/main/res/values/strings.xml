@@ -10,9 +10,9 @@
     <string name="v">V</string>
     <string name="i">I</string>
     <string name="omega">Ω</string>
-    <string name="capture">Capture</string>
-    <string name="screenshot">Screenshot</string>
-    <string name="generate">Generate</string>
+    <string name="capture">CAPTURE</string>
+    <string name="screenshot">SCREENSHOT</string>
+    <string name="generate">GENERATE</string>
     <string name="signal_type">Signal type</string>
     <string name="frequency">Frequency</string>
     <string name="magnitude">Magnitude</string>
@@ -42,8 +42,8 @@
     <string name="cancel">Cancel</string>
     <string name="are_you_sure">Are you sure?</string>
     <string name="arduino_chart">Arduino chart</string>
-    <string name="stop">Stop</string>
-    <string name="terminate">Terminate</string>
+    <string name="stop">STOP</string>
+    <string name="terminate">TERMINATE</string>
     <string name="empty_frequency">Empty frequency!</string>
     <string name="empty_magnitude">Empty magnitude!</string>
     <string name="go_to_main_menu">Go to main menu</string>
@@ -58,4 +58,6 @@
     <string name="pwm">PWM</string>
     <string name="must_be_less_than">Must be less than 100!</string>
     <string name="must_be_not_empty">Must be not empty!</string>
+    <string name="request_sent">Request sent</string>
+    <string name="incorrect_value">Incorrect value</string>
 </resources>

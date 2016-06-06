@@ -15,7 +15,7 @@ import java.io.OutputStream;
 public class ConnectionManager {
 
     private static final String TAG = "BluetoothService";
-    private static final boolean D = false;
+    private static final boolean D = true;
 
     public static final int STATE_NONE = 0;
     public static final int STATE_CONNECTING = 1;

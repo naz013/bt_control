@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.DeviceData;
@@ -169,6 +170,7 @@ public class MultimeterActivity extends AppCompatActivity {
             setupConnector();
         }
         mBtService.writeMessage(message.getBytes());
+        showToast(getString(R.string.request_sent));
     }
 
     private void postResponse(Message msg) {
@@ -217,6 +219,10 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private void closeScreen() {
         finish();
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -3,14 +3,18 @@ package com.example.helio.arduino.signal;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.helio.arduino.R;
@@ -20,11 +24,12 @@ public class SignalFragment extends Fragment {
 
     private FragmentListener mFragmentListener;
 
-    private Button mGenerate;
-    private Button mTerminate;
+    private TextView mGenerate;
+    private TextView mTerminate;
     private Spinner mWaveSelector;
     private Spinner mFrequencySelector;
     private EditText mFrequencyField;
+    private TextInputLayout freqInput;
 
     private final View.OnClickListener mListener = new View.OnClickListener() {
         @Override
@@ -39,6 +44,35 @@ public class SignalFragment extends Fragment {
             }
         }
     };
+
+    private AdapterView.OnItemSelectedListener mItemSelectListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            if (position == 0) {
+                setMaxLength(8);
+            } else if (position == 1) {
+                setMaxLength(5);
+            } else if (position == 2) {
+                setMaxLength(2);
+            }
+            checkFrequency();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    };
+
+    private void setMaxLength(int length) {
+        String string = mFrequencyField.getText().toString().trim();
+        if (string.length() > length) {
+            mFrequencyField.setText(string.substring(0, length - 1));
+        }
+        InputFilter[] FilterArray = new InputFilter[1];
+        FilterArray[0] = new InputFilter.LengthFilter(length);
+        mFrequencyField.setFilters(FilterArray);
+    }
 
     public SignalFragment() {
         // Required empty public constructor
@@ -70,6 +104,10 @@ public class SignalFragment extends Fragment {
     private void initViews(View view) {
         mWaveSelector = (Spinner) view.findViewById(R.id.waveType);
         mFrequencySelector = (Spinner) view.findViewById(R.id.freqSelector);
+        mFrequencySelector.setOnItemSelectedListener(mItemSelectListener);
+
+        freqInput = (TextInputLayout) view.findViewById(R.id.freqInput);
+        freqInput.setHintEnabled(false);
         mFrequencyField = (EditText) view.findViewById(R.id.freqField);
         mFrequencyField.addTextChangedListener(new TextWatcher() {
             @Override
@@ -84,6 +122,7 @@ public class SignalFragment extends Fragment {
                 } else {
                     mGenerate.setEnabled(true);
                 }
+                checkFrequency();
             }
 
             @Override
@@ -93,10 +132,42 @@ public class SignalFragment extends Fragment {
         });
     }
 
+    private void checkFrequency() {
+        if (mFrequencyField.getText().toString().trim().matches("")) {
+            freqInput.setErrorEnabled(true);
+            freqInput.setError(getString(R.string.must_be_not_empty));
+            return;
+        } else {
+            freqInput.setErrorEnabled(false);
+        }
+
+        if (getFrequency() > Constants.MAX_HZ) {
+            freqInput.setErrorEnabled(true);
+            freqInput.setError(getString(R.string.max_frequency4));
+            mGenerate.setEnabled(false);
+        } else {
+            freqInput.setErrorEnabled(false);
+        }
+    }
+
+    private long getFrequency() {
+        long freq = Integer.parseInt(mFrequencyField.getText().toString().trim());
+        int multi = mFrequencySelector.getSelectedItemPosition();
+        long eval = 1;
+        if (multi == 0) {
+            eval = Constants.HZ;
+        } else if (multi == 1) {
+            eval = Constants.kHZ;
+        } else if (multi == 2) {
+            eval = Constants.MHZ;
+        }
+        return freq * eval;
+    }
+
     private void initButtons(View view) {
-        mGenerate = (Button) view.findViewById(R.id.generateButton);
+        mGenerate = (TextView) view.findViewById(R.id.generateButton);
         mGenerate.setOnClickListener(mListener);
-        mTerminate = (Button) view.findViewById(R.id.terminateButton);
+        mTerminate = (TextView) view.findViewById(R.id.terminateButton);
         mTerminate.setOnClickListener(mListener);
         mGenerate.setEnabled(false);
     }

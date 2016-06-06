@@ -5,9 +5,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/tool_bar" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -38,49 +35,62 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
                 android:layout_marginTop="32dp"
                 android:gravity="center"
-                android:orientation="horizontal"
-                android:paddingBottom="10dp">
+                android:orientation="horizontal">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <Button
+                    <TextView
                         android:id="@+id/captureButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="50dp"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:background="@drawable/button_green_selector"
-                        android:padding="5dp"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:paddingBottom="10dp"
+                        android:paddingLeft="15dp"
+                        android:paddingRight="15dp"
+                        android:paddingTop="10dp"
                         android:text="@string/capture"
                         android:textColor="@color/colorWhite"
                         android:textSize="18sp" />
 
-                    <Button
+                    <TextView
                         android:id="@+id/stopButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="50dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginTop="16dp"
+                        android:gravity="center"
                         android:background="@drawable/button_red_selector"
-                        android:padding="5dp"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:paddingBottom="10dp"
+                        android:paddingLeft="15dp"
+                        android:paddingRight="15dp"
+                        android:paddingTop="10dp"
                         android:text="@string/stop"
                         android:textColor="@color/colorWhite"
                         android:textSize="18sp" />
 
                 </LinearLayout>
 
-                <Button
+                <TextView
                     android:id="@+id/screenshotButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="50dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="top"
                     android:layout_marginLeft="100dp"
                     android:background="@drawable/button_blue_selector"
-                    android:padding="5dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:paddingBottom="10dp"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:paddingTop="10dp"
                     android:text="@string/screenshot"
                     android:textColor="@color/colorWhite"
                     android:textSize="18sp" />

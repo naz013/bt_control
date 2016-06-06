@@ -22,7 +22,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +36,6 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
-import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
@@ -61,8 +59,8 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
 
     private ScatterChart mChart;
     private TextView mBlockView;
-    private Button mStopButton;
-    private Button mCaptureButton;
+    private TextView mStopButton;
+    private TextView mCaptureButton;
 
     private BluetoothAdapter mBtAdapter = null;
     private ConnectionManager mBtService = null;
@@ -165,8 +163,8 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     }
 
     private void initButtons() {
-        mCaptureButton = (Button) findViewById(R.id.captureButton);
-        mStopButton = (Button) findViewById(R.id.stopButton);
+        mCaptureButton = (TextView) findViewById(R.id.captureButton);
+        mStopButton = (TextView) findViewById(R.id.stopButton);
         mCaptureButton.setOnClickListener(mListener);
         mStopButton.setOnClickListener(mListener);
         findViewById(R.id.screenshotButton).setOnClickListener(mListener);
@@ -203,6 +201,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
             setupConnector();
         }
         mBtService.writeMessage(message.getBytes());
+        showToast(getString(R.string.request_sent));
     }
 
     private void readDso(Message msg) {
@@ -279,7 +278,6 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         mCapturing = true;
         mCaptureButton.setEnabled(false);
         mStopButton.setEnabled(true);
-        //mChart.getScatterData().clearValues();
     }
 
     private boolean checkPermission() {
@@ -361,11 +359,16 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         }
         String msg = Constants.S;
         mBtService.writeMessage(msg.getBytes());
+        showToast(getString(R.string.request_sent));
     }
 
     private void closeScreen() {
         sendCancelMessage();
         finish();
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override
