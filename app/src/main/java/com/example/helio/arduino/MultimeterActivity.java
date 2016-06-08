@@ -195,6 +195,7 @@ public class MultimeterActivity extends AppCompatActivity {
             mBtService.stop();
             mBtService = null;
         }
+        mBlockView.setVisibility(View.VISIBLE);
     }
 
     private void setupConnector() {
@@ -270,6 +271,13 @@ public class MultimeterActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ENABLE_BT && resultCode != RESULT_OK) {
             requestBtEnable();
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        if (!hasFocus) {
+            stopConnection();
         }
     }
 

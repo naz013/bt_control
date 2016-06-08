@@ -240,6 +240,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
             mBtService.stop();
             mBtService = null;
         }
+        mBlockView.setVisibility(View.VISIBLE);
     }
 
     private void setupConnector() {
@@ -445,6 +446,13 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     @Override
     public void onBackPressed() {
         closeScreen();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        if (!hasFocus) {
+            stopConnection();
+        }
     }
 
     @Override

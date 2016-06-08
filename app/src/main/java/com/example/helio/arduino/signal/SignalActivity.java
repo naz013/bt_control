@@ -111,7 +111,7 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
 
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
-        //mBlockView.setVisibility(View.VISIBLE);
+        mBlockView.setVisibility(View.VISIBLE);
         mBlockView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -150,6 +150,7 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
             mBtService.stop();
             mBtService = null;
         }
+        mBlockView.setVisibility(View.VISIBLE);
     }
 
     private void setupConnector() {
@@ -229,7 +230,16 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
             setupConnector();
         }
         if (D) Log.d(TAG, "onAction: " + message);
-        mBtService.writeMessage(message.getBytes());
-        showToast(getString(R.string.request_sent));
+        if (mBtService != null) {
+            mBtService.writeMessage(message.getBytes());
+            showToast(getString(R.string.request_sent));
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        if (!hasFocus) {
+            stopConnection();
+        }
     }
 }

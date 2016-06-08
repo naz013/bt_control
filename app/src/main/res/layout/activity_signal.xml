@@ -40,7 +40,6 @@
             android:gravity="center"
             android:lineSpacingExtra="10dp"
             android:padding="15dp"
-            android:visibility="gone"
             android:text="@string/wait_while_connection_was_established"
             android:textColor="@color/colorWhite"
             android:textSize="22sp"
