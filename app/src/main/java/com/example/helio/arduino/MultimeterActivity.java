@@ -8,8 +8,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,9 +19,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.helio.arduino.core.ConnectionManager;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.DeviceData;
-import com.example.helio.arduino.core.ConnectionManager;
 
 public class MultimeterActivity extends AppCompatActivity {
 
@@ -99,14 +99,13 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private void initActionBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }
-        if (toolbar != null) {
-            toolbar.setTitle(R.string.multimeter);
-            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setTitle(R.string.multimeter);
         }
     }
 

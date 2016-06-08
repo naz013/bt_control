@@ -47,7 +47,9 @@
                         android:layout_marginLeft="8dp"
                         android:layout_marginRight="8dp"
                         android:layout_marginTop="8dp"
-                        android:entries="@array/wave_types" />
+                        android:background="@drawable/spinner_bg"
+                        android:entries="@array/wave_types"
+                        android:popupBackground="@color/colorWhite" />
 
                 </LinearLayout>
 
@@ -116,7 +118,9 @@
                             android:layout_centerVertical="true"
                             android:layout_marginLeft="8dp"
                             android:layout_toRightOf="@+id/freqInput"
-                            android:entries="@array/frequency_measure" />
+                            android:background="@drawable/spinner_bg"
+                            android:entries="@array/frequency_measure"
+                            android:popupBackground="@color/colorWhite" />
 
                     </RelativeLayout>
 

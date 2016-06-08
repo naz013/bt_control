@@ -10,8 +10,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,9 +24,9 @@ import android.widget.Toast;
 import com.example.helio.arduino.BuildConfig;
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.SettingsActivity;
+import com.example.helio.arduino.core.ConnectionManager;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.DeviceData;
-import com.example.helio.arduino.core.ConnectionManager;
 
 public class SignalActivity extends AppCompatActivity implements FragmentListener {
 
@@ -111,7 +111,7 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
 
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
-        mBlockView.setVisibility(View.VISIBLE);
+        //mBlockView.setVisibility(View.VISIBLE);
         mBlockView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -125,13 +125,12 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
     }
 
     private void initActionBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }
-        if (toolbar != null) {
-            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
         }
     }
 
@@ -226,7 +225,7 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
 
     @Override
     public void onAction(String message) {
-        if (mBtService.getState() != ConnectionManager.STATE_CONNECTED) {
+        if (mBtService == null || mBtService.getState() != ConnectionManager.STATE_CONNECTED) {
             setupConnector();
         }
         if (D) Log.d(TAG, "onAction: " + message);

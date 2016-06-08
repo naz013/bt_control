@@ -2,14 +2,14 @@ package com.example.helio.arduino.dso;
 
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.R;
+import com.example.helio.arduino.core.Constants;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -46,14 +46,13 @@ public class ImagesActivity extends AppCompatActivity {
     }
 
     private void initActionBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }
-        if (toolbar != null) {
-            toolbar.setTitle(R.string.screenshots);
-            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setTitle(R.string.screenshots);
         }
     }
 
