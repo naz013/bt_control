@@ -6,12 +6,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.helio.arduino.core.BluetoothService;
 import com.example.helio.arduino.dso.DsoActivity;
 import com.example.helio.arduino.signal.SignalActivity;
 
@@ -93,6 +93,12 @@ public class MainActivity extends AppCompatActivity {
         if (!mBtAdapter.isEnabled()) {
             requestBtEnabling(REQUEST_ENABLE_BT_AUTO);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(this, BluetoothService.class));
     }
 
     @Override

@@ -58,6 +58,8 @@
 
         <activity android:name=".dso.ImagePreviewActivity" />
 
+        <service android:name=".core.BluetoothService" />
+
     </application>
 
 </manifest>

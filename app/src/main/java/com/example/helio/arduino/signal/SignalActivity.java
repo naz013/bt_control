@@ -2,12 +2,8 @@ package com.example.helio.arduino.signal;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -24,9 +20,13 @@ import android.widget.Toast;
 import com.example.helio.arduino.BuildConfig;
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.SettingsActivity;
-import com.example.helio.arduino.core.ConnectionManager;
+import com.example.helio.arduino.core.BluetoothService;
+import com.example.helio.arduino.core.ConnectionEvent;
 import com.example.helio.arduino.core.Constants;
-import com.example.helio.arduino.core.DeviceData;
+import com.example.helio.arduino.core.ControlEvent;
+import com.example.helio.arduino.core.ResponseEvent;
+
+import de.greenrobot.event.EventBus;
 
 public class SignalActivity extends AppCompatActivity implements FragmentListener {
 
@@ -35,25 +35,11 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
     private static final boolean D = BuildConfig.DEBUG;
 
     private BluetoothAdapter mBtAdapter = null;
-    private ConnectionManager mBtService = null;
 
     private TextView mBlockView;
 
     private static Activity activity;
 
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case Constants.MESSAGE_STATE_CHANGE:
-                    obtainConnectionMessage(msg);
-                    break;
-                case Constants.MESSAGE_DEVICE_NAME:
-                    mBlockView.setVisibility(View.GONE);
-                    break;
-            }
-        }
-    };
     private ViewPager.OnPageChangeListener mPageListener = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -71,17 +57,21 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
         }
     };
 
+    public void onEvent(ConnectionEvent responseEvent) {
+        if (responseEvent.isConnected()) {
+            mBlockView.setVisibility(View.GONE);
+        } else {
+            mBlockView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void onEvent(ResponseEvent responseEvent) {
+
+    }
+
     private void sendCancelSignal() {
         onAction(Constants.E);
         onAction(Constants.T);
-    }
-
-    private void obtainConnectionMessage(Message msg) {
-        switch (msg.arg1) {
-            case ConnectionManager.STATE_CONNECTED:
-                mBlockView.setVisibility(View.GONE);
-                break;
-        }
     }
 
     @Override
@@ -142,32 +132,13 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
     private void checkBtAdapterStatus() {
         if (!mBtAdapter.isEnabled()) {
             requestBtEnable();
+        } else {
+            startService(new Intent(this, BluetoothService.class));
         }
     }
 
-    private void stopConnection() {
-        if (mBtService != null) {
-            mBtService.stop();
-            mBtService = null;
-        }
+    private void showBlockView() {
         mBlockView.setVisibility(View.VISIBLE);
-    }
-
-    private void setupConnector() {
-        stopConnection();
-        try {
-            String emptyName = "None";
-            SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Activity.MODE_PRIVATE);
-            String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
-            if (mAddress != null) {
-                BluetoothDevice mConnectedDevice = mBtAdapter.getRemoteDevice(mAddress);
-                DeviceData data = new DeviceData(mConnectedDevice, emptyName);
-                mBtService = new ConnectionManager(data, mHandler);
-                mBtService.connect();
-            }
-        } catch (IllegalArgumentException e) {
-            if (D) Log.d(TAG, "setupConnector failed: " + e.getMessage());
-        }
     }
 
     private void showToast(String message) {
@@ -178,22 +149,21 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
     public void onStart() {
         super.onStart();
         checkBtAdapterStatus();
+        EventBus.getDefault().register(this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mBtAdapter != null) {
-            mBtAdapter.cancelDiscovery();
-        }
-        sendCancelSignal();
-        stopConnection();
+        showBlockView();
+        stopService(new Intent(this, BluetoothService.class));
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        setupConnector();
+    protected void onStop() {
+        super.onStop();
+        sendCancelSignal();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -226,20 +196,8 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
 
     @Override
     public void onAction(String message) {
-        if (mBtService == null || mBtService.getState() != ConnectionManager.STATE_CONNECTED) {
-            setupConnector();
-        }
         if (D) Log.d(TAG, "onAction: " + message);
-        if (mBtService != null) {
-            mBtService.writeMessage(message.getBytes());
-            showToast(getString(R.string.request_sent));
-        }
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        if (!hasFocus) {
-            stopConnection();
-        }
+        EventBus.getDefault().post(new ControlEvent(message));
+        showToast(getString(R.string.request_sent));
     }
 }

@@ -60,4 +60,5 @@
     <string name="must_be_not_empty">Must be not empty!</string>
     <string name="request_sent">Request sent</string>
     <string name="incorrect_value">Incorrect value</string>
+    <string name="bt_service_started">Bluetooth service started</string>
 </resources>

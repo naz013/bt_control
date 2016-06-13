@@ -3,20 +3,16 @@ package com.example.helio.arduino.dso;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,9 +23,11 @@ import android.widget.Toast;
 
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.SettingsActivity;
-import com.example.helio.arduino.core.ConnectionManager;
+import com.example.helio.arduino.core.BluetoothService;
+import com.example.helio.arduino.core.ConnectionEvent;
 import com.example.helio.arduino.core.Constants;
-import com.example.helio.arduino.core.DeviceData;
+import com.example.helio.arduino.core.ControlEvent;
+import com.example.helio.arduino.core.ResponseEvent;
 import com.github.mikephil.charting.charts.ScatterChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -48,6 +46,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+import de.greenrobot.event.EventBus;
+
 public class DsoActivity extends AppCompatActivity implements OnChartGestureListener, OnChartValueSelectedListener {
 
     private static final int REQUEST_ENABLE_BT = 3;
@@ -63,32 +63,18 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     private TextView mCaptureButton;
 
     private BluetoothAdapter mBtAdapter = null;
-    private ConnectionManager mBtService = null;
 
     private static Activity activity;
 
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case Constants.MESSAGE_STATE_CHANGE:
-                    obtainConnectionMessage(msg);
-                    break;
-                case Constants.MESSAGE_DEVICE_NAME:
-                    mBlockView.setVisibility(View.GONE);
-                    break;
-                case Constants.MESSAGE_READ:
-                    readDso(msg);
-                    break;
-            }
-        }
-    };
+    public void onEvent(ResponseEvent responseEvent) {
+        readDso(responseEvent.getMsg());
+    }
 
-    private void obtainConnectionMessage(Message msg) {
-        switch (msg.arg1) {
-            case ConnectionManager.STATE_CONNECTED:
-                mBlockView.setVisibility(View.GONE);
-                break;
+    public void onEvent(ConnectionEvent responseEvent) {
+        if (responseEvent.isConnected()) {
+            mBlockView.setVisibility(View.GONE);
+        } else {
+            mBlockView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -192,14 +178,13 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     private void checkBtAdapterStatus() {
         if (!mBtAdapter.isEnabled()) {
             requestBtEnable();
+        } else {
+            startService(new Intent(this, BluetoothService.class));
         }
     }
 
     private void sendMessage(String message) {
-        if (mBtService.getState() != ConnectionManager.STATE_CONNECTED) {
-            setupConnector();
-        }
-        mBtService.writeMessage(message.getBytes());
+        EventBus.getDefault().post(new ControlEvent(message));
         showToast(getString(R.string.request_sent));
     }
 
@@ -235,29 +220,8 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         }
     };
 
-    private void stopConnection() {
-        if (mBtService != null) {
-            mBtService.stop();
-            mBtService = null;
-        }
+    private void showBlockView() {
         mBlockView.setVisibility(View.VISIBLE);
-    }
-
-    private void setupConnector() {
-        stopConnection();
-        try {
-            String emptyName = "None";
-            SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Activity.MODE_PRIVATE);
-            String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
-            if (mAddress != null) {
-                BluetoothDevice mConnectedDevice = mBtAdapter.getRemoteDevice(mAddress);
-                DeviceData data = new DeviceData(mConnectedDevice, emptyName);
-                mBtService = new ConnectionManager(data, mHandler);
-                mBtService.connect();
-            }
-        } catch (IllegalArgumentException e) {
-            Log.d("TAG", "setupConnector failed: " + e.getMessage());
-        }
     }
 
     private void stopCapturing() {
@@ -354,11 +318,8 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     }
 
     private void sendCancelMessage() {
-        if (mBtService.getState() != ConnectionManager.STATE_CONNECTED) {
-            setupConnector();
-        }
         String msg = Constants.S;
-        mBtService.writeMessage(msg.getBytes());
+        EventBus.getDefault().post(new ControlEvent(msg));
         showToast(getString(R.string.request_sent));
     }
 
@@ -375,28 +336,21 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     public void onStart() {
         super.onStart();
         checkBtAdapterStatus();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        stopCapturing();
-        stopConnection();
+        EventBus.getDefault().register(this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mBtAdapter != null) {
-            mBtAdapter.cancelDiscovery();
-        }
-        stopConnection();
+        showBlockView();
+        stopService(new Intent(this, BluetoothService.class));
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        setupConnector();
+    protected void onStop() {
+        super.onStop();
+        stopCapturing();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -440,19 +394,14 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ENABLE_BT && resultCode != RESULT_OK) {
             requestBtEnable();
+        } else {
+            startService(new Intent(this, BluetoothService.class));
         }
     }
 
     @Override
     public void onBackPressed() {
         closeScreen();
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        if (!hasFocus) {
-            stopConnection();
-        }
     }
 
     @Override
