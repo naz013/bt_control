@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -24,12 +23,12 @@ public class SignalFragment extends Fragment {
 
     private FragmentListener mFragmentListener;
 
-    private TextView mGenerate;
-    private TextView mTerminate;
+    private TextView mGenerateButton;
+    private TextView mTerminateButton;
     private Spinner mWaveSelector;
     private Spinner mFrequencySelector;
     private EditText mFrequencyField;
-    private TextInputLayout freqInput;
+    private TextInputLayout mFreqLabel;
 
     private final View.OnClickListener mListener = new View.OnClickListener() {
         @Override
@@ -72,6 +71,7 @@ public class SignalFragment extends Fragment {
         InputFilter[] FilterArray = new InputFilter[1];
         FilterArray[0] = new InputFilter.LengthFilter(length);
         mFrequencyField.setFilters(FilterArray);
+        mFrequencyField.setSelection(mFrequencyField.getText().length());
     }
 
     public SignalFragment() {
@@ -106,8 +106,8 @@ public class SignalFragment extends Fragment {
         mFrequencySelector = (Spinner) view.findViewById(R.id.freqSelector);
         mFrequencySelector.setOnItemSelectedListener(mItemSelectListener);
 
-        freqInput = (TextInputLayout) view.findViewById(R.id.freqInput);
-        freqInput.setHintEnabled(false);
+        mFreqLabel = (TextInputLayout) view.findViewById(R.id.freqInput);
+        mFreqLabel.setHintEnabled(false);
         mFrequencyField = (EditText) view.findViewById(R.id.freqField);
         mFrequencyField.addTextChangedListener(new TextWatcher() {
             @Override
@@ -118,9 +118,9 @@ public class SignalFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() == 0) {
-                    mGenerate.setEnabled(false);
+                    mGenerateButton.setEnabled(false);
                 } else {
-                    mGenerate.setEnabled(true);
+                    mGenerateButton.setEnabled(true);
                 }
                 checkFrequency();
             }
@@ -134,19 +134,22 @@ public class SignalFragment extends Fragment {
 
     private void checkFrequency() {
         if (mFrequencyField.getText().toString().trim().matches("")) {
-            freqInput.setErrorEnabled(true);
-            freqInput.setError(getString(R.string.must_be_not_empty));
+            mFreqLabel.setErrorEnabled(true);
+            mFreqLabel.setError(getString(R.string.must_be_not_empty));
             return;
         } else {
-            freqInput.setErrorEnabled(false);
+            mFreqLabel.setErrorEnabled(false);
+            mFreqLabel.setError("");
         }
 
         if (getFrequency() > Constants.MAX_HZ) {
-            freqInput.setErrorEnabled(true);
-            freqInput.setError(getString(R.string.max_frequency4));
-            mGenerate.setEnabled(false);
+            mFreqLabel.setErrorEnabled(true);
+            mFreqLabel.setError(getString(R.string.max_frequency4));
+            mGenerateButton.setEnabled(false);
         } else {
-            freqInput.setErrorEnabled(false);
+            mFreqLabel.setErrorEnabled(false);
+            mFreqLabel.setError("");
+            mGenerateButton.setEnabled(true);
         }
     }
 
@@ -165,11 +168,11 @@ public class SignalFragment extends Fragment {
     }
 
     private void initButtons(View view) {
-        mGenerate = (TextView) view.findViewById(R.id.generateButton);
-        mGenerate.setOnClickListener(mListener);
-        mTerminate = (TextView) view.findViewById(R.id.terminateButton);
-        mTerminate.setOnClickListener(mListener);
-        mGenerate.setEnabled(false);
+        mGenerateButton = (TextView) view.findViewById(R.id.generateButton);
+        mGenerateButton.setOnClickListener(mListener);
+        mTerminateButton = (TextView) view.findViewById(R.id.terminateButton);
+        mTerminateButton.setOnClickListener(mListener);
+        mGenerateButton.setEnabled(false);
     }
 
     private void sendTerminateMessage() {
@@ -183,7 +186,7 @@ public class SignalFragment extends Fragment {
         String freqString = mFrequencyField.getText().toString().trim();
         if (freqString.matches("")) {
             showToast(getString(R.string.empty_frequency));
-            mFrequencyField.setText("0");
+            mFrequencyField.setText("");
             return;
         }
         long frequency = Long.parseLong(freqString);
@@ -200,7 +203,7 @@ public class SignalFragment extends Fragment {
         frequency = frequency * eval;
         if (frequency > Constants.MAX_HZ) {
             showToast(getString(R.string.max_frequency4));
-            mFrequencyField.setText("0");
+            mFrequencyField.setText("");
             return;
         }
         String msg = Constants.G + ";w:" + wave + ";f:" + frequency;

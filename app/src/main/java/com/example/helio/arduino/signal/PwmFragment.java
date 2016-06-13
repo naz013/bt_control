@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -24,13 +23,13 @@ public class PwmFragment extends Fragment {
 
     private FragmentListener mFragmentListener;
 
-    private TextView mGenerate;
-    private TextView mTerminate;
+    private TextView mGenerateButton;
+    private TextView mTerminateButton;
     private Spinner mFrequencySelector;
     private EditText mFrequencyField;
     private EditText mDutyField;
-    private TextInputLayout cycleInput;
-    private TextInputLayout freqInput;
+    private TextInputLayout mCycleLabel;
+    private TextInputLayout mFreqLabel;
 
     private final View.OnClickListener mListener = new View.OnClickListener() {
         @Override
@@ -73,6 +72,7 @@ public class PwmFragment extends Fragment {
         InputFilter[] FilterArray = new InputFilter[1];
         FilterArray[0] = new InputFilter.LengthFilter(length);
         mFrequencyField.setFilters(FilterArray);
+        mFrequencyField.setSelection(mFrequencyField.getText().length());
     }
 
     public PwmFragment() {
@@ -103,8 +103,8 @@ public class PwmFragment extends Fragment {
     }
 
     private void initViews(View view) {
-        freqInput = (TextInputLayout) view.findViewById(R.id.freqInput);
-        freqInput.setHintEnabled(false);
+        mFreqLabel = (TextInputLayout) view.findViewById(R.id.freqInput);
+        mFreqLabel.setHintEnabled(false);
         mFrequencyField = (EditText) view.findViewById(R.id.freqField);
         mFrequencyField.addTextChangedListener(new TextWatcher() {
             @Override
@@ -126,8 +126,8 @@ public class PwmFragment extends Fragment {
         mFrequencySelector = (Spinner) view.findViewById(R.id.freqSelector);
         mFrequencySelector.setOnItemSelectedListener(mItemSelectListener);
 
-        cycleInput = (TextInputLayout) view.findViewById(R.id.cycleInput);
-        cycleInput.setHintEnabled(false);
+        mCycleLabel = (TextInputLayout) view.findViewById(R.id.cycleInput);
+        mCycleLabel.setHintEnabled(false);
         mDutyField = (EditText) view.findViewById(R.id.cycleField);
         mDutyField.addTextChangedListener(new TextWatcher() {
             @Override
@@ -151,46 +151,52 @@ public class PwmFragment extends Fragment {
 
     private void checkData() {
         if (mFrequencyField.getText().length() > 0 && mDutyField.getText().length() > 0) {
-            mGenerate.setEnabled(true);
+            mGenerateButton.setEnabled(true);
         } else {
-            mGenerate.setEnabled(false);
+            mGenerateButton.setEnabled(false);
         }
     }
 
     private void checkDuty() {
-        cycleInput.refreshDrawableState();
+        mCycleLabel.refreshDrawableState();
         if (mDutyField.getText().toString().trim().matches("")){
-            cycleInput.setErrorEnabled(true);
-            cycleInput.setError(getString(R.string.must_be_not_empty));
+            mCycleLabel.setErrorEnabled(true);
+            mCycleLabel.setError(getString(R.string.must_be_not_empty));
             return;
         } else {
-            cycleInput.setErrorEnabled(false);
+            mCycleLabel.setErrorEnabled(false);
+            mCycleLabel.setError("");
         }
         int perc = Integer.parseInt(mDutyField.getText().toString().trim());
         if (perc > 100) {
-            cycleInput.setErrorEnabled(true);
-            cycleInput.setError(getString(R.string.must_be_less_than));
-            mGenerate.setEnabled(false);
+            mCycleLabel.setErrorEnabled(true);
+            mCycleLabel.setError(getString(R.string.must_be_less_than));
+            mGenerateButton.setEnabled(false);
         } else {
-            cycleInput.setErrorEnabled(false);
+            mCycleLabel.setErrorEnabled(false);
+            mCycleLabel.setError("");
+            mGenerateButton.setEnabled(true);
         }
     }
 
     private void checkFrequency() {
         if (mFrequencyField.getText().toString().trim().matches("")){
-            freqInput.setErrorEnabled(true);
-            freqInput.setError(getString(R.string.must_be_not_empty));
+            mFreqLabel.setErrorEnabled(true);
+            mFreqLabel.setError(getString(R.string.must_be_not_empty));
             return;
         } else {
-            freqInput.setErrorEnabled(false);
+            mFreqLabel.setErrorEnabled(false);
+            mFreqLabel.setError("");
         }
 
         if (getFrequency() > Constants.MAX_HZ) {
-            freqInput.setErrorEnabled(true);
-            freqInput.setError(getString(R.string.max_frequency4));
-            mGenerate.setEnabled(false);
+            mFreqLabel.setErrorEnabled(true);
+            mFreqLabel.setError(getString(R.string.max_frequency4));
+            mGenerateButton.setEnabled(false);
         } else {
-            freqInput.setErrorEnabled(false);
+            mFreqLabel.setErrorEnabled(false);
+            mFreqLabel.setError("");
+            mGenerateButton.setEnabled(true);
         }
     }
 
@@ -209,11 +215,11 @@ public class PwmFragment extends Fragment {
     }
 
     private void initButtons(View view) {
-        mGenerate = (TextView) view.findViewById(R.id.generateButton);
-        mGenerate.setOnClickListener(mListener);
-        mTerminate = (TextView) view.findViewById(R.id.terminateButton);
-        mTerminate.setOnClickListener(mListener);
-        mGenerate.setEnabled(false);
+        mGenerateButton = (TextView) view.findViewById(R.id.generateButton);
+        mGenerateButton.setOnClickListener(mListener);
+        mTerminateButton = (TextView) view.findViewById(R.id.terminateButton);
+        mTerminateButton.setOnClickListener(mListener);
+        mGenerateButton.setEnabled(false);
     }
 
     private void sendTerminateMessage() {
