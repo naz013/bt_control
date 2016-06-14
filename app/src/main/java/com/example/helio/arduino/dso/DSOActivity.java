@@ -53,7 +53,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     private static final int REQUEST_ENABLE_BT = 3;
     private static final float CHART_MAX_Y = 15f;
     private static final float CHART_MIN_Y = -15f;
-    private static final float CHART_MAX_X = 1000;
+    private static final float CHART_MAX_X = 1020;
 
     private boolean mCapturing = false;
 
@@ -134,6 +134,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         yAxis.removeAllLimitLines();
         yAxis.setAxisMaxValue(CHART_MAX_Y);
         yAxis.setAxisMinValue(CHART_MIN_Y);
+        yAxis.setLabelCount(11, true);
         yAxis.setDrawZeroLine(true);
         yAxis.setValueFormatter((value, yAxis1) -> String.format(Locale.getDefault(), "%.2f", value));
         mChart.getAxisRight().setEnabled(false);
@@ -222,6 +223,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
 
     private void clearGraph() {
         mChart.getScatterData().clearValues();
+        mChart.invalidate();
     }
 
     private void showBlockView() {
