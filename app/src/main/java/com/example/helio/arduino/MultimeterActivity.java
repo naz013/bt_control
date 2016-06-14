@@ -269,6 +269,13 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        if (!hasFocus) {
+            reset();
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         closeScreen();
     }
