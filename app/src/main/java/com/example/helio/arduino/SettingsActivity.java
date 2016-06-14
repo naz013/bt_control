@@ -58,12 +58,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    private final View.OnClickListener buttonClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            removeBtDevice();
-        }
-    };
+    private final View.OnClickListener buttonClick = v -> removeBtDevice();
 
     private void removeBtDevice() {
         removePrefs();

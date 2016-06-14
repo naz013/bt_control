@@ -34,14 +34,11 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
-import com.github.mikephil.charting.formatter.XAxisValueFormatter;
-import com.github.mikephil.charting.formatter.YAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -100,12 +97,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
         mBlockView.setVisibility(View.VISIBLE);
-        mBlockView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
+        mBlockView.setOnTouchListener((v, event) -> true);
     }
 
     private void initBtAdapter() {
@@ -143,22 +135,14 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         yAxis.setAxisMaxValue(CHART_MAX_Y);
         yAxis.setAxisMinValue(CHART_MIN_Y);
         yAxis.setDrawZeroLine(true);
-        yAxis.setValueFormatter(new YAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, YAxis yAxis) {
-                return String.format(Locale.getDefault(), "%.2f", value);
-            }
-        });
+        yAxis.setValueFormatter((value, yAxis1) -> String.format(Locale.getDefault(), "%.2f", value));
         mChart.getAxisRight().setEnabled(false);
         XAxis xAxis = mChart.getXAxis();
         xAxis.setDrawGridLines(false);
         xAxis.setAxisMaxValue(CHART_MAX_X);
-        xAxis.setValueFormatter(new XAxisValueFormatter() {
-            @Override
-            public String getXValue(String original, int index, ViewPortHandler viewPortHandler) {
-                float f = index / 100f;
-                return String.format(Locale.getDefault(), "%.2f", f);
-            }
+        xAxis.setValueFormatter((original, index, viewPortHandler) -> {
+            float f = index / 100f;
+            return String.format(Locale.getDefault(), "%.2f", f);
         });
         mChart.invalidate();
     }
@@ -216,26 +200,23 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         }
     }
 
-    private View.OnClickListener mListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.captureButton:
-                    capture();
-                    break;
-                case R.id.screenshotButton:
-                    takeScreenshot();
-                    break;
-                case R.id.viewScreenshot:
-                    showScreenshots();
-                    break;
-                case R.id.stopButton:
-                    stopCapturing();
-                    break;
-                case R.id.clearButton:
-                    clearGraph();
-                    break;
-            }
+    private View.OnClickListener mListener = v -> {
+        switch (v.getId()) {
+            case R.id.captureButton:
+                capture();
+                break;
+            case R.id.screenshotButton:
+                takeScreenshot();
+                break;
+            case R.id.viewScreenshot:
+                showScreenshots();
+                break;
+            case R.id.stopButton:
+                stopCapturing();
+                break;
+            case R.id.clearButton:
+                clearGraph();
+                break;
         }
     };
 

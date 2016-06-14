@@ -30,17 +30,14 @@ public class SignalFragment extends Fragment {
     private EditText mFrequencyField;
     private TextInputLayout mFreqLabel;
 
-    private final View.OnClickListener mListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.generateButton:
-                    sendSignal();
-                    break;
-                case R.id.terminateButton:
-                    sendTerminateMessage();
-                    break;
-            }
+    private final View.OnClickListener mListener = v -> {
+        switch (v.getId()) {
+            case R.id.generateButton:
+                sendSignal();
+                break;
+            case R.id.terminateButton:
+                sendTerminateMessage();
+                break;
         }
     };
 

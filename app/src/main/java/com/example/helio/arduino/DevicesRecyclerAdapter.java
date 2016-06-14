@@ -52,12 +52,7 @@ public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecycler
         public DeviceViewHolder(View itemView) {
             super(itemView);
             deviceName = (TextView) itemView.findViewById(R.id.deviceName);
-            deviceName.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    handleClick(getAdapterPosition());
-                }
-            });
+            deviceName.setOnClickListener(v -> handleClick(getAdapterPosition()));
         }
     }
 

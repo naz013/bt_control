@@ -121,12 +121,9 @@ public class StartActivity extends AppCompatActivity {
         }
     }
 
-    private final View.OnClickListener visibleClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            v.setVisibility(View.GONE);
-            doDiscovery(REQUEST_CLICK);
-        }
+    private final View.OnClickListener visibleClick = v -> {
+        v.setVisibility(View.GONE);
+        doDiscovery(REQUEST_CLICK);
     };
 
     private void addDeviceToList(BluetoothDevice device) {
@@ -238,12 +235,9 @@ public class StartActivity extends AppCompatActivity {
         }
     }
 
-    private final View.OnClickListener mClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            startActivity(new Intent(StartActivity.this, MainActivity.class));
-            finish();
-        }
+    private final View.OnClickListener mClick = v -> {
+        startActivity(new Intent(StartActivity.this, MainActivity.class));
+        finish();
     };
 
     private void showMainButton() {

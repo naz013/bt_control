@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -102,12 +101,7 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
         mBlockView.setVisibility(View.VISIBLE);
-        mBlockView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
+        mBlockView.setOnTouchListener((v, event) -> true);
     }
 
     private void initBtAdapter() {

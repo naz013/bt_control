@@ -113,7 +113,7 @@ public class BluetoothUtils {
     }
 
     public static ArrayList<ParcelUuid> getDeviceUuids(BluetoothDevice device) {
-        ArrayList<ParcelUuid> result = new ArrayList<ParcelUuid>();
+        ArrayList<ParcelUuid> result = new ArrayList<>();
 
         try {
             Method method = device.getClass().getMethod("getUuids", null);
@@ -124,13 +124,7 @@ public class BluetoothUtils {
                     result.add(uuid);
                 }
             }
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            if (D) Log.e(TAG, "getDeviceUuids() failed", e);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            if (D) Log.e(TAG, "getDeviceUuids() failed", e);
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
             if (D) Log.e(TAG, "getDeviceUuids() failed", e);
         }
@@ -140,7 +134,7 @@ public class BluetoothUtils {
 
 
     private static ArrayList<String> getDeviceServices(ArrayList<ParcelUuid> uuids) {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         for (ParcelUuid uuid : uuids) {
             String s = uuid.toString().toUpperCase();
             boolean found = false;
@@ -179,13 +173,7 @@ public class BluetoothUtils {
             aobj[0] = Integer.valueOf(1);
 
             tmp = (BluetoothSocket) method.invoke(device, aobj);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            if (D) Log.e(TAG, "createRfcommSocket() failed", e);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            if (D) Log.e(TAG, "createRfcommSocket() failed", e);
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
             if (D) Log.e(TAG, "createRfcommSocket() failed", e);
         }

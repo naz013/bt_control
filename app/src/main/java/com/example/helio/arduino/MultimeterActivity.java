@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -70,12 +69,7 @@ public class MultimeterActivity extends AppCompatActivity {
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
         mBlockView.setVisibility(View.VISIBLE);
-        mBlockView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
+        mBlockView.setOnTouchListener((v, event) -> true);
     }
 
     private void initBluetoothAdapter() {
@@ -117,18 +111,17 @@ public class MultimeterActivity extends AppCompatActivity {
     private final View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (mSelectedId == v.getId()) {
-                v.setSelected(false);
-                mSelectedId = -1;
-                enableAll();
-                return;
+            if (mSelectedId != v.getId() && mSelectedId != -1) {
+                if (v.getId() != R.id.resetButton) {
+                    deselectAll();
+                    v.setSelected(true);
+                    mSelectedId = v.getId();
+                    disableAll(mSelectedId);
+                    mResetButton.setEnabled(true);
+                    isReading = true;
+                }
             } else {
-                deselectAll();
-                v.setSelected(true);
-                mSelectedId = v.getId();
-                disableAll(mSelectedId);
-                mResetButton.setEnabled(true);
-                isReading = true;
+                return;
             }
             switch (v.getId()) {
                 case R.id.resistanceButton:
@@ -216,6 +209,7 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private void closeScreen() {
+        sendMessage(Constants.D);
         finish();
     }
 
@@ -240,6 +234,7 @@ public class MultimeterActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        sendMessage(Constants.D);
         EventBus.getDefault().unregister(this);
     }
 

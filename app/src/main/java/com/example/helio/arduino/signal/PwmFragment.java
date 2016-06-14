@@ -31,17 +31,14 @@ public class PwmFragment extends Fragment {
     private TextInputLayout mCycleLabel;
     private TextInputLayout mFreqLabel;
 
-    private final View.OnClickListener mListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.generateButton:
-                    sendSignal();
-                    break;
-                case R.id.terminateButton:
-                    sendTerminateMessage();
-                    break;
-            }
+    private final View.OnClickListener mListener = v -> {
+        switch (v.getId()) {
+            case R.id.generateButton:
+                sendSignal();
+                break;
+            case R.id.terminateButton:
+                sendTerminateMessage();
+                break;
         }
     };
 

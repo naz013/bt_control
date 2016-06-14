@@ -65,20 +65,17 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, MultimeterActivity.class));
     }
 
-    private final View.OnClickListener mListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.multimeterButton:
-                    openMultimeter();
-                    break;
-                case R.id.dsoButton:
-                    openDSO();
-                    break;
-                case R.id.signalButton:
-                    openSignal();
-                    break;
-            }
+    private final View.OnClickListener mListener = v -> {
+        switch (v.getId()) {
+            case R.id.multimeterButton:
+                openMultimeter();
+                break;
+            case R.id.dsoButton:
+                openDSO();
+                break;
+            case R.id.signalButton:
+                openSignal();
+                break;
         }
     };
 
