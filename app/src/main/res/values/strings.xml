@@ -61,4 +61,5 @@
     <string name="request_sent">Request sent</string>
     <string name="incorrect_value">Incorrect value</string>
     <string name="bt_service_started">Bluetooth service started</string>
+    <string name="reset">Reset</string>
 </resources>

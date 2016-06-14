@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,7 +30,10 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private TextView mMeterField;
     private TextView mBlockView;
+    private Button mResetButton;
+
     private int mSelectedId;
+    private boolean isReading;
 
     private BluetoothAdapter mBtAdapter = null;
 
@@ -82,6 +86,9 @@ public class MultimeterActivity extends AppCompatActivity {
         findViewById(R.id.resistanceButton).setOnClickListener(mListener);
         findViewById(R.id.voltageButton).setOnClickListener(mListener);
         findViewById(R.id.currentButton).setOnClickListener(mListener);
+        mResetButton = (Button) findViewById(R.id.resetButton);
+        mResetButton.setOnClickListener(mListener);
+        mResetButton.setEnabled(false);
     }
 
     private void initActionBar() {
@@ -113,11 +120,15 @@ public class MultimeterActivity extends AppCompatActivity {
             if (mSelectedId == v.getId()) {
                 v.setSelected(false);
                 mSelectedId = -1;
+                enableAll();
                 return;
             } else {
                 deselectAll();
                 v.setSelected(true);
                 mSelectedId = v.getId();
+                disableAll(mSelectedId);
+                mResetButton.setEnabled(true);
+                isReading = true;
             }
             switch (v.getId()) {
                 case R.id.resistanceButton:
@@ -129,9 +140,33 @@ public class MultimeterActivity extends AppCompatActivity {
                 case R.id.currentButton:
                     showCurrent();
                     break;
+                case R.id.resetButton:
+                    reset();
+                    break;
             }
         }
     };
+
+    private void reset() {
+        sendMessage(Constants.D);
+        deselectAll();
+        enableAll();
+        mMeterField.setText("");
+        isReading = false;
+    }
+
+    private void enableAll() {
+        findViewById(R.id.resistanceButton).setEnabled(true);
+        findViewById(R.id.voltageButton).setEnabled(true);
+        findViewById(R.id.currentButton).setEnabled(true);
+        mResetButton.setEnabled(false);
+    }
+
+    private void disableAll(int id) {
+        if (id != R.id.resistanceButton) findViewById(R.id.resistanceButton).setEnabled(false);
+        if (id != R.id.voltageButton) findViewById(R.id.voltageButton).setEnabled(false);
+        if (id != R.id.currentButton) findViewById(R.id.currentButton).setEnabled(false);
+    }
 
     private void deselectAll() {
         findViewById(R.id.resistanceButton).setSelected(false);
@@ -158,8 +193,11 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private void postResponse(Message msg) {
+        if (!isReading) {
+            return;
+        }
         String data = (String) msg.obj;
-        String v;
+        String v = "";
         if (data.startsWith(Constants.rV)) {
             data = data.replace(Constants.rV, "");
             v = data.trim();
@@ -169,8 +207,6 @@ public class MultimeterActivity extends AppCompatActivity {
         } else if (data.startsWith(Constants.rR)) {
             data = data.replace(Constants.rR, "");
             v = data.trim();
-        } else {
-            v = getString(R.string.no_key);
         }
         mMeterField.setText(v);
     }

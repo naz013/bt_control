@@ -14,6 +14,7 @@ public class Constants {
     public static final int MESSAGE_TOAST = 5;
 
     public static final String R = "r";
+    public static final String D = "d";
     public static final String I = "i";
     public static final String V = "v";
 
