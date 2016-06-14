@@ -34,11 +34,14 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
+import com.github.mikephil.charting.formatter.XAxisValueFormatter;
+import com.github.mikephil.charting.formatter.YAxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -51,9 +54,9 @@ import de.greenrobot.event.EventBus;
 public class DsoActivity extends AppCompatActivity implements OnChartGestureListener, OnChartValueSelectedListener {
 
     private static final int REQUEST_ENABLE_BT = 3;
-    private static final float CHART_MAX_Y = 220f;
-    private static final float CHART_MIN_Y = -50f;
-    private static final float CHART_MAX_X = 100;
+    private static final float CHART_MAX_Y = 15f;
+    private static final float CHART_MIN_Y = -15f;
+    private static final float CHART_MAX_X = 1000;
 
     private boolean mCapturing = false;
 
@@ -125,7 +128,6 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
             xVals.add((i) + "");
         }
         ArrayList<Entry> entries = new ArrayList<>();
-        //entries.add(new Entry(0f, 0));
         ScatterDataSet dataSet = new ScatterDataSet(entries, getString(R.string.arduino_vhart));
         dataSet.setColor(Color.BLACK);
         dataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
@@ -141,10 +143,23 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         yAxis.setAxisMaxValue(CHART_MAX_Y);
         yAxis.setAxisMinValue(CHART_MIN_Y);
         yAxis.setDrawZeroLine(true);
+        yAxis.setValueFormatter(new YAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, YAxis yAxis) {
+                return String.format(Locale.getDefault(), "%.2f", value);
+            }
+        });
         mChart.getAxisRight().setEnabled(false);
         XAxis xAxis = mChart.getXAxis();
         xAxis.setDrawGridLines(false);
         xAxis.setAxisMaxValue(CHART_MAX_X);
+        xAxis.setValueFormatter(new XAxisValueFormatter() {
+            @Override
+            public String getXValue(String original, int index, ViewPortHandler viewPortHandler) {
+                float f = index / 100f;
+                return String.format(Locale.getDefault(), "%.2f", f);
+            }
+        });
         mChart.invalidate();
     }
 
@@ -155,6 +170,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         mStopButton.setOnClickListener(mListener);
         findViewById(R.id.screenshotButton).setOnClickListener(mListener);
         findViewById(R.id.viewScreenshot).setOnClickListener(mListener);
+        findViewById(R.id.clearButton).setOnClickListener(mListener);
         mStopButton.setEnabled(false);
         mCaptureButton.setEnabled(true);
     }
@@ -193,7 +209,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         if (data.contains(Constants.rX) && data.contains(Constants.rY)) {
             String[] parts = data.split(Constants.DIV);
             String xVal = parts[0].replace(Constants.rX, "");
-            int x = Integer.parseInt(xVal.trim());
+            float x = Float.parseFloat(xVal.trim());
             String yVal = parts[1].replace(Constants.rY, "");
             float y = Float.parseFloat(yVal.trim());
             if (mCapturing) addNewEntry(x, y);
@@ -216,9 +232,16 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
                 case R.id.stopButton:
                     stopCapturing();
                     break;
+                case R.id.clearButton:
+                    clearGraph();
+                    break;
             }
         }
     };
+
+    private void clearGraph() {
+        mChart.getScatterData().clearValues();
+    }
 
     private void showBlockView() {
         mBlockView.setVisibility(View.VISIBLE);
@@ -285,7 +308,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         Toast.makeText(this, R.string.screenshot_saved, Toast.LENGTH_SHORT).show();
     }
 
-    private void addNewEntry(int x, float y) {
+    private void addNewEntry(float x, float y) {
         ScatterData scatterData = mChart.getScatterData();
         if (scatterData != null) {
             IScatterDataSet scatterDataSet;
@@ -300,7 +323,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
                 scatterData.addDataSet(scatterDataSet);
             }
             scatterData.setValueFormatter(new PlotValueFormatter());
-            Entry entry = new Entry(y, x);
+            Entry entry = new Entry(y, (int) (x * 100));
             scatterData.addEntry(entry, 0);
             mChart.notifyDataSetChanged();
             mChart.invalidate();

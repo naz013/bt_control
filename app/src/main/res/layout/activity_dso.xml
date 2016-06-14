@@ -78,21 +78,44 @@
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/screenshotButton"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top"
-                    android:layout_marginLeft="100dp"
-                    android:background="@drawable/button_blue_selector"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:paddingBottom="10dp"
-                    android:paddingLeft="15dp"
-                    android:paddingRight="15dp"
-                    android:paddingTop="10dp"
-                    android:text="@string/screenshot"
-                    android:textColor="@color/colorWhite"
-                    android:textSize="18sp" />
+                    android:layout_marginLeft="48dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/screenshotButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top"
+                        android:background="@drawable/button_blue_selector"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:paddingBottom="10dp"
+                        android:paddingLeft="15dp"
+                        android:paddingRight="15dp"
+                        android:paddingTop="10dp"
+                        android:text="@string/screenshot"
+                        android:textColor="@color/colorWhite"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/clearButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|right"
+                        android:background="@drawable/button_blue_selector"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:paddingBottom="10dp"
+                        android:paddingLeft="15dp"
+                        android:paddingRight="15dp"
+                        android:layout_marginTop="16dp"
+                        android:paddingTop="10dp"
+                        android:text="@string/clear"
+                        android:textColor="@color/colorWhite"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
