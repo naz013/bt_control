@@ -111,7 +111,7 @@ public class MultimeterActivity extends AppCompatActivity {
     private final View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (mSelectedId != v.getId() && mSelectedId != -1) {
+            if (mSelectedId != v.getId() || mSelectedId == -1) {
                 if (v.getId() != R.id.resetButton) {
                     deselectAll();
                     v.setSelected(true);
@@ -146,6 +146,7 @@ public class MultimeterActivity extends AppCompatActivity {
         enableAll();
         mMeterField.setText("");
         isReading = false;
+        mSelectedId = -1;
     }
 
     private void enableAll() {
