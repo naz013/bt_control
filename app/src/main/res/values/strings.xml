@@ -63,4 +63,5 @@
     <string name="bt_service_started">Bluetooth service started</string>
     <string name="reset">Reset</string>
     <string name="clear">CLEAR</string>
+    <string name="gallery">GALLERY</string>
 </resources>

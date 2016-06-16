@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="32dp"
                     android:layout_marginTop="32dp"
-                    android:gravity="center"
+                    android:gravity="center|top"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -122,6 +122,22 @@
                             android:textColor="@color/colorWhite"
                             android:textSize="18sp" />
 
+                        <TextView
+                            android:id="@+id/galleryButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top|right"
+                            android:layout_marginTop="16dp"
+                            android:background="@drawable/button_blue_selector"
+                            android:foreground="?attr/selectableItemBackground"
+                            android:paddingBottom="10dp"
+                            android:paddingLeft="15dp"
+                            android:paddingRight="15dp"
+                            android:paddingTop="10dp"
+                            android:text="@string/gallery"
+                            android:textColor="@color/colorWhite"
+                            android:textSize="18sp" />
+
                     </LinearLayout>
 
                 </LinearLayout>
@@ -129,15 +145,6 @@
             </LinearLayout>
 
         </ScrollView>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/viewScreenshot"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_collections_white_24dp" />
 
         <TextView
             android:id="@+id/blockView"

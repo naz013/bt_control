@@ -154,8 +154,8 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         mCaptureButton.setOnClickListener(mListener);
         mStopButton.setOnClickListener(mListener);
         findViewById(R.id.screenshotButton).setOnClickListener(mListener);
-        findViewById(R.id.viewScreenshot).setOnClickListener(mListener);
         findViewById(R.id.clearButton).setOnClickListener(mListener);
+        findViewById(R.id.galleryButton).setOnClickListener(mListener);
         mStopButton.setEnabled(false);
         mCaptureButton.setEnabled(true);
     }
@@ -209,14 +209,14 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
             case R.id.screenshotButton:
                 takeScreenshot();
                 break;
-            case R.id.viewScreenshot:
-                showScreenshots();
-                break;
             case R.id.stopButton:
                 stopCapturing();
                 break;
             case R.id.clearButton:
                 clearGraph();
+                break;
+            case R.id.galleryButton:
+                showScreenshots();
                 break;
         }
     };
