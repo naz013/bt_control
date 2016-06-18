@@ -15,7 +15,6 @@
     <string name="generate">GENERATE</string>
     <string name="signal_type">Signal type</string>
     <string name="frequency">Frequency</string>
-    <string name="magnitude">Magnitude</string>
     <string name="connected_to">Connected to</string>
     <string name="screenshots">Screenshots</string>
     <string name="bluetooth">Bluetooth</string>
@@ -45,11 +44,8 @@
     <string name="stop">STOP</string>
     <string name="terminate">TERMINATE</string>
     <string name="empty_frequency">Empty frequency!</string>
-    <string name="empty_magnitude">Empty magnitude!</string>
     <string name="go_to_main_menu">Go to main menu</string>
-    <string name="no_key">No key</string>
     <string name="arduino_vhart">Arduino chart</string>
-    <string name="index_string">Index 10</string>
     <string name="wait_while_connection_was_established">Wait while connection was established</string>
     <string name="max_frequency4">Maximum frequency is 20MHz</string>
     <string name="no_data_available">No data available</string>
@@ -59,7 +55,6 @@
     <string name="must_be_less_than">Must be less than 100!</string>
     <string name="must_be_not_empty">Must be not empty!</string>
     <string name="request_sent">Request sent</string>
-    <string name="incorrect_value">Incorrect value</string>
     <string name="bt_service_started">Bluetooth service started</string>
     <string name="reset">Reset</string>
     <string name="clear">CLEAR</string>
