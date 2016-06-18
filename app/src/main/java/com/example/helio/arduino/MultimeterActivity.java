@@ -113,12 +113,7 @@ public class MultimeterActivity extends AppCompatActivity {
         public void onClick(View v) {
             if (mSelectedId != v.getId() || mSelectedId == -1) {
                 if (v.getId() != R.id.resetButton) {
-                    deselectAll();
-                    v.setSelected(true);
-                    mSelectedId = v.getId();
-                    disableAll(mSelectedId);
-                    mResetButton.setEnabled(true);
-                    isReading = true;
+                    selectButton(v);
                 }
             } else {
                 return;
@@ -139,6 +134,15 @@ public class MultimeterActivity extends AppCompatActivity {
             }
         }
     };
+
+    private void selectButton(View v) {
+        deselectAll();
+        v.setSelected(true);
+        mSelectedId = v.getId();
+        disableAll(mSelectedId);
+        mResetButton.setEnabled(true);
+        isReading = true;
+    }
 
     private void reset() {
         sendMessage(Constants.D);
@@ -193,16 +197,28 @@ public class MultimeterActivity extends AppCompatActivity {
         String data = (String) msg.obj;
         String v = "";
         if (data.startsWith(Constants.rV)) {
-            data = data.replace(Constants.rV, "");
-            v = data.trim();
+            v = extractV(data);
         } else if (data.startsWith(Constants.rI)) {
-            data = data.replace(Constants.rI, "");
-            v = data.trim();
+            v = extractI(data);
         } else if (data.startsWith(Constants.rR)) {
-            data = data.replace(Constants.rR, "");
-            v = data.trim();
+            v = extractR(data);
         }
         mMeterField.setText(v);
+    }
+
+    private String extractR(String data) {
+        data = data.replace(Constants.rR, "");
+        return data.trim();
+    }
+
+    private String extractI(String data) {
+        data = data.replace(Constants.rI, "");
+        return data.trim();
+    }
+
+    private String extractV(String data) {
+        data = data.replace(Constants.rV, "");
+        return data.trim();
     }
 
     private void showBlockView() {

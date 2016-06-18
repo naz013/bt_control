@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -131,7 +132,7 @@ public class SignalFragment extends Fragment {
     }
 
     private void checkFrequency() {
-        if (mFrequencyField.getText().toString().trim().matches("")) {
+        if (TextUtils.isEmpty(mFrequencyField.getText().toString().trim())) {
             mFreqLabel.setErrorEnabled(true);
             mFreqLabel.setError(getString(R.string.must_be_not_empty));
             return;
@@ -182,7 +183,7 @@ public class SignalFragment extends Fragment {
 
     private void sendSignal() {
         String freqString = mFrequencyField.getText().toString().trim();
-        if (freqString.matches("")) {
+        if (TextUtils.isEmpty(freqString)) {
             showToast(getString(R.string.empty_frequency));
             mFrequencyField.setText("");
             return;

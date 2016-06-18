@@ -2,6 +2,7 @@ package com.example.helio.arduino.core;
 
 import android.bluetooth.BluetoothDevice;
 import android.os.ParcelUuid;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
 
@@ -18,7 +19,7 @@ public class DeviceData {
         address = device.getAddress();
         bondState = device.getBondState();
 
-        if (name == null || name.isEmpty()) name = emptyName;
+        if (TextUtils.isEmpty(name)) name = emptyName;
         deviceClass = device.getBluetoothClass().getDeviceClass();
         majorDeviceClass = device.getBluetoothClass().getMajorDeviceClass();
         uuids = BluetoothUtils.getDeviceUuids(device);
