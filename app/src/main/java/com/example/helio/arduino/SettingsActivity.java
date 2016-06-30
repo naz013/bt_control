@@ -6,14 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.backdoor.shared.Constants;
-import com.example.helio.arduino.dso.DSOActivity;
+import com.example.helio.arduino.core.Constants;
+import com.example.helio.arduino.dso.DsoActivity;
+import com.example.helio.arduino.signal.SignalActivity;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -26,7 +27,6 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         initActionBar();
         initViews();
-
         loadBtDevice();
     }
 
@@ -37,14 +37,13 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void initActionBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }
-        if (toolbar != null) {
-            toolbar.setTitle(R.string.settings);
-            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setTitle(R.string.settings);
         }
     }
 
@@ -59,17 +58,12 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    private final View.OnClickListener buttonClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            removeBtDevice();
-        }
-    };
+    private final View.OnClickListener buttonClick = v -> removeBtDevice();
 
     private void removeBtDevice() {
         removePrefs();
-        if (DSOActivity.getActivity() != null) {
-            DSOActivity.getActivity().finish();
+        if (DsoActivity.getActivity() != null) {
+            DsoActivity.getActivity().finish();
         }
         if (MainActivity.getActivity() != null) {
             MainActivity.getActivity().finish();

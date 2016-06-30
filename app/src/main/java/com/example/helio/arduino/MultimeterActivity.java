@@ -2,25 +2,26 @@ package com.example.helio.arduino;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.backdoor.shared.Constants;
-import com.backdoor.shared.JMessage;
-import com.backdoor.shared.OriginalChatService;
+import com.example.helio.arduino.core.BluetoothService;
+import com.example.helio.arduino.core.ConnectionEvent;
+import com.example.helio.arduino.core.Constants;
+import com.example.helio.arduino.core.ControlEvent;
+import com.example.helio.arduino.core.ResponseEvent;
+
+import de.greenrobot.event.EventBus;
 
 public class MultimeterActivity extends AppCompatActivity {
 
@@ -28,29 +29,14 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private TextView mMeterField;
     private TextView mBlockView;
+    private Button mResetButton;
+
     private int mSelectedId;
+    private boolean isReading;
 
     private BluetoothAdapter mBtAdapter = null;
-    private OriginalChatService mBtService = null;
 
     private static Activity activity;
-
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case Constants.MESSAGE_DEVICE_NAME:
-                    showConnectedDeviceName(msg);
-                    break;
-                case Constants.MESSAGE_TOAST:
-                    showMessage(msg);
-                    break;
-                case Constants.MESSAGE_READ:
-                    postResponse(msg);
-                    break;
-            }
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,15 +54,22 @@ public class MultimeterActivity extends AppCompatActivity {
         return activity;
     }
 
+    public void onEvent(ResponseEvent responseEvent) {
+        postResponse(responseEvent.getMsg());
+    }
+
+    public void onEvent(ConnectionEvent responseEvent) {
+        if (responseEvent.isConnected()) {
+            mBlockView.setVisibility(View.GONE);
+        } else {
+            mBlockView.setVisibility(View.VISIBLE);
+        }
+    }
+
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
         mBlockView.setVisibility(View.VISIBLE);
-        mBlockView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
+        mBlockView.setOnTouchListener((v, event) -> true);
     }
 
     private void initBluetoothAdapter() {
@@ -87,17 +80,19 @@ public class MultimeterActivity extends AppCompatActivity {
         findViewById(R.id.resistanceButton).setOnClickListener(mListener);
         findViewById(R.id.voltageButton).setOnClickListener(mListener);
         findViewById(R.id.currentButton).setOnClickListener(mListener);
+        mResetButton = (Button) findViewById(R.id.resetButton);
+        mResetButton.setOnClickListener(mListener);
+        mResetButton.setEnabled(false);
     }
 
     private void initActionBar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-        }
-        if (toolbar != null) {
-            toolbar.setTitle(R.string.multimeter);
-            toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setTitle(R.string.multimeter);
         }
     }
 
@@ -116,14 +111,12 @@ public class MultimeterActivity extends AppCompatActivity {
     private final View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (mSelectedId == v.getId()) {
-                v.setSelected(false);
-                mSelectedId = -1;
-                return;
+            if (mSelectedId != v.getId() || mSelectedId == -1) {
+                if (v.getId() != R.id.resetButton) {
+                    selectButton(v);
+                }
             } else {
-                deselectAll();
-                v.setSelected(true);
-                mSelectedId = v.getId();
+                return;
             }
             switch (v.getId()) {
                 case R.id.resistanceButton:
@@ -135,9 +128,43 @@ public class MultimeterActivity extends AppCompatActivity {
                 case R.id.currentButton:
                     showCurrent();
                     break;
+                case R.id.resetButton:
+                    reset();
+                    break;
             }
         }
     };
+
+    private void selectButton(View v) {
+        deselectAll();
+        v.setSelected(true);
+        mSelectedId = v.getId();
+        disableAll(mSelectedId);
+        mResetButton.setEnabled(true);
+        isReading = true;
+    }
+
+    private void reset() {
+        sendMessage(Constants.D);
+        deselectAll();
+        enableAll();
+        mMeterField.setText("");
+        isReading = false;
+        mSelectedId = -1;
+    }
+
+    private void enableAll() {
+        findViewById(R.id.resistanceButton).setEnabled(true);
+        findViewById(R.id.voltageButton).setEnabled(true);
+        findViewById(R.id.currentButton).setEnabled(true);
+        mResetButton.setEnabled(false);
+    }
+
+    private void disableAll(int id) {
+        if (id != R.id.resistanceButton) findViewById(R.id.resistanceButton).setEnabled(false);
+        if (id != R.id.voltageButton) findViewById(R.id.voltageButton).setEnabled(false);
+        if (id != R.id.currentButton) findViewById(R.id.currentButton).setEnabled(false);
+    }
 
     private void deselectAll() {
         findViewById(R.id.resistanceButton).setSelected(false);
@@ -153,133 +180,79 @@ public class MultimeterActivity extends AppCompatActivity {
     private void checkBtAdapterStatus() {
         if (!mBtAdapter.isEnabled()) {
             requestBtEnable();
-        } else if (mBtService == null) {
-            setupBtService();
+        } else {
+            startService(new Intent(this, BluetoothService.class));
         }
-    }
-
-    private void setupBtService() {
-        mBtService = new OriginalChatService(this, mHandler);
     }
 
     private void sendMessage(String message) {
-        if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
-            resumeBtService();
-        }
-        String msg = new JMessage().putFlag(message).asString();
-        mBtService.writeMessage(msg.getBytes());
+        EventBus.getDefault().post(new ControlEvent(message));
+        showToast(getString(R.string.request_sent));
     }
 
     private void postResponse(Message msg) {
-        byte[] readBuff = (byte[]) msg.obj;
-        String data = new String(readBuff, 0, msg.arg1);
-        JMessage jMessage = new JMessage(data);
-        String v;
-        if (jMessage.hasVoltage()) {
-            v = jMessage.getVoltage();
-        } else if (jMessage.hasCurrent()) {
-            v = jMessage.getCurrent();
-        } else if (jMessage.hasResistance()) {
-            v = jMessage.getResistance();
-        } else {
-            v = getString(R.string.no_key);
+        if (!isReading) {
+            return;
+        }
+        String data = (String) msg.obj;
+        String v = "";
+        if (data.startsWith(Constants.rV)) {
+            v = extractV(data);
+        } else if (data.startsWith(Constants.rI)) {
+            v = extractI(data);
+        } else if (data.startsWith(Constants.rR)) {
+            v = extractR(data);
         }
         mMeterField.setText(v);
     }
 
-    private void showConnectedDeviceName(Message msg) {
-        String mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
-        showToast(getString(R.string.connected_to) + " " + mConnectedDeviceName);
-        mBlockView.setVisibility(View.GONE);
+    private String extractR(String data) {
+        data = data.replace(Constants.rR, "");
+        return data.trim();
     }
 
-    private void showMessage(Message msg) {
-        String message = msg.getData().getString(Constants.TOAST);
-        if (message == null) {
-            return;
-        }
-        if (message.startsWith(Constants.UNABLE)) {
-            if (mBtService.getState() == OriginalChatService.STATE_NONE) {
-                mBtService.start();
-            }
-            if (mBtService.getState() == OriginalChatService.STATE_LISTEN) {
-                connectToBtDevice(true);
-            }
-        }
+    private String extractI(String data) {
+        data = data.replace(Constants.rI, "");
+        return data.trim();
     }
 
-    private void stopBtService() {
-        if (mBtService != null) {
-            mBtService.stop();
-        }
+    private String extractV(String data) {
+        data = data.replace(Constants.rV, "");
+        return data.trim();
     }
 
-    private void resumeBtService() {
-        if (mBtService != null) {
-            startBtService();
-        } else {
-            setupBtService();
-            startBtService();
-        }
+    private void showBlockView() {
+        mBlockView.setVisibility(View.VISIBLE);
     }
 
-    private void startBtService() {
-        if (mBtService.getState() == OriginalChatService.STATE_NONE) {
-            mBtService.start();
-            while (true) {
-                if (mBtService.getState() == OriginalChatService.STATE_LISTEN) {
-                    connectToBtDevice(true);
-                    break;
-                }
-            }
-        }
+    private void closeScreen() {
+        sendMessage(Constants.D);
+        finish();
     }
 
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    private void connectToBtDevice(boolean secure) {
-        SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Activity.MODE_PRIVATE);
-        String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
-        if (mAddress != null) {
-            BluetoothDevice mConnectedDevice = mBtAdapter.getRemoteDevice(mAddress);
-            mBtService.connect(mConnectedDevice, secure);
-        }
-    }
-
-    private void sendCancelMessage() {
-        if (mBtService.getState() != OriginalChatService.STATE_CONNECTED) {
-            resumeBtService();
-        }
-        String msg = new JMessage().putFlag(Constants.T).asString();
-        mBtService.writeMessage(msg.getBytes());
-    }
-
-    private void closeScreen() {
-        sendCancelMessage();
-        finish();
-    }
-
     @Override
     public void onStart() {
         super.onStart();
         checkBtAdapterStatus();
+        EventBus.getDefault().register(this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mBtAdapter != null) {
-            mBtAdapter.cancelDiscovery();
-        }
-        stopBtService();
+        showBlockView();
+        stopService(new Intent(this, BluetoothService.class));
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        resumeBtService();
+    protected void onStop() {
+        super.onStop();
+        sendMessage(Constants.D);
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -307,6 +280,15 @@ public class MultimeterActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ENABLE_BT && resultCode != RESULT_OK) {
             requestBtEnable();
+        } else {
+            startService(new Intent(this, BluetoothService.class));
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        if (!hasFocus) {
+            reset();
         }
     }
 

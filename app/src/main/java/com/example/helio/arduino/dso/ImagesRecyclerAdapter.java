@@ -1,7 +1,6 @@
 package com.example.helio.arduino.dso;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
@@ -54,12 +53,7 @@ public class ImagesRecyclerAdapter extends RecyclerView.Adapter<ImagesRecyclerAd
         public ImageViewHolder(View itemView) {
             super(itemView);
             binding = DataBindingUtil.bind(itemView);
-            binding.setClick(new ClickListener() {
-                @Override
-                public void onClick(View view) {
-                    performClick(view.getId(), getAdapterPosition());
-                }
-            });
+            binding.setClick(view -> performClick(view.getId(), getAdapterPosition()));
         }
     }
 
@@ -78,19 +72,11 @@ public class ImagesRecyclerAdapter extends RecyclerView.Adapter<ImagesRecyclerAd
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setCancelable(true);
         builder.setMessage(mContext.getString(R.string.are_you_sure));
-        builder.setPositiveButton(mContext.getString(R.string.remove), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                removeImage(position);
-            }
+        builder.setPositiveButton(mContext.getString(R.string.remove), (dialog, which) -> {
+            dialog.dismiss();
+            removeImage(position);
         });
-        builder.setNegativeButton(mContext.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        builder.setNegativeButton(mContext.getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
         AlertDialog dialog = builder.create();
         dialog.show();
     }

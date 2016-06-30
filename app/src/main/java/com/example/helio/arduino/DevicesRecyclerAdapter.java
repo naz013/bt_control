@@ -14,11 +14,13 @@ public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecycler
 
     private final Context mContext;
     private final List<String> mDataList;
+    private final List<String> mDataAddresses;
     private final DeviceClickListener mListener;
 
     public DevicesRecyclerAdapter(Context context, DeviceClickListener listener) {
         this.mContext = context;
         this.mDataList = new ArrayList<>();
+        this.mDataAddresses = new ArrayList<>();
         this.mListener = listener;
     }
 
@@ -39,6 +41,10 @@ public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecycler
         return mDataList.size();
     }
 
+    public String getDevice(int position) {
+        return mDataAddresses.get(position);
+    }
+
     public class DeviceViewHolder extends RecyclerView.ViewHolder{
 
         final TextView deviceName;
@@ -46,16 +52,11 @@ public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecycler
         public DeviceViewHolder(View itemView) {
             super(itemView);
             deviceName = (TextView) itemView.findViewById(R.id.deviceName);
-            deviceName.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    handleClick(getAdapterPosition());
-                }
-            });
+            deviceName.setOnClickListener(v -> handleClick(getAdapterPosition()));
         }
     }
 
-    public void addDevice(String name) {
+    public void addDevice(String name, String address) {
         if (mDataList.size() > 0) {
             String noDevices = mContext.getString(R.string.none_found);
             if (mDataList.contains(noDevices)) {
@@ -66,6 +67,7 @@ public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecycler
             }
         }
         mDataList.add(name);
+        mDataAddresses.add(address);
         int pos = mDataList.indexOf(name);
         notifyItemInserted(pos);
     }

@@ -17,7 +17,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".SplashActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,14 +32,15 @@
 
         <activity
             android:name=".StartActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Fullscreen" />
 
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".dso.DSOActivity"
+            android:name=".dso.DsoActivity"
             android:screenOrientation="portrait" />
 
         <activity
@@ -46,7 +48,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".SignalActivity"
+            android:name=".signal.SignalActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateVisible|adjustResize" />
 
@@ -55,6 +57,8 @@
             android:screenOrientation="portrait" />
 
         <activity android:name=".dso.ImagePreviewActivity" />
+
+        <service android:name=".core.BluetoothService" />
 
     </application>
 
