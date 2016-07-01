@@ -30,6 +30,7 @@ public class MultimeterActivity extends AppCompatActivity {
     private TextView mMeterField;
     private TextView mBlockView;
     private Button mResetButton;
+    private View mSctStatus;
 
     private int mSelectedId;
     private boolean isReading;
@@ -47,6 +48,7 @@ public class MultimeterActivity extends AppCompatActivity {
         initActionBar();
         initButtons();
         mMeterField = (TextView) findViewById(R.id.meterField);
+        mSctStatus = findViewById(R.id.sctStatus);
         initBlockView();
     }
 
@@ -68,7 +70,7 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
-        mBlockView.setVisibility(View.VISIBLE);
+        //mBlockView.setVisibility(View.VISIBLE);
         mBlockView.setOnTouchListener((v, event) -> true);
     }
 
@@ -80,6 +82,7 @@ public class MultimeterActivity extends AppCompatActivity {
         findViewById(R.id.resistanceButton).setOnClickListener(mListener);
         findViewById(R.id.voltageButton).setOnClickListener(mListener);
         findViewById(R.id.currentButton).setOnClickListener(mListener);
+        findViewById(R.id.sctButton).setOnClickListener(mListener);
         mResetButton = (Button) findViewById(R.id.resetButton);
         mResetButton.setOnClickListener(mListener);
         mResetButton.setEnabled(false);
@@ -128,12 +131,19 @@ public class MultimeterActivity extends AppCompatActivity {
                 case R.id.currentButton:
                     showCurrent();
                     break;
+                case R.id.sctButton:
+                    showSct();
+                    break;
                 case R.id.resetButton:
                     reset();
                     break;
             }
         }
     };
+
+    private void showSct() {
+        sendMessage(Constants.Q);
+    }
 
     private void selectButton(View v) {
         deselectAll();
@@ -151,12 +161,14 @@ public class MultimeterActivity extends AppCompatActivity {
         mMeterField.setText("");
         isReading = false;
         mSelectedId = -1;
+        mSctStatus.setBackgroundResource(R.drawable.gray_circle);
     }
 
     private void enableAll() {
         findViewById(R.id.resistanceButton).setEnabled(true);
         findViewById(R.id.voltageButton).setEnabled(true);
         findViewById(R.id.currentButton).setEnabled(true);
+        findViewById(R.id.sctButton).setEnabled(true);
         mResetButton.setEnabled(false);
     }
 
@@ -164,12 +176,14 @@ public class MultimeterActivity extends AppCompatActivity {
         if (id != R.id.resistanceButton) findViewById(R.id.resistanceButton).setEnabled(false);
         if (id != R.id.voltageButton) findViewById(R.id.voltageButton).setEnabled(false);
         if (id != R.id.currentButton) findViewById(R.id.currentButton).setEnabled(false);
+        if (id != R.id.sctButton) findViewById(R.id.sctButton).setEnabled(false);
     }
 
     private void deselectAll() {
         findViewById(R.id.resistanceButton).setSelected(false);
         findViewById(R.id.voltageButton).setSelected(false);
         findViewById(R.id.currentButton).setSelected(false);
+        findViewById(R.id.sctButton).setSelected(false);
     }
 
     private void requestBtEnable() {
@@ -197,13 +211,35 @@ public class MultimeterActivity extends AppCompatActivity {
         String data = (String) msg.obj;
         String v = "";
         if (data.startsWith(Constants.rV)) {
-            v = extractV(data);
+            v = extractV(data) + " " + getString(R.string.v_low);
+            mSctStatus.setBackgroundResource(R.drawable.gray_circle);
         } else if (data.startsWith(Constants.rI)) {
-            v = extractI(data);
+            v = extractI(data) + " " + getString(R.string.a);
+            mSctStatus.setBackgroundResource(R.drawable.gray_circle);
         } else if (data.startsWith(Constants.rR)) {
-            v = extractR(data);
+            v = extractR(data) + " " + getString(R.string.omega);
+            mSctStatus.setBackgroundResource(R.drawable.gray_circle);
+        } else if (data.startsWith(Constants.sCT)) {
+            int value = extractSct(data);
+            if (value == 1) {
+                mSctStatus.setBackgroundResource(R.drawable.red_circle);
+            } else {
+                mSctStatus.setBackgroundResource(R.drawable.gray_circle);
+            }
+            v = "";
         }
         mMeterField.setText(v);
+    }
+
+    private int extractSct(String data) {
+        data = data.replace(Constants.sCT, "");
+        int i = 0;
+        try {
+            i = Integer.parseInt(data.trim());
+        } catch (NumberFormatException e) {
+            e.getLocalizedMessage();
+        }
+        return i;
     }
 
     private String extractR(String data) {
@@ -219,10 +255,6 @@ public class MultimeterActivity extends AppCompatActivity {
     private String extractV(String data) {
         data = data.replace(Constants.rV, "");
         return data.trim();
-    }
-
-    private void showBlockView() {
-        mBlockView.setVisibility(View.VISIBLE);
     }
 
     private void closeScreen() {
@@ -244,7 +276,7 @@ public class MultimeterActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        showBlockView();
+        mBlockView.setVisibility(View.VISIBLE);
         stopService(new Intent(this, BluetoothService.class));
     }
 

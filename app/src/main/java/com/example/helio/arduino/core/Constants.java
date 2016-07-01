@@ -27,12 +27,15 @@ public class Constants {
     public static final String P = "p";
     public static final String E = "e";
 
+    public static final String Q = "q";
+
     public static final String DIV = ";";
     public static final String rY = "y:";
     public static final String rX = "x:";
     public static final String rV = "v:";
     public static final String rI = "i:";
     public static final String rR = "r:";
+    public static final String sCT = "SCT:";
 
     public static final String DEVICE_ADDRESS = "device_address";
     public static final String PREFS = "app_prefs";
