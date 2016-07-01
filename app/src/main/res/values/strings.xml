@@ -11,7 +11,7 @@
     <string name="i">I</string>
     <string name="omega">Ω</string>
     <string name="capture">CAPTURE</string>
-    <string name="screenshot">SCREENSHOT</string>
+    <string name="screenshot">S</string>
     <string name="generate">GENERATE</string>
     <string name="signal_type">Signal type</string>
     <string name="frequency">Frequency</string>
@@ -57,9 +57,13 @@
     <string name="request_sent">Request sent</string>
     <string name="bt_service_started">Bluetooth service started</string>
     <string name="reset">Reset</string>
-    <string name="clear">CLEAR</string>
-    <string name="gallery">GALLERY</string>
+    <string name="clear">C</string>
+    <string name="gallery">G</string>
     <string name="a">A</string>
     <string name="v_low">v</string>
     <string name="user_manual">User Manual</string>
+    <string name="y_axis">Y axis</string>
+    <string name="x_axis">X axis</string>
+    <string name="y_trace">Y Trace</string>
+    <string name="x_trace">X Trace</string>
 </resources>

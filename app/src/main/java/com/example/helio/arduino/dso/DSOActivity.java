@@ -13,10 +13,10 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,26 +36,32 @@ import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
-import com.github.mikephil.charting.listener.ChartTouchListener;
-import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import de.greenrobot.event.EventBus;
 
-public class DsoActivity extends AppCompatActivity implements OnChartGestureListener, OnChartValueSelectedListener {
+public class DsoActivity extends AppCompatActivity implements OnChartValueSelectedListener {
 
     private static final int REQUEST_ENABLE_BT = 3;
-    private static final float CHART_MAX_Y = 15f;
-    private static final float CHART_MIN_Y = -15f;
+    private static final float CHART_MAX_Y = 16f;
+    private static final float CHART_MIN_Y = -16f;
     private static final float CHART_MAX_X = 1020;
+    private static final float X_SCALE_BASE = 1000f;
+    private static final String TAG = "DsoActivity";
 
     private boolean mCapturing = false;
+    private float mScallar = 1f;
+    private int mScaleStep = 0;
+    private List<Float> mYVals = new ArrayList<>();
+    private List<Float> mXVals = new ArrayList<>();
 
     private ScatterChart mChart;
     private TextView mBlockView;
@@ -96,7 +102,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
 
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
-        mBlockView.setVisibility(View.VISIBLE);
+        //mBlockView.setVisibility(View.VISIBLE);
         mBlockView.setOnTouchListener((v, event) -> true);
     }
 
@@ -130,6 +136,12 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         scatterData.setValueFormatter(new PlotValueFormatter());
         mChart.setData(scatterData);
         mChart.getLegend().setEnabled(false);
+        mChart.invalidate();
+        refreshChart();
+    }
+
+    private void refreshChart() {
+        Log.d(TAG, "refreshChart: start");
         YAxis yAxis = mChart.getAxisLeft();
         yAxis.removeAllLimitLines();
         yAxis.setAxisMaxValue(CHART_MAX_Y);
@@ -142,10 +154,22 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         xAxis.setDrawGridLines(false);
         xAxis.setAxisMaxValue(CHART_MAX_X);
         xAxis.setValueFormatter((original, index, viewPortHandler) -> {
-            float f = index / 100f;
+            Log.d(TAG, "setValueFormatter: " + index);
+            float f = index / getXFormatScale();
             return String.format(Locale.getDefault(), "%.2f", f);
         });
         mChart.invalidate();
+        Log.d(TAG, "refreshChart: end");
+    }
+
+    private float getXFormatScale() {
+        if (mScallar > 1000000) {
+            return mScallar / 1000000;
+        } else if (mScallar > 1000) {
+            return mScallar / 1000;
+        } else {
+            return 1000;
+        }
     }
 
     private void initButtons() {
@@ -156,6 +180,12 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
         findViewById(R.id.screenshotButton).setOnClickListener(mListener);
         findViewById(R.id.clearButton).setOnClickListener(mListener);
         findViewById(R.id.galleryButton).setOnClickListener(mListener);
+        findViewById(R.id.yZoomOut).setOnClickListener(mListener);
+        findViewById(R.id.yZoomIn).setOnClickListener(mListener);
+        findViewById(R.id.yTrace).setOnClickListener(mListener);
+        findViewById(R.id.xTrace).setOnClickListener(mListener);
+        findViewById(R.id.xZoomOut).setOnClickListener(mListener);
+        findViewById(R.id.xZoomIn).setOnClickListener(mListener);
         mStopButton.setEnabled(false);
         mCaptureButton.setEnabled(true);
     }
@@ -218,12 +248,59 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
             case R.id.galleryButton:
                 showScreenshots();
                 break;
+            case R.id.xZoomIn:
+                scaleX(1);
+                break;
+            case R.id.xZoomOut:
+                scaleX(-1);
+                break;
         }
     };
+
+    private void scaleX(int i) {
+        Log.d(TAG, "scaleX: " + i);
+        if (i < 0 && mScaleStep == 0) {
+            return;
+        }
+        if (i > 0 && mScaleStep == 6) {
+            return;
+        }
+        if (i > 0) {
+            mScallar *= 10;
+        }
+        if (i < 0) {
+            mScallar /= 10;
+        }
+        mScaleStep += i;
+        Log.d(TAG, "scaleX: scalar " + mScallar);
+        Log.d(TAG, "scaleX: step " + mScaleStep);
+        initChart();
+        reloadData();
+    }
+
+    private void reloadData() {
+        Log.d(TAG, "reloadData: start");
+        if (mYVals.size() > 0 && mXVals.size() > 0) {
+            List<Float> xList = new ArrayList<>(mXVals);
+            List<Float> yList = new ArrayList<>(mYVals);
+            for (int i = 0; i < xList.size(); i++) {
+                float x = xList.get(i);
+                float y = yList.get(i);
+                addNewEntry(x, y);
+            }
+        }
+        Log.d(TAG, "reloadData: end");
+    }
+
+    private float getXScale() {
+        return X_SCALE_BASE * mScallar;
+    }
 
     private void clearGraph() {
         mChart.getScatterData().clearValues();
         mChart.invalidate();
+        mXVals.clear();
+        mYVals.clear();
     }
 
     private void showBlockView() {
@@ -306,8 +383,12 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
                 scatterData.addDataSet(scatterDataSet);
             }
             scatterData.setValueFormatter(new PlotValueFormatter());
-            Entry entry = new Entry(y, (int) (x * 100));
+            float scale = getXScale();
+            Log.d(TAG, "addNewEntry: scale " + scale + ", x " + x);
+            Entry entry = new Entry(y, (int) (x * scale));
             scatterData.addEntry(entry, 0);
+            mYVals.add(y);
+            mXVals.add(x);
             mChart.notifyDataSetChanged();
             mChart.invalidate();
         }
@@ -360,6 +441,18 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        clearGraph();
+        Random rand = new Random();
+        for (int i = 0; i < 25; i++) {
+            float x = rand.nextFloat() * (1f - 0f) + 0f;
+            float y = rand.nextFloat() * (15f - (-15f)) + (-15f);
+            addNewEntry(x, y);
+        }
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case 101:
@@ -408,47 +501,6 @@ public class DsoActivity extends AppCompatActivity implements OnChartGestureList
     @Override
     public void onBackPressed() {
         closeScreen();
-    }
-
-    @Override
-    public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
-
-    }
-
-    @Override
-    public void onChartGestureEnd(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
-        if(lastPerformedGesture != ChartTouchListener.ChartGesture.SINGLE_TAP)
-            mChart.highlightValues(null);
-    }
-
-    @Override
-    public void onChartLongPressed(MotionEvent me) {
-
-    }
-
-    @Override
-    public void onChartDoubleTapped(MotionEvent me) {
-
-    }
-
-    @Override
-    public void onChartSingleTapped(MotionEvent me) {
-
-    }
-
-    @Override
-    public void onChartFling(MotionEvent me1, MotionEvent me2, float velocityX, float velocityY) {
-
-    }
-
-    @Override
-    public void onChartScale(MotionEvent me, float scaleX, float scaleY) {
-
-    }
-
-    @Override
-    public void onChartTranslate(MotionEvent me, float dX, float dY) {
-
     }
 
     @Override
