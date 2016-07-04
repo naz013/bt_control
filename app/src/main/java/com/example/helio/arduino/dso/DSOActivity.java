@@ -58,6 +58,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
     private static final float CHART_MIN_Y = -500f;
     private static final float CHART_MAX_X = 1010;
     private static final float X_SCALE_BASE = 1000f;
+    private static final float CHART_POINT_SIZE = 2f;
     private static final String TAG = "DsoActivity";
 
     private boolean mCapturing = false;
@@ -131,7 +132,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
         dataSet.setColor(Color.BLACK);
         dataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
         dataSet.setScatterShapeHoleRadius(0f);
-        dataSet.setScatterShapeSize(2f);
+        dataSet.setScatterShapeSize(CHART_POINT_SIZE);
         ScatterData scatterData = new ScatterData(dataSet);
         scatterData.setDrawValues(false);
         mChart.setData(scatterData);
@@ -379,6 +380,9 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
                     scatterData.addEntry(entry, 0);
                 }
             }
+            if (mChart.getScatterData().getEntryCount() == 0) {
+                mChart.getScatterData().addEntry(new Entry(-1f, 0f), 0);
+            }
             mChart.notifyDataSetChanged();
             mChart.invalidate();
         }
@@ -509,7 +513,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
         dataSet.setColor(Color.BLACK);
         dataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
         dataSet.setScatterShapeHoleRadius(0f);
-        dataSet.setScatterShapeSize(1f);
+        dataSet.setScatterShapeSize(CHART_POINT_SIZE);
         dataSet.setDrawValues(false);
         return dataSet;
     }
