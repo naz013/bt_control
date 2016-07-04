@@ -370,21 +370,22 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
             if (scatterData == null) return;
             float scaleX = getXScale();
             float scaleY = getYScale();
+            IScatterDataSet dataSet = scatterData.getDataSetByIndex(0);
+            dataSet.clear();
             for (int i = 0; i < xList.size(); i++) {
                 float x = xList.get(i);
                 float y = yList.get(i);
                 int xSc = (int) (x * scaleX);
                 int ySc = (int) (y * scaleY);
                 if (xSc < CHART_MAX_X && ySc > CHART_MIN_Y && ySc < CHART_MAX_Y) {
-                    Entry entry = new Entry(xSc, ySc);
-                    scatterData.addEntry(entry, 0);
+                    dataSet.addEntry(new Entry(xSc, ySc));
                 }
             }
-            if (mChart.getScatterData().getEntryCount() == 0) {
-                mChart.getScatterData().addEntry(new Entry(-1f, 0f), 0);
+            if (dataSet.getEntryCount() == 0) {
+                dataSet.addEntry(new Entry(-1f, 0f));
             }
             mChart.notifyDataSetChanged();
-            mChart.invalidate();
+            //mChart.invalidate();
         }
     }
 
@@ -578,18 +579,21 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
         mChart.invalidate();
         float scaleX = getXScale();
         float scaleY = getYScale();
+        IScatterDataSet dataSet = scatterData.getDataSetByIndex(0);
+        dataSet.clear();
         for (int i = 0; i < 10000; i++) {
             float x = rand.nextFloat() * (1f - 0f) + 0f;
             float y = rand.nextFloat() * (16f - (-16f)) + (-16f);
             float xSc = x * scaleX;
             float ySc = y * scaleY;
             if (xSc < CHART_MAX_X && ySc > CHART_MIN_Y && ySc < CHART_MAX_Y) {
-                Entry entry = new Entry(xSc, ySc);
-                scatterData.addEntry(entry, 0);
+                dataSet.addEntry(new Entry(xSc, ySc));
                 mYVals.add(y);
                 mXVals.add(x);
             }
         }
+        scatterData.addDataSet(dataSet);
+        mChart.notifyDataSetChanged();
     }
 
     @Override
