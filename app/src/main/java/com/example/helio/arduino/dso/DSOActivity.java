@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -37,9 +38,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
 import com.github.mikephil.charting.formatter.AxisValueFormatter;
-import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -51,7 +50,7 @@ import java.util.Random;
 
 import de.greenrobot.event.EventBus;
 
-public class DsoActivity extends AppCompatActivity implements OnChartValueSelectedListener {
+public class DsoActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 3;
     private static final float CHART_MAX_Y = 500f;
@@ -119,11 +118,33 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
 
     private void initChart() {
         mChart = (ScatterChart) findViewById(R.id.chart1);
-        mChart.setOnChartValueSelectedListener(this);
         mChart.setDrawGridBackground(false);
         mChart.setTouchEnabled(true);
         mChart.setScaleEnabled(false);
         mChart.setPinchZoom(false);
+        mChart.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_MOVE:
+                        float x = motionEvent.getRawX();
+                        float y = motionEvent.getRawY();
+                        Entry entry = mChart.getEntryByTouchPoint(x, y);
+                        Log.d(TAG, "onTouch: " + x + ", " + y);
+                        if (entry != null) {
+                            Log.d(TAG, "onTouch Entry: " + entry.toString());
+                        }
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        break;
+
+                    case MotionEvent.ACTION_DOWN:
+                        break;
+                }
+                return true;
+            }
+        });
         mChart.setNoDataText(getString(R.string.no_data_available));
         mChart.setAutoScaleMinMaxEnabled(true);
         mChart.setDescription(getString(R.string.arduino_chart));
@@ -142,7 +163,6 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
     }
 
     private void refreshChart() {
-        Log.d(TAG, "refreshChart: start");
         YAxis yAxis = mChart.getAxisLeft();
         yAxis.removeAllLimitLines();
         yAxis.setAxisMaxValue(CHART_MAX_Y);
@@ -180,7 +200,6 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
             }
         });
         mChart.invalidate();
-        Log.d(TAG, "refreshChart: end");
     }
 
     private float getXFormatScale() {
@@ -385,7 +404,6 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
                 dataSet.addEntry(new Entry(-1f, 0f));
             }
             mChart.notifyDataSetChanged();
-            //mChart.invalidate();
         }
     }
 
@@ -645,15 +663,5 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
     @Override
     public void onBackPressed() {
         closeScreen();
-    }
-
-    @Override
-    public void onValueSelected(Entry e, Highlight h) {
-
-    }
-
-    @Override
-    public void onNothingSelected() {
-
     }
 }
