@@ -75,15 +75,15 @@
 
                                 <ImageButton
                                     android:id="@+id/yZoomOut"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
+                                    android:layout_width="36dp"
+                                    android:layout_height="36dp"
                                     android:background="@null"
                                     android:src="@drawable/ic_zoom_out_black_24px" />
 
                                 <ImageButton
                                     android:id="@+id/yZoomIn"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
+                                    android:layout_width="36dp"
+                                    android:layout_height="36dp"
                                     android:layout_marginLeft="16dp"
                                     android:background="@null"
                                     android:src="@drawable/ic_zoom_in_black_24px" />
@@ -154,16 +154,16 @@
 
                                 <ImageButton
                                     android:id="@+id/xZoomOut"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
+                                    android:layout_width="36dp"
+                                    android:layout_height="36dp"
                                     android:background="@null"
                                     android:src="@drawable/ic_zoom_out_black_24px" />
 
                                 <ImageButton
                                     android:id="@+id/xZoomIn"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginLeft="16dp"
+                                    android:layout_width="36dp"
+                                    android:layout_height="36dp"
+                                    android:layout_marginLeft="8dp"
                                     android:background="@null"
                                     android:src="@drawable/ic_zoom_in_black_24px" />
 

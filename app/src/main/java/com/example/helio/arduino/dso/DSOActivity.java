@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,11 +30,13 @@ import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.ControlEvent;
 import com.example.helio.arduino.core.ResponseEvent;
 import com.github.mikephil.charting.charts.ScatterChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
+import com.github.mikephil.charting.formatter.AxisValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
@@ -51,15 +54,16 @@ import de.greenrobot.event.EventBus;
 public class DsoActivity extends AppCompatActivity implements OnChartValueSelectedListener {
 
     private static final int REQUEST_ENABLE_BT = 3;
-    private static final float CHART_MAX_Y = 16f;
-    private static final float CHART_MIN_Y = -16f;
-    private static final float CHART_MAX_X = 1020;
+    private static final float CHART_MAX_Y = 500f;
+    private static final float CHART_MIN_Y = -500f;
+    private static final float CHART_MAX_X = 1010;
     private static final float X_SCALE_BASE = 1000f;
     private static final String TAG = "DsoActivity";
 
     private boolean mCapturing = false;
-    private float mScallar = 1f;
-    private int mScaleStep = 0;
+    private float mXScallar = 1f;
+    private int mXScaleStep = 0;
+    private int mYScaleStep = 0;
     private List<Float> mYVals = new ArrayList<>();
     private List<Float> mXVals = new ArrayList<>();
 
@@ -67,6 +71,8 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
     private TextView mBlockView;
     private TextView mStopButton;
     private TextView mCaptureButton;
+    private ImageButton xZoomIn, xZoomOut;
+    private ImageButton yZoomIn, yZoomOut;
 
     private BluetoothAdapter mBtAdapter = null;
 
@@ -115,25 +121,19 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
         mChart.setOnChartValueSelectedListener(this);
         mChart.setDrawGridBackground(false);
         mChart.setTouchEnabled(true);
-        mChart.setScaleEnabled(true);
-        mChart.setPinchZoom(true);
+        mChart.setScaleEnabled(false);
+        mChart.setPinchZoom(false);
         mChart.setNoDataText(getString(R.string.no_data_available));
         mChart.setAutoScaleMinMaxEnabled(true);
         mChart.setDescription(getString(R.string.arduino_chart));
-
-        ArrayList<String> xVals = new ArrayList<>();
-        for (int i = 0; i < CHART_MAX_X + 1; i++) {
-            xVals.add((i) + "");
-        }
         ArrayList<Entry> entries = new ArrayList<>();
         ScatterDataSet dataSet = new ScatterDataSet(entries, getString(R.string.arduino_vhart));
         dataSet.setColor(Color.BLACK);
         dataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
         dataSet.setScatterShapeHoleRadius(0f);
-        dataSet.setScatterShapeSize(5f);
-        dataSet.setValueTextSize(9f);
-        ScatterData scatterData = new ScatterData(xVals, dataSet);
-        scatterData.setValueFormatter(new PlotValueFormatter());
+        dataSet.setScatterShapeSize(2f);
+        ScatterData scatterData = new ScatterData(dataSet);
+        scatterData.setDrawValues(false);
         mChart.setData(scatterData);
         mChart.getLegend().setEnabled(false);
         mChart.invalidate();
@@ -148,27 +148,63 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
         yAxis.setAxisMinValue(CHART_MIN_Y);
         yAxis.setLabelCount(11, true);
         yAxis.setDrawZeroLine(true);
-        yAxis.setValueFormatter((value, yAxis1) -> String.format(Locale.getDefault(), "%.2f", value));
+        yAxis.setValueFormatter(new AxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                float scal = getYFormatScale();
+                float f = value / scal;
+                return String.format(Locale.getDefault(), "%.2f", f);
+            }
+
+            @Override
+            public int getDecimalDigits() {
+                return 0;
+            }
+        });
         mChart.getAxisRight().setEnabled(false);
         XAxis xAxis = mChart.getXAxis();
         xAxis.setDrawGridLines(false);
         xAxis.setAxisMaxValue(CHART_MAX_X);
-        xAxis.setValueFormatter((original, index, viewPortHandler) -> {
-            Log.d(TAG, "setValueFormatter: " + index);
-            float f = index / getXFormatScale();
-            return String.format(Locale.getDefault(), "%.2f", f);
+        xAxis.setValueFormatter(new AxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                float scal = getXFormatScale();
+                float f = value / scal;
+                return String.format(Locale.getDefault(), "%.2f", f);
+            }
+
+            @Override
+            public int getDecimalDigits() {
+                return 0;
+            }
         });
         mChart.invalidate();
         Log.d(TAG, "refreshChart: end");
     }
 
     private float getXFormatScale() {
-        if (mScallar > 1000000) {
-            return mScallar / 1000000;
-        } else if (mScallar > 1000) {
-            return mScallar / 1000;
-        } else {
+        if (mXScallar > 1000000) {
+            return mXScallar / 1000000;
+        } else if (mXScallar > 1000) {
+            return mXScallar / 1000;
+        } else if (mXScallar == 1000 || mXScallar == 1) {
             return 1000;
+        } else {
+            return mXScallar;
+        }
+    }
+
+    private float getYFormatScale() {
+        if (mYScaleStep == 1) {
+            return 125f;
+        } else if (mYScaleStep == 2) {
+            return 500f;
+        } else if (mYScaleStep == 3) {
+            return 2f;
+        } else if (mYScaleStep == 4) {
+            return 8f;
+        } else {
+            return 31.25f;
         }
     }
 
@@ -184,8 +220,14 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
         findViewById(R.id.yZoomIn).setOnClickListener(mListener);
         findViewById(R.id.yTrace).setOnClickListener(mListener);
         findViewById(R.id.xTrace).setOnClickListener(mListener);
-        findViewById(R.id.xZoomOut).setOnClickListener(mListener);
-        findViewById(R.id.xZoomIn).setOnClickListener(mListener);
+        xZoomIn = (ImageButton) findViewById(R.id.xZoomIn);
+        xZoomOut = (ImageButton) findViewById(R.id.xZoomOut);
+        yZoomIn = (ImageButton) findViewById(R.id.yZoomIn);
+        yZoomOut = (ImageButton) findViewById(R.id.yZoomOut);
+        xZoomOut.setOnClickListener(mListener);
+        xZoomIn.setOnClickListener(mListener);
+        yZoomIn.setOnClickListener(mListener);
+        yZoomOut.setOnClickListener(mListener);
         mStopButton.setEnabled(false);
         mCaptureButton.setEnabled(true);
     }
@@ -254,46 +296,110 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
             case R.id.xZoomOut:
                 scaleX(-1);
                 break;
+            case R.id.yZoomIn:
+                scaleY(1);
+                break;
+            case R.id.yZoomOut:
+                scaleY(-1);
+                break;
         }
     };
 
-    private void scaleX(int i) {
-        Log.d(TAG, "scaleX: " + i);
-        if (i < 0 && mScaleStep == 0) {
+    private void scaleY(int i) {
+        Log.d(TAG, "scaleY: " + i);
+        if (i < 0 && mYScaleStep == 0) {
             return;
         }
-        if (i > 0 && mScaleStep == 6) {
+        if (i > 0 && mYScaleStep == 4) {
+            return;
+        }
+        mYScaleStep += i;
+        Log.d(TAG, "scaleY: y step " + mYScaleStep);
+        yZoomIn.setEnabled(false);
+        yZoomOut.setEnabled(false);
+        reloadData();
+        yZoomIn.setEnabled(true);
+        yZoomOut.setEnabled(true);
+    }
+
+    private void scaleX(int i) {
+        Log.d(TAG, "scaleX: " + i);
+        if (i < 0 && mXScaleStep == 0) {
+            return;
+        }
+        if (i > 0 && mXScaleStep == 6) {
             return;
         }
         if (i > 0) {
-            mScallar *= 10;
+            mXScallar *= 10;
         }
         if (i < 0) {
-            mScallar /= 10;
+            mXScallar /= 10;
         }
-        mScaleStep += i;
-        Log.d(TAG, "scaleX: scalar " + mScallar);
-        Log.d(TAG, "scaleX: step " + mScaleStep);
-        initChart();
+        mXScaleStep += i;
+        Log.d(TAG, "scaleX: scalar " + mXScallar);
+        Log.d(TAG, "scaleX: step " + mXScaleStep);
+        xZoomIn.setEnabled(false);
+        xZoomOut.setEnabled(false);
         reloadData();
+        xZoomIn.setEnabled(true);
+        xZoomOut.setEnabled(true);
     }
 
-    private void reloadData() {
-        Log.d(TAG, "reloadData: start");
+    private synchronized void reloadData() {
         if (mYVals.size() > 0 && mXVals.size() > 0) {
             List<Float> xList = new ArrayList<>(mXVals);
             List<Float> yList = new ArrayList<>(mYVals);
+            mChart.getScatterData().clearValues();
+            mChart.invalidate();
+            ScatterData scatterData = mChart.getScatterData();
+            if (scatterData != null) {
+                IScatterDataSet scatterDataSet;
+                try {
+                    scatterDataSet = scatterData.getDataSetByIndex(0);
+                    if (scatterDataSet == null) {
+                        scatterDataSet = createSet();
+                        scatterData.addDataSet(scatterDataSet);
+                    }
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    scatterDataSet = createSet();
+                    scatterData.addDataSet(scatterDataSet);
+                }
+            }
+            if (scatterData == null) return;
+            float scaleX = getXScale();
+            float scaleY = getYScale();
             for (int i = 0; i < xList.size(); i++) {
                 float x = xList.get(i);
                 float y = yList.get(i);
-                addNewEntry(x, y);
+                int xSc = (int) (x * scaleX);
+                int ySc = (int) (y * scaleY);
+                if (xSc < CHART_MAX_X && ySc > CHART_MIN_Y && ySc < CHART_MAX_Y) {
+                    Entry entry = new Entry(xSc, ySc);
+                    scatterData.addEntry(entry, 0);
+                }
             }
+            mChart.notifyDataSetChanged();
+            mChart.invalidate();
         }
-        Log.d(TAG, "reloadData: end");
     }
 
     private float getXScale() {
-        return X_SCALE_BASE * mScallar;
+        return X_SCALE_BASE * mXScallar;
+    }
+
+    private float getYScale() {
+        if (mYScaleStep == 1) {
+            return 125f;
+        } else if (mYScaleStep == 2) {
+            return 500f;
+        } else if (mYScaleStep == 3) {
+            return 2000f;
+        } else if (mYScaleStep == 4) {
+            return 8000f;
+        } else {
+            return 31.25f;
+        }
     }
 
     private void clearGraph() {
@@ -382,15 +488,19 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
                 scatterDataSet = createSet();
                 scatterData.addDataSet(scatterDataSet);
             }
-            scatterData.setValueFormatter(new PlotValueFormatter());
-            float scale = getXScale();
-            Log.d(TAG, "addNewEntry: scale " + scale + ", x " + x);
-            Entry entry = new Entry(y, (int) (x * scale));
-            scatterData.addEntry(entry, 0);
-            mYVals.add(y);
-            mXVals.add(x);
-            mChart.notifyDataSetChanged();
-            mChart.invalidate();
+            scatterData.setDrawValues(false);
+            float scaleX = getXScale();
+            float scaleY = getYScale();
+            float xSc = x * scaleX;
+            float ySc = y * scaleY;
+            if (xSc < CHART_MAX_X) {
+                Entry entry = new Entry(xSc, ySc);
+                scatterData.addEntry(entry, 0);
+                mYVals.add(y);
+                mXVals.add(x);
+                mChart.notifyDataSetChanged();
+                mChart.invalidate();
+            }
         }
     }
 
@@ -399,8 +509,8 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
         dataSet.setColor(Color.BLACK);
         dataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
         dataSet.setScatterShapeHoleRadius(0f);
-        dataSet.setScatterShapeSize(5f);
-        dataSet.setValueTextSize(9f);
+        dataSet.setScatterShapeSize(1f);
+        dataSet.setDrawValues(false);
         return dataSet;
     }
 
@@ -445,10 +555,36 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
         super.onResume();
         clearGraph();
         Random rand = new Random();
-        for (int i = 0; i < 25; i++) {
+        ScatterData scatterData = mChart.getScatterData();
+        if (scatterData != null) {
+            IScatterDataSet scatterDataSet;
+            try {
+                scatterDataSet = scatterData.getDataSetByIndex(0);
+                if (scatterDataSet == null) {
+                    scatterDataSet = createSet();
+                    scatterData.addDataSet(scatterDataSet);
+                }
+            } catch (ArrayIndexOutOfBoundsException e) {
+                scatterDataSet = createSet();
+                scatterData.addDataSet(scatterDataSet);
+            }
+        }
+        if (scatterData == null) return;
+        mChart.notifyDataSetChanged();
+        mChart.invalidate();
+        float scaleX = getXScale();
+        float scaleY = getYScale();
+        for (int i = 0; i < 10000; i++) {
             float x = rand.nextFloat() * (1f - 0f) + 0f;
-            float y = rand.nextFloat() * (15f - (-15f)) + (-15f);
-            addNewEntry(x, y);
+            float y = rand.nextFloat() * (16f - (-16f)) + (-16f);
+            float xSc = x * scaleX;
+            float ySc = y * scaleY;
+            if (xSc < CHART_MAX_X && ySc > CHART_MIN_Y && ySc < CHART_MAX_Y) {
+                Entry entry = new Entry(xSc, ySc);
+                scatterData.addEntry(entry, 0);
+                mYVals.add(y);
+                mXVals.add(x);
+            }
         }
     }
 
@@ -504,7 +640,7 @@ public class DsoActivity extends AppCompatActivity implements OnChartValueSelect
     }
 
     @Override
-    public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+    public void onValueSelected(Entry e, Highlight h) {
 
     }
 
