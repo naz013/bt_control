@@ -64,6 +64,7 @@ dependencies {
     compile 'com.android.support:support-v4:24.0.0'
     compile 'de.greenrobot:eventbus:2.4.1'
     testCompile 'junit:junit:4.12'
+    compile 'com.getbase:floatingactionbutton:1.10.1'
     compile project(':MPChartLib')
 }
 

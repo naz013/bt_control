@@ -19,7 +19,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +29,7 @@ import com.example.helio.arduino.core.ConnectionEvent;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.ControlEvent;
 import com.example.helio.arduino.core.ResponseEvent;
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.github.mikephil.charting.charts.ScatterChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
@@ -69,10 +69,11 @@ public class DsoActivity extends AppCompatActivity {
 
     private ScatterChart mChart;
     private TextView mBlockView;
-    private TextView mStopButton;
-    private TextView mCaptureButton;
-    private ImageButton xZoomIn, xZoomOut;
-    private ImageButton yZoomIn, yZoomOut;
+    private FloatingActionButton zoomInX, zoomOutX;
+    private FloatingActionButton zoomInY, zoomOutY;
+    private FloatingActionButton moveRight, moveLeft;
+    private FloatingActionButton moveTop, moveBottom;
+    private FloatingActionButton mCaptureButton, mStopButton;
 
     private BluetoothAdapter mBtAdapter = null;
 
@@ -229,27 +230,31 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private void initButtons() {
-        mCaptureButton = (TextView) findViewById(R.id.captureButton);
-        mStopButton = (TextView) findViewById(R.id.stopButton);
-        mCaptureButton.setOnClickListener(mListener);
-        mStopButton.setOnClickListener(mListener);
-        findViewById(R.id.screenshotButton).setOnClickListener(mListener);
+        findViewById(R.id.screenshot_item).setOnClickListener(mListener);
         findViewById(R.id.clearButton).setOnClickListener(mListener);
-        findViewById(R.id.galleryButton).setOnClickListener(mListener);
-        findViewById(R.id.yZoomOut).setOnClickListener(mListener);
-        findViewById(R.id.yZoomIn).setOnClickListener(mListener);
-        findViewById(R.id.yTrace).setOnClickListener(mListener);
-        findViewById(R.id.xTrace).setOnClickListener(mListener);
-        xZoomIn = (ImageButton) findViewById(R.id.xZoomIn);
-        xZoomOut = (ImageButton) findViewById(R.id.xZoomOut);
-        yZoomIn = (ImageButton) findViewById(R.id.yZoomIn);
-        yZoomOut = (ImageButton) findViewById(R.id.yZoomOut);
-        xZoomOut.setOnClickListener(mListener);
-        xZoomIn.setOnClickListener(mListener);
-        yZoomIn.setOnClickListener(mListener);
-        yZoomOut.setOnClickListener(mListener);
-        mStopButton.setEnabled(false);
-        mCaptureButton.setEnabled(true);
+        findViewById(R.id.stopButton).setOnClickListener(mListener);
+        findViewById(R.id.captureButton).setOnClickListener(mListener);
+        findViewById(R.id.gallery_item).setOnClickListener(mListener);
+        findViewById(R.id.traceY).setOnClickListener(mListener);
+        findViewById(R.id.traceX).setOnClickListener(mListener);
+        moveBottom = (FloatingActionButton) findViewById(R.id.moveBottom);
+        moveTop = (FloatingActionButton) findViewById(R.id.moveTop);
+        moveLeft = (FloatingActionButton) findViewById(R.id.moveLeft);
+        moveRight = (FloatingActionButton) findViewById(R.id.moveRight);
+        zoomInX = (FloatingActionButton) findViewById(R.id.zoomInX);
+        zoomOutX = (FloatingActionButton) findViewById(R.id.zoomOutX);
+        zoomInY = (FloatingActionButton) findViewById(R.id.zoomInY);
+        zoomOutY = (FloatingActionButton) findViewById(R.id.zoomOutY);
+        mCaptureButton = (FloatingActionButton) findViewById(R.id.captureButton);
+        mStopButton = (FloatingActionButton) findViewById(R.id.stopButton);
+        zoomInX.setOnClickListener(mListener);
+        zoomOutX.setOnClickListener(mListener);
+        zoomInY.setOnClickListener(mListener);
+        zoomOutY.setOnClickListener(mListener);
+        moveBottom.setOnClickListener(mListener);
+        moveRight.setOnClickListener(mListener);
+        moveLeft.setOnClickListener(mListener);
+        moveTop.setOnClickListener(mListener);
     }
 
     private void initActionBar() {
@@ -298,7 +303,7 @@ public class DsoActivity extends AppCompatActivity {
             case R.id.captureButton:
                 capture();
                 break;
-            case R.id.screenshotButton:
+            case R.id.screenshot_item:
                 takeScreenshot();
                 break;
             case R.id.stopButton:
@@ -307,19 +312,19 @@ public class DsoActivity extends AppCompatActivity {
             case R.id.clearButton:
                 clearGraph();
                 break;
-            case R.id.galleryButton:
+            case R.id.gallery_item:
                 showScreenshots();
                 break;
-            case R.id.xZoomIn:
+            case R.id.zoomInX:
                 scaleX(1);
                 break;
-            case R.id.xZoomOut:
+            case R.id.zoomOutX:
                 scaleX(-1);
                 break;
-            case R.id.yZoomIn:
+            case R.id.zoomInY:
                 scaleY(1);
                 break;
-            case R.id.yZoomOut:
+            case R.id.zoomOutY:
                 scaleY(-1);
                 break;
         }
@@ -335,11 +340,11 @@ public class DsoActivity extends AppCompatActivity {
         }
         mYScaleStep += i;
         Log.d(TAG, "scaleY: y step " + mYScaleStep);
-        yZoomIn.setEnabled(false);
-        yZoomOut.setEnabled(false);
+        zoomInY.setEnabled(false);
+        zoomOutY.setEnabled(false);
         reloadData();
-        yZoomIn.setEnabled(true);
-        yZoomOut.setEnabled(true);
+        zoomInY.setEnabled(true);
+        zoomOutY.setEnabled(true);
     }
 
     private void scaleX(int i) {
@@ -359,11 +364,11 @@ public class DsoActivity extends AppCompatActivity {
         mXScaleStep += i;
         Log.d(TAG, "scaleX: scalar " + mXScallar);
         Log.d(TAG, "scaleX: step " + mXScaleStep);
-        xZoomIn.setEnabled(false);
-        xZoomOut.setEnabled(false);
+        zoomInX.setEnabled(false);
+        zoomOutX.setEnabled(false);
         reloadData();
-        xZoomIn.setEnabled(true);
-        xZoomOut.setEnabled(true);
+        zoomInX.setEnabled(true);
+        zoomOutX.setEnabled(true);
     }
 
     private synchronized void reloadData() {

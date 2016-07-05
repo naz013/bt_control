@@ -1,303 +1,256 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <ScrollView
+        <android.support.v7.widget.CardView
+            android:id="@+id/chartCard"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="32dp"
+            app:cardElevation="2dp">
+
+            <com.github.mikephil.charting.charts.ScatterChart
+                android:id="@+id/chart1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </android.support.v7.widget.CardView>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:overScrollMode="never"
-            android:scrollbars="none">
+            android:gravity="center"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="80dp">
-
-                <android.support.v7.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginTop="32dp"
-                    app:cardElevation="2dp">
-
-                    <com.github.mikephil.charting.charts.ScatterChart
-                        android:id="@+id/chart1"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_above="@+id/seekBar1" />
-
-                </android.support.v7.widget.CardView>
+                android:orientation="vertical">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:gravity="center"
                     android:orientation="horizontal">
 
-                    <android.support.v7.widget.CardView
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/zoomInY"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
-                        android:layout_gravity="left"
-                        app:cardElevation="2dp"
-                        app:cardUseCompatPadding="true">
+                        app:fab_colorNormal="@color/colorBlue"
+                        app:fab_colorPressed="@color/colorGray"
+                        app:fab_icon="@drawable/ic_zoom_in_black_24px"
+                        app:fab_size="mini" />
 
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="8dp"
-                            android:gravity="center"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/y_axis"
-                                android:textSize="18sp" />
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:orientation="horizontal">
-
-                                <ImageButton
-                                    android:id="@+id/yZoomOut"
-                                    android:layout_width="36dp"
-                                    android:layout_height="36dp"
-                                    android:background="@null"
-                                    android:src="@drawable/ic_zoom_out_black_24px" />
-
-                                <ImageButton
-                                    android:id="@+id/yZoomIn"
-                                    android:layout_width="36dp"
-                                    android:layout_height="36dp"
-                                    android:layout_marginLeft="16dp"
-                                    android:background="@null"
-                                    android:src="@drawable/ic_zoom_in_black_24px" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                    </android.support.v7.widget.CardView>
-
-                    <LinearLayout
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/zoomOutY"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <Button
-                            android:id="@+id/yTrace"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:layout_gravity="center"
-                            android:background="@drawable/green_selector_rounded"
-                            android:padding="5dp"
-                            android:text="@string/y_trace"
-                            android:textColor="@color/colorGreen"
-                            android:textSize="16sp" />
-
-                        <Button
-                            android:id="@+id/xTrace"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:layout_gravity="center"
-                            android:background="@drawable/green_selector_rounded"
-                            android:padding="5dp"
-                            android:layout_marginTop="8dp"
-                            android:text="@string/x_trace"
-                            android:textColor="@color/colorGreen"
-                            android:textSize="16sp" />
-
-                    </LinearLayout>
-
-                    <android.support.v7.widget.CardView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
-                        android:layout_gravity="right"
-                        app:cardElevation="2dp"
-                        app:cardUseCompatPadding="true">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="8dp"
-                            android:gravity="center"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/x_axis"
-                                android:textSize="18sp" />
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:orientation="horizontal">
-
-                                <ImageButton
-                                    android:id="@+id/xZoomOut"
-                                    android:layout_width="36dp"
-                                    android:layout_height="36dp"
-                                    android:background="@null"
-                                    android:src="@drawable/ic_zoom_out_black_24px" />
-
-                                <ImageButton
-                                    android:id="@+id/xZoomIn"
-                                    android:layout_width="36dp"
-                                    android:layout_height="36dp"
-                                    android:layout_marginLeft="8dp"
-                                    android:background="@null"
-                                    android:src="@drawable/ic_zoom_in_black_24px" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                    </android.support.v7.widget.CardView>
+                        app:fab_colorNormal="@color/colorBlue"
+                        app:fab_colorPressed="@color/colorGray"
+                        app:fab_icon="@drawable/ic_zoom_out_black_24px"
+                        app:fab_size="mini" />
 
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="32dp"
-                    android:layout_marginTop="16dp"
-                    android:gravity="center|top"
                     android:orientation="horizontal">
 
-                    <LinearLayout
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/moveTop"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        app:fab_colorNormal="@color/colorBlue"
+                        app:fab_colorPressed="@color/colorGray"
+                        app:fab_icon="@drawable/ic_expand_less_black_24dp"
+                        app:fab_size="mini" />
 
-                        <TextView
-                            android:id="@+id/captureButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:background="@drawable/button_green_selector"
-                            android:foreground="?attr/selectableItemBackground"
-                            android:paddingBottom="10dp"
-                            android:paddingLeft="15dp"
-                            android:paddingRight="15dp"
-                            android:paddingTop="10dp"
-                            android:text="@string/capture"
-                            android:textColor="@color/colorWhite"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:id="@+id/stopButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="16dp"
-                            android:background="@drawable/button_red_selector"
-                            android:foreground="?attr/selectableItemBackground"
-                            android:gravity="center"
-                            android:paddingBottom="10dp"
-                            android:paddingLeft="15dp"
-                            android:paddingRight="15dp"
-                            android:paddingTop="10dp"
-                            android:text="@string/stop"
-                            android:textColor="@color/colorWhite"
-                            android:textSize="18sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/moveBottom"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="32dp"
-                        android:orientation="horizontal">
+                        app:fab_colorNormal="@color/colorBlue"
+                        app:fab_colorPressed="@color/colorGray"
+                        app:fab_icon="@drawable/ic_expand_more_black_24dp"
+                        app:fab_size="mini" />
 
-                        <TextView
-                            android:id="@+id/screenshotButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="top"
-                            android:background="@drawable/button_blue_selector"
-                            android:foreground="?attr/selectableItemBackground"
-                            android:paddingBottom="10dp"
-                            android:paddingLeft="15dp"
-                            android:paddingRight="15dp"
-                            android:paddingTop="10dp"
-                            android:text="@string/screenshot"
-                            android:textColor="@color/colorWhite"
-                            android:textSize="18sp" />
+                </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/clearButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="top|right"
-                            android:layout_marginLeft="8dp"
-                            android:background="@drawable/button_blue_selector"
-                            android:foreground="?attr/selectableItemBackground"
-                            android:paddingBottom="10dp"
-                            android:paddingLeft="15dp"
-                            android:paddingRight="15dp"
-                            android:paddingTop="10dp"
-                            android:text="@string/clear"
-                            android:textColor="@color/colorWhite"
-                            android:textSize="18sp" />
+                <com.getbase.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/traceY"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    app:fab_colorNormal="@color/colorBlue"
+                    app:fab_colorPressed="@color/colorGray"
+                    app:fab_icon="@drawable/ic_trace_y"
+                    app:fab_size="mini" />
 
-                        <TextView
-                            android:id="@+id/galleryButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="top|right"
-                            android:layout_marginLeft="8dp"
-                            android:background="@drawable/button_blue_selector"
-                            android:foreground="?attr/selectableItemBackground"
-                            android:paddingBottom="10dp"
-                            android:paddingLeft="15dp"
-                            android:paddingRight="15dp"
-                            android:paddingTop="10dp"
-                            android:text="@string/gallery"
-                            android:textColor="@color/colorWhite"
-                            android:textSize="18sp" />
+            </LinearLayout>
 
-                    </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/captureButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fab_colorNormal="@color/colorWhite"
+                        app:fab_colorPressed="@color/colorGray"
+                        app:fab_icon="@drawable/ic_chart_areaspline"
+                        app:fab_size="mini" />
+
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/stopButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fab_colorNormal="@color/colorWhite"
+                        app:fab_colorPressed="@color/colorGray"
+                        app:fab_icon="@drawable/ic_stop_black_24dp"
+                        app:fab_size="mini" />
+
+                </LinearLayout>
+
+                <com.getbase.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/clearButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    app:fab_colorNormal="@color/colorWhite"
+                    app:fab_colorPressed="@color/colorGray"
+                    app:fab_icon="@drawable/ic_delete_black_24dp"
+                    app:fab_size="mini" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/screenshot_item"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fab_colorNormal="@color/colorRed"
+                        app:fab_colorPressed="@color/colorGray"
+                        app:fab_icon="@drawable/ic_camera_alt_black_24dp"
+                        app:fab_size="mini" />
+
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/gallery_item"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fab_colorNormal="@color/colorRed"
+                        app:fab_colorPressed="@color/colorGray"
+                        app:fab_icon="@drawable/ic_collections_black_24dp"
+                        app:fab_size="mini" />
 
                 </LinearLayout>
 
             </LinearLayout>
 
-        </ScrollView>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/blockView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/colorGrayTr"
-            android:clickable="false"
-            android:focusable="false"
-            android:gravity="center"
-            android:lineSpacingExtra="10dp"
-            android:padding="15dp"
-            android:text="@string/wait_while_connection_was_established"
-            android:textColor="@color/colorWhite"
-            android:textSize="24sp"
-            android:visibility="gone" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-    </RelativeLayout>
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/zoomInX"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fab_colorNormal="@color/colorGreen"
+                        app:fab_colorPressed="@color/colorGray"
+                        app:fab_icon="@drawable/ic_zoom_in_black_24px"
+                        app:fab_size="mini" />
 
-</LinearLayout>
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/zoomOutX"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fab_colorNormal="@color/colorGreen"
+                        app:fab_colorPressed="@color/colorGray"
+                        app:fab_icon="@drawable/ic_zoom_out_black_24px"
+                        app:fab_size="mini" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/moveRight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fab_colorNormal="@color/colorGreen"
+                        app:fab_colorPressed="@color/colorGray"
+                        app:fab_icon="@drawable/ic_chevron_right_black_24dp"
+                        app:fab_size="mini" />
+
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/moveLeft"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fab_colorNormal="@color/colorGreen"
+                        app:fab_colorPressed="@color/colorGray"
+                        app:fab_icon="@drawable/ic_chevron_left_black_24dp"
+                        app:fab_size="mini" />
+
+                </LinearLayout>
+
+                <com.getbase.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/traceX"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    app:fab_colorNormal="@color/colorGreen"
+                    app:fab_colorPressed="@color/colorGray"
+                    app:fab_icon="@drawable/ic_trace_x"
+                    app:fab_size="mini" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/blockView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorGrayTr"
+        android:clickable="false"
+        android:focusable="false"
+        android:gravity="center"
+        android:lineSpacingExtra="10dp"
+        android:padding="15dp"
+        android:text="@string/wait_while_connection_was_established"
+        android:textColor="@color/colorWhite"
+        android:textSize="24sp"
+        android:visibility="gone" />
+
+</RelativeLayout>
