@@ -55,15 +55,19 @@ public class DsoActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT = 3;
     private static final float CHART_MAX_Y = 500f;
     private static final float CHART_MIN_Y = -500f;
-    private static final float CHART_MAX_X = 1010;
+    private static final float CHART_MAX_X = 1010f;
     private static final float X_SCALE_BASE = 1000f;
     private static final float CHART_POINT_SIZE = 2f;
+    private static final float RANGE_DIVIDER = 2f;
     private static final String TAG = "DsoActivity";
 
     private boolean mCapturing = false;
     private float mXScallar = 1f;
+    private float mXRangeValue = 1f;
     private int mXScaleStep = 0;
     private int mYScaleStep = 0;
+    private int mXMoveStep = 0;
+    private int mXParts = 0;
     private List<Float> mYVals = new ArrayList<>();
     private List<Float> mXVals = new ArrayList<>();
 
@@ -191,7 +195,7 @@ public class DsoActivity extends AppCompatActivity {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
                 float scal = getXFormatScale();
-                float f = value / scal;
+                float f = value / scal + getXPartSize();
                 return String.format(Locale.getDefault(), "%.2f", f);
             }
 
@@ -327,8 +331,38 @@ public class DsoActivity extends AppCompatActivity {
             case R.id.zoomOutY:
                 scaleY(-1);
                 break;
+            case R.id.moveRight:
+                moveX(1);
+                break;
+            case R.id.moveLeft:
+                moveX(-1);
+                break;
         }
     };
+
+    private void moveX(int i) {
+        if (mXScaleStep == 0) {
+            return;
+        }
+        if (i < 0 && mXMoveStep == 0) {
+            return;
+        }
+        mXParts = (int) ((int) X_SCALE_BASE / getXPartSize());
+        Log.d(TAG, "moveX: parts " + mXParts);
+        if (i > 0 && mXMoveStep == (mXParts - 2)) {
+            return;
+        }
+        mXMoveStep += i;
+        moveLeft.setEnabled(false);
+        moveRight.setEnabled(false);
+        reloadData();
+        moveLeft.setEnabled(true);
+        moveRight.setEnabled(true);
+    }
+
+    private float getXPartSize() {
+        return X_SCALE_BASE / mXScallar / RANGE_DIVIDER;
+    }
 
     private void scaleY(int i) {
         Log.d(TAG, "scaleY: " + i);
@@ -361,6 +395,7 @@ public class DsoActivity extends AppCompatActivity {
         if (i < 0) {
             mXScallar /= 10;
         }
+        mXMoveStep = 0;
         mXScaleStep += i;
         Log.d(TAG, "scaleX: scalar " + mXScallar);
         Log.d(TAG, "scaleX: step " + mXScaleStep);
@@ -394,14 +429,19 @@ public class DsoActivity extends AppCompatActivity {
             if (scatterData == null) return;
             float scaleX = getXScale();
             float scaleY = getYScale();
+            float slideX = getSlideX();
+            float maxX = CHART_MAX_X / scaleX + (slideX / scaleX);
+            float minX = mXMoveStep > 0 ? (maxX - ((slideX / scaleX) * 2)) : 0f;
+            float minY = CHART_MIN_Y / scaleY;
+            float maxY = CHART_MAX_Y / scaleY;
             IScatterDataSet dataSet = scatterData.getDataSetByIndex(0);
             dataSet.clear();
             for (int i = 0; i < xList.size(); i++) {
                 float x = xList.get(i);
                 float y = yList.get(i);
-                int xSc = (int) (x * scaleX);
-                int ySc = (int) (y * scaleY);
-                if (xSc < CHART_MAX_X && ySc > CHART_MIN_Y && ySc < CHART_MAX_Y) {
+                if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
+                    int xSc = (int) (x * scaleX - slideX);
+                    int ySc = (int) (y * scaleY);
                     dataSet.addEntry(new Entry(xSc, ySc));
                 }
             }
@@ -413,7 +453,11 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private float getXScale() {
-        return X_SCALE_BASE * mXScallar;
+        return (X_SCALE_BASE * mXScallar);
+    }
+
+    private float getSlideX() {
+        return X_SCALE_BASE / 2 * mXMoveStep;
     }
 
     private float getYScale() {
@@ -602,14 +646,18 @@ public class DsoActivity extends AppCompatActivity {
         mChart.invalidate();
         float scaleX = getXScale();
         float scaleY = getYScale();
+        float minX = 0f;
+        float maxX = CHART_MAX_X / scaleX;
+        float minY = CHART_MIN_Y / scaleY;
+        float maxY = CHART_MAX_Y / scaleY;
         IScatterDataSet dataSet = scatterData.getDataSetByIndex(0);
         dataSet.clear();
         for (int i = 0; i < 10000; i++) {
             float x = rand.nextFloat() * (1f - 0f) + 0f;
             float y = rand.nextFloat() * (16f - (-16f)) + (-16f);
-            float xSc = x * scaleX;
-            float ySc = y * scaleY;
-            if (xSc < CHART_MAX_X && ySc > CHART_MIN_Y && ySc < CHART_MAX_Y) {
+            if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
+                float xSc = x * scaleX;
+                float ySc = y * scaleY;
                 dataSet.addEntry(new Entry(xSc, ySc));
                 mYVals.add(y);
                 mXVals.add(x);
