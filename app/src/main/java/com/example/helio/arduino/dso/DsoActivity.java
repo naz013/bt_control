@@ -53,21 +53,20 @@ import de.greenrobot.event.EventBus;
 public class DsoActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 3;
-    private static final float CHART_MAX_Y = 500f;
-    private static final float CHART_MIN_Y = -500f;
-    private static final float CHART_MAX_X = 1010f;
+    private static final float CHART_MAX_Y = 1000f;
+    private static final float CHART_MAX_X = 1000f;
     private static final float X_SCALE_BASE = 1000f;
+    private static final float Y_SCALE_BASE = 31.25f;
     private static final float CHART_POINT_SIZE = 2f;
     private static final float RANGE_DIVIDER = 2f;
     private static final String TAG = "DsoActivity";
 
     private boolean mCapturing = false;
     private float mXScallar = 1f;
-    private float mXRangeValue = 1f;
     private int mXScaleStep = 0;
     private int mYScaleStep = 0;
     private int mXMoveStep = 0;
-    private int mXParts = 0;
+    private int mYMoveStep = 0;
     private List<Float> mYVals = new ArrayList<>();
     private List<Float> mXVals = new ArrayList<>();
 
@@ -171,14 +170,18 @@ public class DsoActivity extends AppCompatActivity {
         YAxis yAxis = mChart.getAxisLeft();
         yAxis.removeAllLimitLines();
         yAxis.setAxisMaxValue(CHART_MAX_Y);
-        yAxis.setAxisMinValue(CHART_MIN_Y);
         yAxis.setLabelCount(11, true);
-        yAxis.setDrawZeroLine(true);
+        yAxis.setDrawZeroLine(false);
         yAxis.setValueFormatter(new AxisValueFormatter() {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
                 float scal = getYFormatScale();
-                float f = value / scal;
+                float deviation = getYDeviation();
+                float deviationCorrector = getDeviationCorrector();
+                float f = ((value - CHART_MAX_Y / 2) / scal);
+                if (mYScaleStep > 0 && mYMoveStep != getYParts() / 2) {
+                    f = f - (deviation * deviationCorrector);
+                }
                 return String.format(Locale.getDefault(), "%.2f", f);
             }
 
@@ -195,7 +198,17 @@ public class DsoActivity extends AppCompatActivity {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
                 float scal = getXFormatScale();
-                float f = value / scal + getXPartSize();
+                float f;
+                if (mXScaleStep > 0) {
+                    float scaleX = getXScale();
+                    float slideX = getSlideX();
+                    float maxX = CHART_MAX_X / scaleX + (slideX / scaleX);
+                    float minX = mXMoveStep > 0 ? (maxX - (CHART_MAX_X / scaleX)) : 0f;
+                    f = value / (scal / (scal * maxX));
+                    if (mXMoveStep > 0 && f == 0.0) f = minX * CHART_MAX_X;
+                } else {
+                    f = value / scal;
+                }
                 return String.format(Locale.getDefault(), "%.2f", f);
             }
 
@@ -337,25 +350,38 @@ public class DsoActivity extends AppCompatActivity {
             case R.id.moveLeft:
                 moveX(-1);
                 break;
+            case R.id.moveTop:
+                moveY(1);
+                break;
+            case R.id.moveBottom:
+                moveY(-1);
+                break;
         }
     };
 
+    private void moveY(int i) {
+        if (mYScaleStep == 0) return;
+        if (i > 0 && mYMoveStep == 1) return;
+        if (i < 0 && mYMoveStep == getYParts() - 1) return;
+        mYMoveStep -= i;
+        Log.d(TAG, "moveY: step " + mYMoveStep);
+        moveTop.setEnabled(false);
+        moveBottom.setEnabled(false);
+        reloadData(mYVals, mXVals);
+        moveTop.setEnabled(true);
+        moveBottom.setEnabled(true);
+    }
+
     private void moveX(int i) {
-        if (mXScaleStep == 0) {
-            return;
-        }
-        if (i < 0 && mXMoveStep == 0) {
-            return;
-        }
-        mXParts = (int) ((int) X_SCALE_BASE / getXPartSize());
+        if (mXScaleStep == 0) return;
+        if (i < 0 && mXMoveStep == 0) return;
+        int mXParts = (int) ((int) X_SCALE_BASE / getXPartSize());
         Log.d(TAG, "moveX: parts " + mXParts);
-        if (i > 0 && mXMoveStep == (mXParts - 2)) {
-            return;
-        }
+        if (i > 0 && mXMoveStep == (mXParts - 2)) return;
         mXMoveStep += i;
         moveLeft.setEnabled(false);
         moveRight.setEnabled(false);
-        reloadData();
+        reloadData(mYVals, mXVals);
         moveLeft.setEnabled(true);
         moveRight.setEnabled(true);
     }
@@ -374,11 +400,18 @@ public class DsoActivity extends AppCompatActivity {
         }
         mYScaleStep += i;
         Log.d(TAG, "scaleY: y step " + mYScaleStep);
+        int mYParts = getYParts();
+        Log.d(TAG, "scaleY: parts " + mYParts);
+        mYMoveStep = mYParts / 2;
         zoomInY.setEnabled(false);
         zoomOutY.setEnabled(false);
-        reloadData();
+        reloadData(mYVals, mXVals);
         zoomInY.setEnabled(true);
         zoomOutY.setEnabled(true);
+    }
+
+    private int getYParts() {
+        return ((int) Math.round(Math.pow(4, mYScaleStep))) * 2;
     }
 
     private void scaleX(int i) {
@@ -401,12 +434,12 @@ public class DsoActivity extends AppCompatActivity {
         Log.d(TAG, "scaleX: step " + mXScaleStep);
         zoomInX.setEnabled(false);
         zoomOutX.setEnabled(false);
-        reloadData();
+        reloadData(mYVals, mXVals);
         zoomInX.setEnabled(true);
         zoomOutX.setEnabled(true);
     }
 
-    private synchronized void reloadData() {
+    private synchronized void reloadData(List<Float> mYVals, List<Float> mXVals) {
         if (mYVals.size() > 0 && mXVals.size() > 0) {
             List<Float> xList = new ArrayList<>(mXVals);
             List<Float> yList = new ArrayList<>(mYVals);
@@ -430,10 +463,14 @@ public class DsoActivity extends AppCompatActivity {
             float scaleX = getXScale();
             float scaleY = getYScale();
             float slideX = getSlideX();
+            float deviationY = getYDeviation();
             float maxX = CHART_MAX_X / scaleX + (slideX / scaleX);
-            float minX = mXMoveStep > 0 ? (maxX - ((slideX / scaleX) * 2)) : 0f;
-            float minY = CHART_MIN_Y / scaleY;
-            float maxY = CHART_MAX_Y / scaleY;
+            float minX = mXMoveStep > 0 ? (maxX - (CHART_MAX_X / scaleX)) : 0f;
+            float baseY = (CHART_MAX_Y / 2) / scaleY;
+            float yMoveMiddle = getYParts() / 2;
+            float deviationCorrector = getDeviationCorrector();
+            float maxY = baseY + ((yMoveMiddle - mYMoveStep) * baseY);
+            float minY = mYMoveStep != yMoveMiddle ? (maxY - baseY * 2) : -deviationY;
             IScatterDataSet dataSet = scatterData.getDataSetByIndex(0);
             dataSet.clear();
             for (int i = 0; i < xList.size(); i++) {
@@ -441,14 +478,23 @@ public class DsoActivity extends AppCompatActivity {
                 float y = yList.get(i);
                 if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
                     int xSc = (int) (x * scaleX - slideX);
-                    int ySc = (int) (y * scaleY);
+                    int ySc = (int) ((y + (deviationY * deviationCorrector)) * scaleY);
                     dataSet.addEntry(new Entry(xSc, ySc));
                 }
             }
-            if (dataSet.getEntryCount() == 0) {
-                dataSet.addEntry(new Entry(-1f, 0f));
-            }
+            dataSet.addEntry(new Entry(-0f, 0f));
             mChart.notifyDataSetChanged();
+        }
+    }
+
+    private float getDeviationCorrector() {
+        return mYMoveStep - (getYParts() / 2 - 1);
+    }
+
+    private float getYDeviation() {
+        if (mYScaleStep == 0) return 16f;
+        else {
+            return 16f / (float) Math.pow(4, mYScaleStep);
         }
     }
 
@@ -461,17 +507,11 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private float getYScale() {
-        if (mYScaleStep == 1) {
-            return 125f;
-        } else if (mYScaleStep == 2) {
-            return 500f;
-        } else if (mYScaleStep == 3) {
-            return 2000f;
-        } else if (mYScaleStep == 4) {
-            return 8000f;
-        } else {
-            return 31.25f;
+        float incr = 1f;
+        if (mYScaleStep > 0) {
+            incr = (float) Math.pow(4, mYScaleStep);
         }
+        return Y_SCALE_BASE * incr;
     }
 
     private void clearGraph() {
@@ -646,23 +686,19 @@ public class DsoActivity extends AppCompatActivity {
         mChart.invalidate();
         float scaleX = getXScale();
         float scaleY = getYScale();
-        float minX = 0f;
-        float maxX = CHART_MAX_X / scaleX;
-        float minY = CHART_MIN_Y / scaleY;
-        float maxY = CHART_MAX_Y / scaleY;
+        float deviationY = getYDeviation();
         IScatterDataSet dataSet = scatterData.getDataSetByIndex(0);
         dataSet.clear();
         for (int i = 0; i < 10000; i++) {
             float x = rand.nextFloat() * (1f - 0f) + 0f;
             float y = rand.nextFloat() * (16f - (-16f)) + (-16f);
-            if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
-                float xSc = x * scaleX;
-                float ySc = y * scaleY;
-                dataSet.addEntry(new Entry(xSc, ySc));
-                mYVals.add(y);
-                mXVals.add(x);
-            }
+            float xSc = x * scaleX;
+            float ySc = (y + deviationY) * scaleY;
+            dataSet.addEntry(new Entry(xSc, ySc));
+            mYVals.add(y);
+            mXVals.add(x);
         }
+        dataSet.addEntry(new Entry(-0f, 0f));
         scatterData.addDataSet(dataSet);
         mChart.notifyDataSetChanged();
     }

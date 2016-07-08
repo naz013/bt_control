@@ -44,21 +44,21 @@
                     android:orientation="horizontal">
 
                     <com.getbase.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/zoomInY"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:fab_colorNormal="@color/colorBlue"
-                        app:fab_colorPressed="@color/colorGray"
-                        app:fab_icon="@drawable/ic_zoom_in_black_24px"
-                        app:fab_size="mini" />
-
-                    <com.getbase.floatingactionbutton.FloatingActionButton
                         android:id="@+id/zoomOutY"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:fab_colorNormal="@color/colorBlue"
                         app:fab_colorPressed="@color/colorGray"
                         app:fab_icon="@drawable/ic_zoom_out_black_24px"
+                        app:fab_size="mini" />
+
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/zoomInY"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fab_colorNormal="@color/colorBlue"
+                        app:fab_colorPressed="@color/colorGray"
+                        app:fab_icon="@drawable/ic_zoom_in_black_24px"
                         app:fab_size="mini" />
 
                 </LinearLayout>
@@ -178,21 +178,21 @@
                     android:orientation="horizontal">
 
                     <com.getbase.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/zoomInX"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:fab_colorNormal="@color/colorGreen"
-                        app:fab_colorPressed="@color/colorGray"
-                        app:fab_icon="@drawable/ic_zoom_in_black_24px"
-                        app:fab_size="mini" />
-
-                    <com.getbase.floatingactionbutton.FloatingActionButton
                         android:id="@+id/zoomOutX"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:fab_colorNormal="@color/colorGreen"
                         app:fab_colorPressed="@color/colorGray"
                         app:fab_icon="@drawable/ic_zoom_out_black_24px"
+                        app:fab_size="mini" />
+
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/zoomInX"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fab_colorNormal="@color/colorGreen"
+                        app:fab_colorPressed="@color/colorGray"
+                        app:fab_icon="@drawable/ic_zoom_in_black_24px"
                         app:fab_size="mini" />
 
                 </LinearLayout>
@@ -203,21 +203,21 @@
                     android:orientation="horizontal">
 
                     <com.getbase.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/moveRight"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:fab_colorNormal="@color/colorGreen"
-                        app:fab_colorPressed="@color/colorGray"
-                        app:fab_icon="@drawable/ic_chevron_right_black_24dp"
-                        app:fab_size="mini" />
-
-                    <com.getbase.floatingactionbutton.FloatingActionButton
                         android:id="@+id/moveLeft"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:fab_colorNormal="@color/colorGreen"
                         app:fab_colorPressed="@color/colorGray"
                         app:fab_icon="@drawable/ic_chevron_left_black_24dp"
+                        app:fab_size="mini" />
+
+                    <com.getbase.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/moveRight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:fab_colorNormal="@color/colorGreen"
+                        app:fab_colorPressed="@color/colorGray"
+                        app:fab_icon="@drawable/ic_chevron_right_black_24dp"
                         app:fab_size="mini" />
 
                 </LinearLayout>
