@@ -452,10 +452,10 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private String getYLabelFormatted(float value) {
-        float scal = getYFormatScale();
+        float scalar = getYFormatScale();
         float deviation = getYDeviation();
         float deviationCorrector = getDeviationCorrector();
-        float f = ((value - CHART_MAX_Y / 2) / scal);
+        float f = ((value - CHART_MAX_Y / 2) / scalar);
         if (mYScaleStep > 0 && mYMoveStep != getYParts() / 2) {
             f = f - (deviation * (deviationCorrector - 1));
         }
@@ -476,17 +476,17 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private String getXLabelFormatted(float value) {
-        float scal = getXFormatScale();
+        float scalar = getXFormatScale();
         float f;
         if (mXScaleStep > 0 && mXScaleStep < 4) {
             float scaleX = getXScale();
             float slideX = getSlideX();
             float maxX = CHART_MAX_X / scaleX + (slideX / scaleX);
             float minX = mXMoveStep > 0 ? (maxX - (CHART_MAX_X / scaleX)) : 0f;
-            f = value / (scal / (scal * maxX));
+            f = value / (scalar / (scalar * maxX));
             if (mXMoveStep > 0 && f == 0.0) f = minX * CHART_MAX_X;
         } else {
-            f = value / scal;
+            f = value / scalar;
         }
         return String.format(Locale.getDefault(), "%.2f", f);
     }
@@ -579,10 +579,10 @@ public class DsoActivity extends AppCompatActivity {
         zoomOutX.setEnabled(true);
     }
 
-    private synchronized void reloadData(List<Float> mYVals, List<Float> mXVals) {
-        if (mYVals.size() > 0 && mXVals.size() > 0) {
-            List<Float> xList = new ArrayList<>(mXVals);
-            List<Float> yList = new ArrayList<>(mYVals);
+    private synchronized void reloadData(List<Float> mYValues, List<Float> mXValues) {
+        if (mYValues.size() > 0 && mXValues.size() > 0) {
+            List<Float> xList = new ArrayList<>(mXValues);
+            List<Float> yList = new ArrayList<>(mYValues);
             mChart.getScatterData().clearValues();
             mChart.invalidate();
             ScatterData scatterData = mChart.getScatterData();
@@ -652,9 +652,9 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private float getYScale() {
-        float incr = 1f;
-        if (mYScaleStep > 0) incr = (float) Math.pow(4, mYScaleStep);
-        return Y_SCALE_BASE * incr;
+        float increment = 1f;
+        if (mYScaleStep > 0) increment = (float) Math.pow(4, mYScaleStep);
+        return Y_SCALE_BASE * increment;
     }
 
     private void clearGraph() {
