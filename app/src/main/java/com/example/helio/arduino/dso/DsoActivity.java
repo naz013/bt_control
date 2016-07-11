@@ -66,14 +66,15 @@ public class DsoActivity extends AppCompatActivity {
     private static final float RANGE_DIVIDER = 2f;
     private static final String TAG = "DsoActivity";
 
-    private boolean mXReceived = false;
+    private boolean xProcessing;
+    private boolean yProcessing;
     private boolean mIsYTracing = false;
     private boolean mIsXTracing = false;
     private float mXScallar = 1f;
     private int mXScaleStep = 0;
     private int mYScaleStep = 0;
     private int mXMoveStep = 0;
-    private int mYMoveStep = 0;
+    private int mYMoveStep = 4;
     private List<Float> mYVals = new ArrayList<>();
     private List<Float> mXVals = new ArrayList<>();
 
@@ -90,6 +91,7 @@ public class DsoActivity extends AppCompatActivity {
     private BluetoothAdapter mBtAdapter = null;
 
     private static Activity activity;
+    private boolean mXReceived;
 
     public void onEvent(ResponseEvent responseEvent) {
         readDso(responseEvent.getMsg());
@@ -147,7 +149,7 @@ public class DsoActivity extends AppCompatActivity {
         int height = mScreenSize.y;
         y = height - y - (height - ((float) pointHigh.y - (float) pointLow.y));
         float tmp = (float) ((y - pointLow.y) / (pointHigh.y - pointLow.y));
-        return CHART_MAX_Y * tmp + (mChart.getHeight() / 2);
+        return CHART_MAX_Y * tmp + (mChart.getHeight());
     }
 
     private void initChart() {
@@ -156,28 +158,25 @@ public class DsoActivity extends AppCompatActivity {
         mChart.setTouchEnabled(true);
         mChart.setScaleEnabled(false);
         mChart.setPinchZoom(false);
-        mChart.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_MOVE:
-                        float x = motionEvent.getRawX();
-                        float y = motionEvent.getRawY();
-                        if (mIsXTracing) {
-                            drawVerticalLine(getXPositionByTouch(x));
-                        } else if (mIsYTracing) {
-                            drawHorizontalLine(getYPositionByTouch(y));
-                        }
-                        break;
+        mChart.setOnTouchListener((view, motionEvent) -> {
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_MOVE:
+                    float x = motionEvent.getRawX();
+                    float y = motionEvent.getRawY();
+                    if (mIsXTracing) {
+                        drawVerticalLine(getXPositionByTouch(x));
+                    } else if (mIsYTracing) {
+                        drawHorizontalLine(getYPositionByTouch(y));
+                    }
+                    break;
 
-                    case MotionEvent.ACTION_UP:
-                        break;
+                case MotionEvent.ACTION_UP:
+                    break;
 
-                    case MotionEvent.ACTION_DOWN:
-                        break;
-                }
-                return true;
+                case MotionEvent.ACTION_DOWN:
+                    break;
             }
+            return true;
         });
         mChart.setNoDataText(getString(R.string.no_data_available));
         mChart.setAutoScaleMinMaxEnabled(true);
@@ -316,20 +315,34 @@ public class DsoActivity extends AppCompatActivity {
 
     private void readDso(Message msg) {
         String data = (String) msg.obj;
-        if (data.startsWith(Constants.rX)) {
-            String[] parts = data.split(Constants.DIV);
+        String[] arrays = data.split(";");
+        if (arrays[0].startsWith("����x:")) {
+            String xArray = arrays[0].replace("����x:", "");
+            String[] parts = xArray.split(Constants.COMMA);
             mXVals.clear();
             for (String xVal : parts) {
-                if (TextUtils.isEmpty(xVal)) continue;
-                float y = Float.parseFloat(xVal.trim());
-                mXVals.add(y);
+                if (TextUtils.isEmpty(xVal.trim())) continue;
+                float x = Float.parseFloat(xVal.trim());
+                mXVals.add(x);
             }
             mXReceived = true;
-        } else if (data.startsWith(Constants.rY)) {
-            String[] parts = data.split(Constants.DIV);
+        } else if (arrays[0].startsWith(Constants.rX)) {
+            String xArray = arrays[0].replace(Constants.rX, "");
+            String[] parts = xArray.split(Constants.COMMA);
+            mXVals.clear();
+            for (String xVal : parts) {
+                if (TextUtils.isEmpty(xVal.trim())) continue;
+                float x = Float.parseFloat(xVal.trim());
+                mXVals.add(x);
+            }
+            mXReceived = true;
+        }
+        if (arrays[1].startsWith(Constants.rY)) {
+            String yArray = arrays[1].replace(Constants.rY, "");
+            String[] parts = yArray.split(Constants.COMMA);
             mYVals.clear();
             for (String yVal : parts) {
-                if (TextUtils.isEmpty(yVal)) continue;
+                if (TextUtils.isEmpty(yVal.trim())) continue;
                 float y = Float.parseFloat(yVal.trim());
                 mYVals.add(y);
             }
@@ -338,6 +351,30 @@ public class DsoActivity extends AppCompatActivity {
                 reloadData(mYVals, mXVals);
             }
         }
+//        Log.d(TAG, "readDso: " + data);
+//        if (data.matches(Constants.OPEN_X)) {
+//            mXVals.clear();
+//            xProcessing = true;
+//        } else if (data.matches(Constants.CLOSE_X)) {
+//            xProcessing = false;
+//        } else if (data.matches(Constants.OPEN_Y)) {
+//            mYVals.clear();
+//            yProcessing = true;
+//        } else if (data.matches(Constants.CLOSE_Y)) {
+//            yProcessing = false;
+//        }
+//        if (xProcessing) {
+//            if (TextUtils.isEmpty(data.trim())) return;
+//            float x = Float.parseFloat(data.trim());
+//            mXVals.add(x);
+//        } else if (yProcessing) {
+//            if (TextUtils.isEmpty(data.trim())) return;
+//            float x = Float.parseFloat(data.trim());
+//            mXVals.add(x);
+//        }
+//        if (!xProcessing && !yProcessing) {
+//            reloadData(mYVals, mXVals);
+//        }
     }
 
     private View.OnClickListener mListener = v -> {
@@ -441,7 +478,7 @@ public class DsoActivity extends AppCompatActivity {
     private String getXLabelFormatted(float value) {
         float scal = getXFormatScale();
         float f;
-        if (mXScaleStep > 0) {
+        if (mXScaleStep > 0 && mXScaleStep < 4) {
             float scaleX = getXScale();
             float slideX = getSlideX();
             float maxX = CHART_MAX_X / scaleX + (slideX / scaleX);
@@ -470,7 +507,6 @@ public class DsoActivity extends AppCompatActivity {
         if (i > 0 && mYMoveStep == 1) return;
         if (i < 0 && mYMoveStep == getYParts() - 1) return;
         mYMoveStep -= i;
-        Log.d(TAG, "moveY: step " + mYMoveStep);
         moveTop.setEnabled(false);
         moveBottom.setEnabled(false);
         reloadData(mYVals, mXVals);
@@ -499,15 +535,28 @@ public class DsoActivity extends AppCompatActivity {
         if (i < 0 && mYScaleStep == 0) return;
         if (i > 0 && mYScaleStep == 4) return;
         mYScaleStep += i;
-        Log.d(TAG, "scaleY: y step " + mYScaleStep);
         int mYParts = getYParts();
-        Log.d(TAG, "scaleY: parts " + mYParts);
         mYMoveStep = mYParts / 2;
         zoomInY.setEnabled(false);
         zoomOutY.setEnabled(false);
         reloadData(mYVals, mXVals);
         zoomInY.setEnabled(true);
         zoomOutY.setEnabled(true);
+    }
+
+    private void reloadTraceLines() {
+        if (mIsXTracing) {
+            List<LimitLine> lines = mChart.getXAxis().getLimitLines();
+            if (lines.size() == 0) return;
+            LimitLine line = lines.get(0);
+            drawVerticalLine(line.getLimit());
+        }
+        if (mIsYTracing) {
+            List<LimitLine> lines = mChart.getAxisLeft().getLimitLines();
+            if (lines.size() == 0) return;
+            LimitLine line = lines.get(0);
+            drawHorizontalLine(line.getLimit());
+        }
     }
 
     private int getYParts() {
@@ -521,6 +570,8 @@ public class DsoActivity extends AppCompatActivity {
         if (i < 0) mXScallar /= 10;
         mXMoveStep = 0;
         mXScaleStep += i;
+        int mYParts = getYParts();
+        mYMoveStep = mYParts / 2;
         zoomInX.setEnabled(false);
         zoomOutX.setEnabled(false);
         reloadData(mYVals, mXVals);
@@ -579,6 +630,7 @@ public class DsoActivity extends AppCompatActivity {
             }
             dataSet.addEntry(new Entry(-0f, 0f));
             mChart.notifyDataSetChanged();
+            reloadTraceLines();
         }
     }
 
@@ -673,36 +725,6 @@ public class DsoActivity extends AppCompatActivity {
         String fileName = sdf.format(new Date());
         mChart.saveToPath(fileName, "/" + Constants.SCREENS_FOLDER);
         Toast.makeText(this, R.string.screenshot_saved, Toast.LENGTH_SHORT).show();
-    }
-
-    private void addNewEntry(float x, float y) {
-        ScatterData scatterData = mChart.getScatterData();
-        if (scatterData != null) {
-            IScatterDataSet scatterDataSet;
-            try {
-                scatterDataSet = scatterData.getDataSetByIndex(0);
-                if (scatterDataSet == null) {
-                    scatterDataSet = createSet();
-                    scatterData.addDataSet(scatterDataSet);
-                }
-            } catch (ArrayIndexOutOfBoundsException e) {
-                scatterDataSet = createSet();
-                scatterData.addDataSet(scatterDataSet);
-            }
-            scatterData.setDrawValues(false);
-            float scaleX = getXScale();
-            float scaleY = getYScale();
-            float xSc = x * scaleX;
-            float ySc = y * scaleY;
-            if (xSc < CHART_MAX_X) {
-                Entry entry = new Entry(xSc, ySc);
-                scatterData.addEntry(entry, 0);
-                mYVals.add(y);
-                mXVals.add(x);
-                mChart.notifyDataSetChanged();
-                mChart.invalidate();
-            }
-        }
     }
 
     private ScatterDataSet createSet() {

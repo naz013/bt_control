@@ -29,7 +29,13 @@ public class Constants {
 
     public static final String Q = "q";
 
+    public static final String OPEN_X = "j";
+    public static final String OPEN_Y = "m";
+    public static final String CLOSE_X = "k";
+    public static final String CLOSE_Y = "n";
+
     public static final String DIV = ";";
+    public static final String COMMA = ",";
     public static final String rY = "y:";
     public static final String rX = "x:";
     public static final String rV = "v:";
