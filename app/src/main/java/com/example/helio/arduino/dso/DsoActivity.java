@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,6 +16,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -33,6 +35,7 @@ import com.example.helio.arduino.core.ResponseEvent;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.github.mikephil.charting.charts.ScatterChart;
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -40,6 +43,7 @@ import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
 import com.github.mikephil.charting.formatter.AxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
+import com.github.mikephil.charting.utils.MPPointD;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -63,6 +67,8 @@ public class DsoActivity extends AppCompatActivity {
     private static final String TAG = "DsoActivity";
 
     private boolean mXReceived = false;
+    private boolean mIsYTracing = false;
+    private boolean mIsXTracing = false;
     private float mXScallar = 1f;
     private int mXScaleStep = 0;
     private int mYScaleStep = 0;
@@ -70,6 +76,8 @@ public class DsoActivity extends AppCompatActivity {
     private int mYMoveStep = 0;
     private List<Float> mYVals = new ArrayList<>();
     private List<Float> mXVals = new ArrayList<>();
+
+    private Point mScreenSize;
 
     private ScatterChart mChart;
     private TextView mBlockView;
@@ -100,11 +108,18 @@ public class DsoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         activity = this;
         setContentView(R.layout.activity_dso);
+        setScreenSize();
         initBtAdapter();
         initActionBar();
         initButtons();
         initChart();
         initBlockView();
+    }
+
+    private void setScreenSize() {
+        Display display = getWindowManager().getDefaultDisplay();
+        mScreenSize = new Point();
+        display.getSize(mScreenSize);
     }
 
     public static Activity getActivity() {
@@ -121,6 +136,20 @@ public class DsoActivity extends AppCompatActivity {
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
+    private float getXPositionByTouch(float x) {
+        int width = mScreenSize.x;
+        return CHART_MAX_X * (x / (float) width);
+    }
+
+    private float getYPositionByTouch(float y) {
+        MPPointD pointHigh = mChart.getPixelsForValues(0, 0, YAxis.AxisDependency.LEFT);
+        MPPointD pointLow = mChart.getPixelsForValues(0, 1000, YAxis.AxisDependency.LEFT);
+        int height = mScreenSize.y;
+        y = height - y - (height - ((float) pointHigh.y - (float) pointLow.y));
+        float tmp = (float) ((y - pointLow.y) / (pointHigh.y - pointLow.y));
+        return CHART_MAX_Y * tmp + (mChart.getHeight() / 2);
+    }
+
     private void initChart() {
         mChart = (ScatterChart) findViewById(R.id.chart1);
         mChart.setDrawGridBackground(false);
@@ -134,10 +163,10 @@ public class DsoActivity extends AppCompatActivity {
                     case MotionEvent.ACTION_MOVE:
                         float x = motionEvent.getRawX();
                         float y = motionEvent.getRawY();
-                        Entry entry = mChart.getEntryByTouchPoint(x, y);
-                        Log.d(TAG, "onTouch: " + x + ", " + y);
-                        if (entry != null) {
-                            Log.d(TAG, "onTouch Entry: " + entry.toString());
+                        if (mIsXTracing) {
+                            drawVerticalLine(getXPositionByTouch(x));
+                        } else if (mIsYTracing) {
+                            drawHorizontalLine(getYPositionByTouch(y));
                         }
                         break;
 
@@ -176,14 +205,7 @@ public class DsoActivity extends AppCompatActivity {
         yAxis.setValueFormatter(new AxisValueFormatter() {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                float scal = getYFormatScale();
-                float deviation = getYDeviation();
-                float deviationCorrector = getDeviationCorrector();
-                float f = ((value - CHART_MAX_Y / 2) / scal);
-                if (mYScaleStep > 0 && mYMoveStep != getYParts() / 2) {
-                    f = f - (deviation * (deviationCorrector - 1));
-                }
-                return String.format(Locale.getDefault(), "%.2f", f);
+                return getYLabelFormatted(value);
             }
 
             @Override
@@ -198,19 +220,7 @@ public class DsoActivity extends AppCompatActivity {
         xAxis.setValueFormatter(new AxisValueFormatter() {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                float scal = getXFormatScale();
-                float f;
-                if (mXScaleStep > 0) {
-                    float scaleX = getXScale();
-                    float slideX = getSlideX();
-                    float maxX = CHART_MAX_X / scaleX + (slideX / scaleX);
-                    float minX = mXMoveStep > 0 ? (maxX - (CHART_MAX_X / scaleX)) : 0f;
-                    f = value / (scal / (scal * maxX));
-                    if (mXMoveStep > 0 && f == 0.0) f = minX * CHART_MAX_X;
-                } else {
-                    f = value / scal;
-                }
-                return String.format(Locale.getDefault(), "%.2f", f);
+                return getXLabelFormatted(value);
             }
 
             @Override
@@ -371,8 +381,89 @@ public class DsoActivity extends AppCompatActivity {
             case R.id.moveBottom:
                 moveY(-1);
                 break;
+            case R.id.traceX:
+                traceX();
+                break;
+            case R.id.traceY:
+                traceY();
+                break;
         }
     };
+
+    private void traceY() {
+        mIsYTracing = !mIsYTracing;
+        mIsXTracing = false;
+        mChart.getXAxis().removeAllLimitLines();
+        if (mIsYTracing) {
+            drawHorizontalLine(500f);
+        } else {
+            refreshChart();
+        }
+    }
+
+    private void drawHorizontalLine(float position) {
+        mChart.getAxisLeft().removeAllLimitLines();
+        LimitLine yLimit = new LimitLine(position);
+        yLimit.setLineColor(getResources().getColor(R.color.colorRed));
+        yLimit.setLabel(getYLabelFormatted(position));
+        yLimit.setTextSize(20f);
+        if (position > CHART_MAX_Y / 2) yLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
+        else yLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
+        yLimit.setTextColor(getResources().getColor(R.color.colorBlue));
+        mChart.getAxisLeft().addLimitLine(yLimit);
+        mChart.invalidate();
+    }
+
+    private String getYLabelFormatted(float value) {
+        float scal = getYFormatScale();
+        float deviation = getYDeviation();
+        float deviationCorrector = getDeviationCorrector();
+        float f = ((value - CHART_MAX_Y / 2) / scal);
+        if (mYScaleStep > 0 && mYMoveStep != getYParts() / 2) {
+            f = f - (deviation * (deviationCorrector - 1));
+        }
+        return String.format(Locale.getDefault(), "%.2f", f);
+    }
+
+    private void drawVerticalLine(float position) {
+        mChart.getXAxis().removeAllLimitLines();
+        LimitLine xLimit = new LimitLine(position);
+        xLimit.setLineColor(getResources().getColor(R.color.colorRed));
+        xLimit.setLabel(getXLabelFormatted(position));
+        xLimit.setTextSize(20f);
+        if (position > CHART_MAX_X / 2) xLimit.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
+        else xLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
+        xLimit.setTextColor(getResources().getColor(R.color.colorGreen));
+        mChart.getXAxis().addLimitLine(xLimit);
+        mChart.invalidate();
+    }
+
+    private String getXLabelFormatted(float value) {
+        float scal = getXFormatScale();
+        float f;
+        if (mXScaleStep > 0) {
+            float scaleX = getXScale();
+            float slideX = getSlideX();
+            float maxX = CHART_MAX_X / scaleX + (slideX / scaleX);
+            float minX = mXMoveStep > 0 ? (maxX - (CHART_MAX_X / scaleX)) : 0f;
+            f = value / (scal / (scal * maxX));
+            if (mXMoveStep > 0 && f == 0.0) f = minX * CHART_MAX_X;
+        } else {
+            f = value / scal;
+        }
+        return String.format(Locale.getDefault(), "%.2f", f);
+    }
+
+    private void traceX() {
+        mIsXTracing = !mIsXTracing;
+        mIsYTracing = false;
+        mChart.getAxisLeft().removeAllLimitLines();
+        if (mIsXTracing) {
+            drawVerticalLine(500f);
+        } else {
+            mChart.getXAxis().removeAllLimitLines();
+        }
+    }
 
     private void moveY(int i) {
         if (mYScaleStep == 0) return;
@@ -469,8 +560,14 @@ public class DsoActivity extends AppCompatActivity {
             float deviationCorrector = getDeviationCorrector();
             float maxY = baseY + ((yMoveMiddle - mYMoveStep) * baseY);
             float minY = mYMoveStep != yMoveMiddle ? (maxY - baseY * 2) : -deviationY;
+            if (mYScaleStep == 0) {
+                maxY = 16.0f;
+                minY = -16.0f;
+            }
             IScatterDataSet dataSet = scatterData.getDataSetByIndex(0);
             dataSet.clear();
+            Log.d(TAG, "reloadData: minX " + minX + ", maxX " + maxX);
+            Log.d(TAG, "reloadData: minY " + minY + ", maxY " + maxY);
             for (int i = 0; i < xList.size(); i++) {
                 float x = xList.get(i);
                 float y = yList.get(i);
