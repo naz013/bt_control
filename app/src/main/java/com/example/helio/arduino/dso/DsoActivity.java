@@ -13,6 +13,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -61,7 +62,7 @@ public class DsoActivity extends AppCompatActivity {
     private static final float RANGE_DIVIDER = 2f;
     private static final String TAG = "DsoActivity";
 
-    private boolean mCapturing = false;
+    private boolean mXReceived = false;
     private float mXScallar = 1f;
     private int mXScaleStep = 0;
     private int mYScaleStep = 0;
@@ -180,7 +181,7 @@ public class DsoActivity extends AppCompatActivity {
                 float deviationCorrector = getDeviationCorrector();
                 float f = ((value - CHART_MAX_Y / 2) / scal);
                 if (mYScaleStep > 0 && mYMoveStep != getYParts() / 2) {
-                    f = f - (deviation * deviationCorrector);
+                    f = f - (deviation * (deviationCorrector - 1));
                 }
                 return String.format(Locale.getDefault(), "%.2f", f);
             }
@@ -305,13 +306,27 @@ public class DsoActivity extends AppCompatActivity {
 
     private void readDso(Message msg) {
         String data = (String) msg.obj;
-        if (data.contains(Constants.rX) && data.contains(Constants.rY)) {
+        if (data.startsWith(Constants.rX)) {
             String[] parts = data.split(Constants.DIV);
-            String xVal = parts[0].replace(Constants.rX, "");
-            float x = Float.parseFloat(xVal.trim());
-            String yVal = parts[1].replace(Constants.rY, "");
-            float y = Float.parseFloat(yVal.trim());
-            if (mCapturing) addNewEntry(x, y);
+            mXVals.clear();
+            for (String xVal : parts) {
+                if (TextUtils.isEmpty(xVal)) continue;
+                float y = Float.parseFloat(xVal.trim());
+                mXVals.add(y);
+            }
+            mXReceived = true;
+        } else if (data.startsWith(Constants.rY)) {
+            String[] parts = data.split(Constants.DIV);
+            mYVals.clear();
+            for (String yVal : parts) {
+                if (TextUtils.isEmpty(yVal)) continue;
+                float y = Float.parseFloat(yVal.trim());
+                mYVals.add(y);
+            }
+            if (mXReceived) {
+                mXReceived = false;
+                reloadData(mYVals, mXVals);
+            }
         }
     }
 
@@ -376,7 +391,6 @@ public class DsoActivity extends AppCompatActivity {
         if (mXScaleStep == 0) return;
         if (i < 0 && mXMoveStep == 0) return;
         int mXParts = (int) ((int) X_SCALE_BASE / getXPartSize());
-        Log.d(TAG, "moveX: parts " + mXParts);
         if (i > 0 && mXMoveStep == (mXParts - 2)) return;
         mXMoveStep += i;
         moveLeft.setEnabled(false);
@@ -391,13 +405,8 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private void scaleY(int i) {
-        Log.d(TAG, "scaleY: " + i);
-        if (i < 0 && mYScaleStep == 0) {
-            return;
-        }
-        if (i > 0 && mYScaleStep == 4) {
-            return;
-        }
+        if (i < 0 && mYScaleStep == 0) return;
+        if (i > 0 && mYScaleStep == 4) return;
         mYScaleStep += i;
         Log.d(TAG, "scaleY: y step " + mYScaleStep);
         int mYParts = getYParts();
@@ -415,23 +424,12 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private void scaleX(int i) {
-        Log.d(TAG, "scaleX: " + i);
-        if (i < 0 && mXScaleStep == 0) {
-            return;
-        }
-        if (i > 0 && mXScaleStep == 6) {
-            return;
-        }
-        if (i > 0) {
-            mXScallar *= 10;
-        }
-        if (i < 0) {
-            mXScallar /= 10;
-        }
+        if (i < 0 && mXScaleStep == 0) return;
+        if (i > 0 && mXScaleStep == 6) return;
+        if (i > 0) mXScallar *= 10;
+        if (i < 0) mXScallar /= 10;
         mXMoveStep = 0;
         mXScaleStep += i;
-        Log.d(TAG, "scaleX: scalar " + mXScallar);
-        Log.d(TAG, "scaleX: step " + mXScaleStep);
         zoomInX.setEnabled(false);
         zoomOutX.setEnabled(false);
         reloadData(mYVals, mXVals);
@@ -493,9 +491,7 @@ public class DsoActivity extends AppCompatActivity {
 
     private float getYDeviation() {
         if (mYScaleStep == 0) return 16f;
-        else {
-            return 16f / (float) Math.pow(4, mYScaleStep);
-        }
+        else return 16f / (float) Math.pow(4, mYScaleStep);
     }
 
     private float getXScale() {
@@ -508,9 +504,7 @@ public class DsoActivity extends AppCompatActivity {
 
     private float getYScale() {
         float incr = 1f;
-        if (mYScaleStep > 0) {
-            incr = (float) Math.pow(4, mYScaleStep);
-        }
+        if (mYScaleStep > 0) incr = (float) Math.pow(4, mYScaleStep);
         return Y_SCALE_BASE * incr;
     }
 
@@ -527,7 +521,6 @@ public class DsoActivity extends AppCompatActivity {
 
     private void stopCapturing() {
         sendMessage(Constants.S);
-        mCapturing = false;
         mCaptureButton.setEnabled(true);
         mStopButton.setEnabled(false);
     }
@@ -540,7 +533,6 @@ public class DsoActivity extends AppCompatActivity {
 
     private void capture() {
         sendMessage(Constants.C);
-        mCapturing = true;
         mCaptureButton.setEnabled(false);
         mStopButton.setEnabled(true);
     }
