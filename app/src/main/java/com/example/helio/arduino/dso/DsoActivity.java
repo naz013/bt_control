@@ -199,7 +199,7 @@ public class DsoActivity extends AppCompatActivity {
         YAxis yAxis = mChart.getAxisLeft();
         yAxis.removeAllLimitLines();
         yAxis.setAxisMaxValue(CHART_MAX_Y);
-        yAxis.setLabelCount(11, true);
+        yAxis.setLabelCount(10, true);
         yAxis.setDrawZeroLine(false);
         yAxis.setValueFormatter(new AxisValueFormatter() {
             @Override
@@ -477,17 +477,7 @@ public class DsoActivity extends AppCompatActivity {
 
     private String getXLabelFormatted(float value) {
         float scalar = getXFormatScale();
-        float f;
-        if (mXScaleStep > 0 && mXScaleStep < 4) {
-            float scaleX = getXScale();
-            float slideX = getSlideX();
-            float maxX = CHART_MAX_X / scaleX + (slideX / scaleX);
-            float minX = mXMoveStep > 0 ? (maxX - (CHART_MAX_X / scaleX)) : 0f;
-            f = value / (scalar / (scalar * maxX));
-            if (mXMoveStep > 0 && f == 0.0) f = minX * CHART_MAX_X;
-        } else {
-            f = value / scalar;
-        }
+        float f = (value + getSlideX()) / scalar;
         return String.format(Locale.getDefault(), "%.2f", f);
     }
 
