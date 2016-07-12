@@ -90,12 +90,14 @@ public class LineChartRenderer extends LineRadarRenderer {
         LineData lineData = mChart.getLineData();
 
         ILineDataSet set;
-        int setCount = lineData.getDataSets().size();
-        for (int i = 0; i < setCount; i++) {
-            set = lineData.getDataSets().get(i);
+        if (lineData != null) {
+            int setCount = lineData.getDataSets().size();
+            for (int i = 0; i < setCount; i++) {
+                set = lineData.getDataSets().get(i);
 
-            if (set.isVisible() && set.getEntryCount() > 0)
-                drawDataSet(c, set);
+                if (set.isVisible() && set.getEntryCount() > 0)
+                    drawDataSet(c, set);
+            }
         }
 
         c.drawBitmap(mDrawBitmap.get(), 0, 0, mRenderPaint);

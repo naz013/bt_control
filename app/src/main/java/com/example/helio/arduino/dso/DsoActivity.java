@@ -39,9 +39,12 @@ import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
 import com.github.mikephil.charting.formatter.AxisValueFormatter;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.github.mikephil.charting.utils.MPPointD;
 
@@ -190,7 +193,16 @@ public class DsoActivity extends AppCompatActivity {
         dataSet.setScatterShapeSize(CHART_POINT_SIZE);
         ScatterData scatterData = new ScatterData(dataSet);
         scatterData.setDrawValues(false);
+        LineDataSet lineDataSet = new LineDataSet(entries, getString(R.string.arduino_vhart));
+        lineDataSet.setColor(Color.BLACK);
+        lineDataSet.setCircleColor(Color.BLACK);
+        lineDataSet.setCircleRadius(1f);
+        lineDataSet.setLineWidth(1f);
+        lineDataSet.setMode(LineDataSet.Mode.LINEAR);
+        LineData lineData = new LineData(lineDataSet);
+        lineData.setDrawValues(false);
         mChart.setData(scatterData);
+        mChart.setLineData(lineData);
         mChart.getLegend().setEnabled(false);
         mChart.invalidate();
         refreshChart();
@@ -577,6 +589,7 @@ public class DsoActivity extends AppCompatActivity {
             List<Float> xList = new ArrayList<>(mXValues);
             List<Float> yList = new ArrayList<>(mYValues);
             mChart.getScatterData().clearValues();
+            mChart.getLineData().clearValues();
             mChart.invalidate();
             ScatterData scatterData = mChart.getScatterData();
             if (scatterData != null) {
@@ -593,6 +606,21 @@ public class DsoActivity extends AppCompatActivity {
                 }
             }
             if (scatterData == null) return;
+            LineData lineData = mChart.getLineData();
+            if (lineData != null) {
+                ILineDataSet lineDataSet;
+                try {
+                    lineDataSet = lineData.getDataSetByIndex(0);
+                    if (lineDataSet == null) {
+                        lineDataSet = createLineSet();
+                        lineData.addDataSet(lineDataSet);
+                    }
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    lineDataSet = createLineSet();
+                    lineData.addDataSet(lineDataSet);
+                }
+            }
+            if (lineData == null) return;
             float scaleX = getXScale();
             float scaleY = getYScale();
             float slideX = getSlideX();
@@ -610,6 +638,8 @@ public class DsoActivity extends AppCompatActivity {
             }
             IScatterDataSet dataSet = scatterData.getDataSetByIndex(0);
             dataSet.clear();
+            ILineDataSet lineDataSet = lineData.getDataSetByIndex(0);
+            lineDataSet.clear();
             Log.d(TAG, "reloadData: minX " + minX + ", maxX " + maxX);
             Log.d(TAG, "reloadData: minY " + minY + ", maxY " + maxY);
             for (int i = 0; i < xList.size(); i++) {
@@ -618,10 +648,15 @@ public class DsoActivity extends AppCompatActivity {
                 if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
                     int xSc = (int) (x * scaleX - slideX);
                     int ySc = (int) ((y + (deviationY * deviationCorrector)) * scaleY);
-                    dataSet.addEntry(new Entry(xSc, ySc));
+                    Entry entry = new Entry(xSc, ySc);
+                    dataSet.addEntry(entry);
+                    lineDataSet.addEntry(entry);
                 }
             }
             dataSet.addEntry(new Entry(-0f, 0f));
+            lineDataSet.addEntry(new Entry(-0f, 0f));
+            scatterData.notifyDataChanged();
+            lineData.notifyDataChanged();
             mChart.notifyDataSetChanged();
             reloadTraceLines();
         }
@@ -730,6 +765,16 @@ public class DsoActivity extends AppCompatActivity {
         return dataSet;
     }
 
+    private LineDataSet createLineSet() {
+        LineDataSet lineDataSet = new LineDataSet(null, getString(R.string.arduino_vhart));
+        lineDataSet.setColor(Color.BLACK);
+        lineDataSet.setCircleColor(Color.BLACK);
+        lineDataSet.setCircleRadius(1f);
+        lineDataSet.setLineWidth(1f);
+        lineDataSet.setMode(LineDataSet.Mode.LINEAR);
+        return lineDataSet;
+    }
+
     private void sendCancelMessage() {
         String msg = Constants.S;
         EventBus.getDefault().post(new ControlEvent(msg));
@@ -786,6 +831,21 @@ public class DsoActivity extends AppCompatActivity {
             }
         }
         if (scatterData == null) return;
+        LineData lineData = mChart.getLineData();
+        if (lineData != null) {
+            ILineDataSet lineDataSet;
+            try {
+                lineDataSet = lineData.getDataSetByIndex(0);
+                if (lineDataSet == null) {
+                    lineDataSet = createLineSet();
+                    lineData.addDataSet(lineDataSet);
+                }
+            } catch (ArrayIndexOutOfBoundsException e) {
+                lineDataSet = createLineSet();
+                lineData.addDataSet(lineDataSet);
+            }
+        }
+        if (lineData == null) return;
         mChart.notifyDataSetChanged();
         mChart.invalidate();
         float scaleX = getXScale();
@@ -793,17 +853,23 @@ public class DsoActivity extends AppCompatActivity {
         float deviationY = getYDeviation();
         IScatterDataSet dataSet = scatterData.getDataSetByIndex(0);
         dataSet.clear();
+        ILineDataSet lineDataSet = lineData.getDataSetByIndex(0);
+        lineDataSet.clear();
         for (int i = 0; i < 10000; i++) {
-            float x = rand.nextFloat() * (1f - 0f) + 0f;
+            float x = (float) i / 10000.0f;
             float y = rand.nextFloat() * (16f - (-16f)) + (-16f);
             float xSc = x * scaleX;
             float ySc = (y + deviationY) * scaleY;
-            dataSet.addEntry(new Entry(xSc, ySc));
+            Entry entry = new Entry(xSc, ySc);
+            dataSet.addEntry(entry);
+            lineDataSet.addEntry(entry);
             mYVals.add(y);
             mXVals.add(x);
         }
         dataSet.addEntry(new Entry(-0f, 0f));
-        scatterData.addDataSet(dataSet);
+        lineDataSet.addEntry(new Entry(-0f, 0f));
+        mChart.getLineData().notifyDataChanged();
+        mChart.getScatterData().notifyDataChanged();
         mChart.notifyDataSetChanged();
     }
 

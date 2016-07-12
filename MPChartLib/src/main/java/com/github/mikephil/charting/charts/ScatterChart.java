@@ -2,10 +2,14 @@
 package com.github.mikephil.charting.charts;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
 
+import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.ScatterData;
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.dataprovider.ScatterDataProvider;
+import com.github.mikephil.charting.renderer.LineChartRenderer;
 import com.github.mikephil.charting.renderer.ScatterChartRenderer;
 
 /**
@@ -15,7 +19,10 @@ import com.github.mikephil.charting.renderer.ScatterChartRenderer;
  *
  * @author Philipp Jahoda
  */
-public class ScatterChart extends BarLineChartBase<ScatterData> implements ScatterDataProvider {
+public class ScatterChart extends BarLineChartBase<ScatterData> implements ScatterDataProvider, LineDataProvider {
+
+    private LineData mLineData;
+    private LineChartRenderer mLineRenderer;
 
     public ScatterChart(Context context) {
         super(context);
@@ -33,8 +40,25 @@ public class ScatterChart extends BarLineChartBase<ScatterData> implements Scatt
     @Override
     protected void init() {
         super.init();
-
         mRenderer = new ScatterChartRenderer(this, mAnimator, mViewPortHandler);
+        mLineRenderer = new LineChartRenderer(this, mAnimator, mViewPortHandler);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        if (mLineRenderer != null) {
+            mLineRenderer.drawData(canvas);
+        }
+    }
+
+    public void setLineData(LineData lineData) {
+        this.mLineData = lineData;
+    }
+
+    @Override
+    public LineData getLineData() {
+        return mLineData;
     }
 
     @Override
