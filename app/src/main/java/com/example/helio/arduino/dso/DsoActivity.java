@@ -65,7 +65,7 @@ public class DsoActivity extends AppCompatActivity {
     private static final float CHART_MAX_X = 1000f;
     private static final float X_SCALE_BASE = 1000f;
     private static final float Y_SCALE_BASE = 31.25f;
-    private static final float CHART_POINT_SIZE = 2f;
+    private static final float CHART_POINT_SIZE = 0.5f;
     private static final float RANGE_DIVIDER = 2f;
     private static final String TAG = "DsoActivity";
 
@@ -196,8 +196,8 @@ public class DsoActivity extends AppCompatActivity {
         LineDataSet lineDataSet = new LineDataSet(entries, getString(R.string.arduino_vhart));
         lineDataSet.setColor(Color.BLACK);
         lineDataSet.setCircleColor(Color.BLACK);
-        lineDataSet.setCircleRadius(1f);
-        lineDataSet.setLineWidth(1f);
+        lineDataSet.setCircleRadius(0.5f);
+        lineDataSet.setLineWidth(0.1f);
         lineDataSet.setMode(LineDataSet.Mode.LINEAR);
         LineData lineData = new LineData(lineDataSet);
         lineData.setDrawValues(false);
@@ -772,8 +772,8 @@ public class DsoActivity extends AppCompatActivity {
         LineDataSet lineDataSet = new LineDataSet(null, getString(R.string.arduino_vhart));
         lineDataSet.setColor(Color.BLACK);
         lineDataSet.setCircleColor(Color.BLACK);
-        lineDataSet.setCircleRadius(1f);
-        lineDataSet.setLineWidth(1f);
+        lineDataSet.setCircleRadius(0.5f);
+        lineDataSet.setLineWidth(0.1f);
         lineDataSet.setMode(LineDataSet.Mode.LINEAR);
         return lineDataSet;
     }
