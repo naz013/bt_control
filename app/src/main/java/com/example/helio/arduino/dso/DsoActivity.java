@@ -214,6 +214,7 @@ public class DsoActivity extends AppCompatActivity {
         yAxis.setAxisMaxValue(CHART_MAX_Y);
         yAxis.setLabelCount(10, true);
         yAxis.setDrawZeroLine(false);
+        yAxis.setDrawLimitLinesBehindData(false);
         yAxis.setValueFormatter(new AxisValueFormatter() {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
@@ -228,6 +229,7 @@ public class DsoActivity extends AppCompatActivity {
         mChart.getAxisRight().setEnabled(false);
         XAxis xAxis = mChart.getXAxis();
         xAxis.setDrawGridLines(false);
+        xAxis.setDrawLimitLinesBehindData(false);
         xAxis.setAxisMaxValue(CHART_MAX_X);
         xAxis.setValueFormatter(new AxisValueFormatter() {
             @Override
@@ -461,6 +463,7 @@ public class DsoActivity extends AppCompatActivity {
         if (position > CHART_MAX_Y / 2) yLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
         else yLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
         yLimit.setTextColor(getResources().getColor(R.color.colorBlue));
+        mChart.getAxisLeft().setDrawLimitLinesBehindData(false);
         mChart.getAxisLeft().addLimitLine(yLimit);
         mChart.invalidate();
     }
@@ -486,6 +489,7 @@ public class DsoActivity extends AppCompatActivity {
         else xLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
         xLimit.setTextColor(getResources().getColor(R.color.colorGreen));
         mChart.getXAxis().addLimitLine(xLimit);
+        mChart.getXAxis().setDrawLimitLinesBehindData(false);
         mChart.invalidate();
     }
 
@@ -653,8 +657,6 @@ public class DsoActivity extends AppCompatActivity {
                     lineDataSet.addEntry(entry);
                 }
             }
-            dataSet.addEntry(new Entry(-0f, 0f));
-            lineDataSet.addEntry(new Entry(-0f, 0f));
             scatterData.notifyDataChanged();
             lineData.notifyDataChanged();
             mChart.notifyDataSetChanged();
@@ -687,6 +689,7 @@ public class DsoActivity extends AppCompatActivity {
 
     private void clearGraph() {
         mChart.getScatterData().clearValues();
+        mChart.getLineData().clearValues();
         mChart.invalidate();
         mXVals.clear();
         mYVals.clear();
@@ -866,8 +869,6 @@ public class DsoActivity extends AppCompatActivity {
             mYVals.add(y);
             mXVals.add(x);
         }
-        dataSet.addEntry(new Entry(-0f, 0f));
-        lineDataSet.addEntry(new Entry(-0f, 0f));
         mChart.getLineData().notifyDataChanged();
         mChart.getScatterData().notifyDataChanged();
         mChart.notifyDataSetChanged();
