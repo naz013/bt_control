@@ -139,8 +139,9 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private float getXPositionByTouch(float x) {
-        int width = mScreenSize.x;
-        return CHART_MAX_X * (x / (float) width);
+        MPPointD pointLeft = mChart.getPixelsForValues(0, 0, YAxis.AxisDependency.LEFT);
+        MPPointD pointRight = mChart.getPixelsForValues(1000, 0, YAxis.AxisDependency.LEFT);
+        return (CHART_MAX_X * (x / (float) (pointRight.x - pointLeft.x))) - 100f;
     }
 
     private float getYPositionByTouch(float y) {
@@ -434,7 +435,8 @@ public class DsoActivity extends AppCompatActivity {
         if (mIsYTracing) {
             drawHorizontalLine(500f);
         } else {
-            refreshChart();
+            mChart.getAxisLeft().removeAllLimitLines();
+            mChart.invalidate();
         }
     }
 
@@ -489,6 +491,7 @@ public class DsoActivity extends AppCompatActivity {
             drawVerticalLine(500f);
         } else {
             mChart.getXAxis().removeAllLimitLines();
+            mChart.invalidate();
         }
     }
 
