@@ -183,7 +183,7 @@ public class DsoActivity extends AppCompatActivity {
             return true;
         });
         mChart.setNoDataText(getString(R.string.no_data_available));
-        mChart.setAutoScaleMinMaxEnabled(true);
+        mChart.setAutoScaleMinMaxEnabled(false);
         mChart.setDescription(getString(R.string.arduino_chart));
         ArrayList<Entry> entries = new ArrayList<>();
         ScatterDataSet dataSet = new ScatterDataSet(entries, getString(R.string.arduino_vhart));
@@ -858,8 +858,8 @@ public class DsoActivity extends AppCompatActivity {
         dataSet.clear();
         ILineDataSet lineDataSet = lineData.getDataSetByIndex(0);
         lineDataSet.clear();
-        for (int i = 0; i < 10000; i++) {
-            float x = (float) i / 10000.0f;
+        for (int i = 0; i < 1000; i++) {
+            float x = (float) i / 1000.0f;
             float y = rand.nextFloat() * (16f - (-16f)) + (-16f);
             float xSc = x * scaleX;
             float ySc = (y + deviationY) * scaleY;
