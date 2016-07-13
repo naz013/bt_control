@@ -68,6 +68,7 @@ public class DsoActivity extends AppCompatActivity {
     private static final float CHART_POINT_SIZE = 0.5f;
     private static final float RANGE_DIVIDER = 2f;
     private static final float NUM_OF_SETS = 5;
+    private static final float NUM_OF_POINTS = 1000;
     private static final String TAG = "DsoActivity";
 
     private boolean xProcessing;
@@ -837,8 +838,8 @@ public class DsoActivity extends AppCompatActivity {
         dataSet.clear();
         ILineDataSet lineDataSet = lineData.getDataSetByIndex(0);
         lineDataSet.clear();
-        for (int i = 0; i < 5000; i++) {
-            float x = (float) i / 5000.0f;
+        for (int i = 0; i < NUM_OF_POINTS; i++) {
+            float x = (float) i / NUM_OF_POINTS;
             float y = rand.nextFloat() * (16f - (-16f)) + (-16f);
             float xSc = x * scaleX;
             float ySc = (y + deviationY) * scaleY;
