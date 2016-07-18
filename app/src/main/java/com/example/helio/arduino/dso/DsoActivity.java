@@ -146,7 +146,7 @@ public class DsoActivity extends AppCompatActivity {
 
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
-        //mBlockView.setVisibility(View.VISIBLE);
+        mBlockView.setVisibility(View.VISIBLE);
         mBlockView.setOnTouchListener((v, event) -> true);
     }
 
@@ -162,7 +162,6 @@ public class DsoActivity extends AppCompatActivity {
 
     private float getYPositionByTouch(float x, float y) {
         MPPointD pointD = mChart.getValuesByTouchPoint(x, y, YAxis.AxisDependency.LEFT);
-        Log.d(TAG, "getYPositionByTouch: point " + pointD.y);
         return (float) pointD.y + 500f;
     }
 
@@ -625,9 +624,9 @@ public class DsoActivity extends AppCompatActivity {
                 dataSet.addEntry(entry);
                 lineDataSet.addEntry(entry);
             }
-            scatterData.notifyDataChanged();
-            lineData.notifyDataChanged();
         }
+        mChart.getData().notifyDataChanged();
+        mChart.getLineData().notifyDataChanged();
         mChart.notifyDataSetChanged();
         mChart.invalidate();
         reloadTraceLines();
