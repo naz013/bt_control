@@ -54,7 +54,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 
 import de.greenrobot.event.EventBus;
 
@@ -818,7 +817,6 @@ public class DsoActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         clearGraph();
-        Random rand = new Random();
         ScatterData scatterData = mChart.getScatterData();
         if (scatterData != null) {
             initSet(scatterData, 0);
@@ -838,17 +836,13 @@ public class DsoActivity extends AppCompatActivity {
         dataSet.clear();
         ILineDataSet lineDataSet = lineData.getDataSetByIndex(0);
         lineDataSet.clear();
-        for (int i = 0; i < NUM_OF_POINTS; i++) {
-            float x = (float) i / NUM_OF_POINTS;
-            float y = rand.nextFloat() * (16f - (-16f)) + (-16f);
-            float xSc = x * scaleX;
-            float ySc = (y + deviationY) * scaleY;
-            Entry entry = new Entry(xSc, ySc);
-            dataSet.addEntry(entry);
-            lineDataSet.addEntry(entry);
-            mYVals.add(y);
-            mXVals.add(x);
-        }
+        float x = 0f;
+        float y = 0f;
+        float xSc = x * scaleX;
+        float ySc = (y + deviationY) * scaleY;
+        Entry entry = new Entry(xSc, ySc);
+        dataSet.addEntry(entry);
+        lineDataSet.addEntry(entry);
         mChart.getLineData().notifyDataChanged();
         mChart.getScatterData().notifyDataChanged();
         mChart.notifyDataSetChanged();
