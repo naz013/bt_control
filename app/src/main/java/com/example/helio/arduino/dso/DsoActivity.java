@@ -149,12 +149,8 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private float getYPositionByTouch(float y) {
-        MPPointD pointHigh = mChart.getPixelsForValues(0, 0, YAxis.AxisDependency.LEFT);
-        MPPointD pointLow = mChart.getPixelsForValues(0, 1000, YAxis.AxisDependency.LEFT);
         int height = mScreenSize.y;
-        y = height - y - (height - ((float) pointHigh.y - (float) pointLow.y));
-        float tmp = (float) ((y - pointLow.y) / (pointHigh.y - pointLow.y));
-        return CHART_MAX_Y * tmp + (mChart.getHeight());
+        return (height - y);
     }
 
     private void initChart() {
