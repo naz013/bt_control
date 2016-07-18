@@ -67,7 +67,6 @@ public class DsoActivity extends AppCompatActivity {
     private static final float CHART_POINT_SIZE = 0.5f;
     private static final float RANGE_DIVIDER = 2f;
     private static final float NUM_OF_SETS = 5;
-    private static final float NUM_OF_POINTS = 1000;
     private static final String TAG = "DsoActivity";
 
     private boolean mIsYTracing = false;
@@ -76,7 +75,7 @@ public class DsoActivity extends AppCompatActivity {
     private int mXScaleStep = 0;
     private int mYScaleStep = 0;
     private int mXMoveStep = 0;
-    private int mYMoveStep = 4;
+    private int mYMoveStep = getYParts() / 2;
     private List<Float> mYVals = new ArrayList<>();
     private List<Float> mXVals = new ArrayList<>();
 
@@ -133,21 +132,11 @@ public class DsoActivity extends AppCompatActivity {
             initSet(lineData, 0);
         }
         if (lineData == null) return;
-        mChart.notifyDataSetChanged();
-        mChart.invalidate();
-        float scaleX = getXScale();
-        float scaleY = getYScale();
-        float deviationY = getYDeviation();
-        float deviationCorrector = getDeviationCorrector();
         IScatterDataSet dataSet = scatterData.getDataSetByIndex(0);
         dataSet.clear();
         ILineDataSet lineDataSet = lineData.getDataSetByIndex(0);
         lineDataSet.clear();
-        float x = 0f;
-        float y = 0f;
-        float xSc = x * scaleX;
-        float ySc = (y + deviationY) * scaleY;
-        Entry entry = new Entry(xSc, ySc);
+        Entry entry = new Entry(0f, 0f);
         dataSet.addEntry(entry);
         lineDataSet.addEntry(entry);
         mChart.getLineData().notifyDataChanged();
@@ -397,30 +386,6 @@ public class DsoActivity extends AppCompatActivity {
                 reloadData(mYVals, mXVals);
             }
         }
-//        Log.d(TAG, "readDso: " + data);
-//        if (data.matches(Constants.OPEN_X)) {
-//            mXVals.clear();
-//            xProcessing = true;
-//        } else if (data.matches(Constants.CLOSE_X)) {
-//            xProcessing = false;
-//        } else if (data.matches(Constants.OPEN_Y)) {
-//            mYVals.clear();
-//            yProcessing = true;
-//        } else if (data.matches(Constants.CLOSE_Y)) {
-//            yProcessing = false;
-//        }
-//        if (xProcessing) {
-//            if (TextUtils.isEmpty(data.trim())) return;
-//            float x = Float.parseFloat(data.trim());
-//            mXVals.add(x);
-//        } else if (yProcessing) {
-//            if (TextUtils.isEmpty(data.trim())) return;
-//            float x = Float.parseFloat(data.trim());
-//            mXVals.add(x);
-//        }
-//        if (!xProcessing && !yProcessing) {
-//            reloadData(mYVals, mXVals);
-//        }
     }
 
     private View.OnClickListener mListener = v -> {
@@ -625,7 +590,6 @@ public class DsoActivity extends AppCompatActivity {
             List<Float> yList = new ArrayList<>(mYValues);
             mChart.getScatterData().clearValues();
             mChart.getLineData().clearValues();
-            mChart.invalidate();
             ScatterData scatterData = mChart.getScatterData();
             if (scatterData != null) {
                 initSet(scatterData, 0);
@@ -657,44 +621,28 @@ public class DsoActivity extends AppCompatActivity {
             lineDataSet.clear();
             Log.d(TAG, "reloadData: minX " + minX + ", maxX " + maxX);
             Log.d(TAG, "reloadData: minY " + minY + ", maxY " + maxY);
-            boolean isPrev = false;
-            int lastIndex = 0;
             for (int i = 0; i < xList.size(); i++) {
                 float x = xList.get(i);
                 float y = yList.get(i);
                 if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
-                    if (!isPrev && (mYScaleStep > 0 || mYScaleStep > 0) && i > 0) {
-                        int xSc = (int) (xList.get(i - 1) * scaleX - slideX);
-                        int ySc = (int) ((yList.get(i - 1) + (deviationY * deviationCorrector)) * scaleY);
-                        Entry entry = new Entry(xSc, ySc);
-                        dataSet.addEntry(entry);
-                        lineDataSet.addEntry(entry);
-                        isPrev = true;
-                    }
                     int xSc = (int) (x * scaleX - slideX);
                     int ySc = (int) ((y + (deviationY * deviationCorrector)) * scaleY);
                     Entry entry = new Entry(xSc, ySc);
                     dataSet.addEntry(entry);
                     lineDataSet.addEntry(entry);
-                    lastIndex = i;
                 }
             }
-            if (lastIndex < xList.size() - 1 && (mXScaleStep > 0 || mYScaleStep > 0)) {
-                int xSc = (int) (xList.get(lastIndex + 1) * scaleX - slideX);
-                int ySc = (int) ((yList.get(lastIndex + 1) + (deviationY * deviationCorrector)) * scaleY);
-                Entry entry = new Entry(xSc, ySc);
+            if (dataSet.getEntryCount() == 0) {
+                Entry entry = new Entry(0f, 0f);
                 dataSet.addEntry(entry);
                 lineDataSet.addEntry(entry);
             }
             scatterData.notifyDataChanged();
             lineData.notifyDataChanged();
-            mChart.notifyDataSetChanged();
-            reloadTraceLines();
-        } else {
-            mChart.notifyDataSetChanged();
-            mChart.invalidate();
-            reloadTraceLines();
         }
+        mChart.notifyDataSetChanged();
+        mChart.invalidate();
+        reloadTraceLines();
     }
 
     private float getDeviationCorrector() {
