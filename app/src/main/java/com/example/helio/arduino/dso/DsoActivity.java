@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,7 +15,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -79,8 +77,6 @@ public class DsoActivity extends AppCompatActivity {
     private List<Float> mYVals = new ArrayList<>();
     private List<Float> mXVals = new ArrayList<>();
 
-    private Point mScreenSize;
-
     private ScatterChart mChart;
     private TextView mBlockView;
     private FloatingActionButton zoomInX, zoomOutX;
@@ -111,7 +107,6 @@ public class DsoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         activity = this;
         setContentView(R.layout.activity_dso);
-        setScreenSize();
         initBtAdapter();
         initActionBar();
         initButtons();
@@ -145,12 +140,6 @@ public class DsoActivity extends AppCompatActivity {
         mChart.invalidate();
     }
 
-    private void setScreenSize() {
-        Display display = getWindowManager().getDefaultDisplay();
-        mScreenSize = new Point();
-        display.getSize(mScreenSize);
-    }
-
     public static Activity getActivity() {
         return activity;
     }
@@ -171,9 +160,10 @@ public class DsoActivity extends AppCompatActivity {
         return (CHART_MAX_X * (x / (float) (pointRight.x - pointLeft.x))) - 100f;
     }
 
-    private float getYPositionByTouch(float y) {
-        int height = mScreenSize.y;
-        return (height - y);
+    private float getYPositionByTouch(float x, float y) {
+        MPPointD pointD = mChart.getValuesByTouchPoint(x, y, YAxis.AxisDependency.LEFT);
+        Log.d(TAG, "getYPositionByTouch: point " + pointD.y);
+        return (float) pointD.y + 500f;
     }
 
     private void initChart() {
@@ -190,13 +180,11 @@ public class DsoActivity extends AppCompatActivity {
                     if (mIsXTracing) {
                         drawVerticalLine(getXPositionByTouch(x));
                     } else if (mIsYTracing) {
-                        drawHorizontalLine(getYPositionByTouch(y));
+                        drawHorizontalLine(getYPositionByTouch(x, y));
                     }
                     break;
-
                 case MotionEvent.ACTION_UP:
                     break;
-
                 case MotionEvent.ACTION_DOWN:
                     break;
             }
