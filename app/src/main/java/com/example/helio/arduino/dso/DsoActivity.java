@@ -70,8 +70,6 @@ public class DsoActivity extends AppCompatActivity {
     private static final float NUM_OF_POINTS = 1000;
     private static final String TAG = "DsoActivity";
 
-    private boolean xProcessing;
-    private boolean yProcessing;
     private boolean mIsYTracing = false;
     private boolean mIsXTracing = false;
     private float mXScallar = 1f;
@@ -120,6 +118,42 @@ public class DsoActivity extends AppCompatActivity {
         initButtons();
         initChart();
         initBlockView();
+        setUpClearGraph();
+    }
+
+    private void setUpClearGraph() {
+        clearGraph();
+        ScatterData scatterData = mChart.getScatterData();
+        if (scatterData != null) {
+            initSet(scatterData, 0);
+        }
+        if (scatterData == null) return;
+        LineData lineData = mChart.getLineData();
+        if (lineData != null) {
+            initSet(lineData, 0);
+        }
+        if (lineData == null) return;
+        mChart.notifyDataSetChanged();
+        mChart.invalidate();
+        float scaleX = getXScale();
+        float scaleY = getYScale();
+        float deviationY = getYDeviation();
+        float deviationCorrector = getDeviationCorrector();
+        IScatterDataSet dataSet = scatterData.getDataSetByIndex(0);
+        dataSet.clear();
+        ILineDataSet lineDataSet = lineData.getDataSetByIndex(0);
+        lineDataSet.clear();
+        float x = 0f;
+        float y = 0f;
+        float xSc = x * scaleX;
+        float ySc = (y + deviationY) * scaleY;
+        Entry entry = new Entry(xSc, ySc);
+        dataSet.addEntry(entry);
+        lineDataSet.addEntry(entry);
+        mChart.getLineData().notifyDataChanged();
+        mChart.getScatterData().notifyDataChanged();
+        mChart.notifyDataSetChanged();
+        mChart.invalidate();
     }
 
     private void setScreenSize() {
@@ -401,7 +435,7 @@ public class DsoActivity extends AppCompatActivity {
                 stopCapturing();
                 break;
             case R.id.clearButton:
-                clearGraph();
+                setUpClearGraph();
                 break;
             case R.id.gallery_item:
                 showScreenshots();
@@ -656,6 +690,10 @@ public class DsoActivity extends AppCompatActivity {
             lineData.notifyDataChanged();
             mChart.notifyDataSetChanged();
             reloadTraceLines();
+        } else {
+            mChart.notifyDataSetChanged();
+            mChart.invalidate();
+            reloadTraceLines();
         }
     }
 
@@ -812,36 +850,6 @@ public class DsoActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        clearGraph();
-        ScatterData scatterData = mChart.getScatterData();
-        if (scatterData != null) {
-            initSet(scatterData, 0);
-        }
-        if (scatterData == null) return;
-        LineData lineData = mChart.getLineData();
-        if (lineData != null) {
-            initSet(lineData, 0);
-        }
-        if (lineData == null) return;
-        mChart.notifyDataSetChanged();
-        mChart.invalidate();
-        float scaleX = getXScale();
-        float scaleY = getYScale();
-        float deviationY = getYDeviation();
-        IScatterDataSet dataSet = scatterData.getDataSetByIndex(0);
-        dataSet.clear();
-        ILineDataSet lineDataSet = lineData.getDataSetByIndex(0);
-        lineDataSet.clear();
-        float x = 0f;
-        float y = 0f;
-        float xSc = x * scaleX;
-        float ySc = (y + deviationY) * scaleY;
-        Entry entry = new Entry(xSc, ySc);
-        dataSet.addEntry(entry);
-        lineDataSet.addEntry(entry);
-        mChart.getLineData().notifyDataChanged();
-        mChart.getScatterData().notifyDataChanged();
-        mChart.notifyDataSetChanged();
     }
 
     private void addEntryToSet(float x, Entry entry, ILineDataSet[] lineDataSets) {
