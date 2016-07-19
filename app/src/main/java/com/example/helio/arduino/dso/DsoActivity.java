@@ -2,6 +2,7 @@ package com.example.helio.arduino.dso;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -52,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import de.greenrobot.event.EventBus;
 
@@ -86,12 +88,23 @@ public class DsoActivity extends AppCompatActivity {
     private FloatingActionButton mCaptureButton, mStopButton;
 
     private BluetoothAdapter mBtAdapter = null;
+    private ProgressDialog mProgressDialog;
 
     private static Activity activity;
     private boolean mXReceived;
 
     public void onEvent(ResponseEvent responseEvent) {
-        readDso(responseEvent.getMsg());
+        try {
+            readDso(responseEvent.getMsg());
+        } catch (NumberFormatException e) {
+            hideProgressDialog();
+        }
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
     }
 
     public void onEvent(ConnectionEvent responseEvent) {
@@ -146,7 +159,7 @@ public class DsoActivity extends AppCompatActivity {
 
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
-        mBlockView.setVisibility(View.VISIBLE);
+        //mBlockView.setVisibility(View.VISIBLE);
         mBlockView.setOnTouchListener((v, event) -> true);
     }
 
@@ -219,7 +232,6 @@ public class DsoActivity extends AppCompatActivity {
         YAxis yAxis = mChart.getAxisLeft();
         yAxis.removeAllLimitLines();
         yAxis.setAxisMaxValue(CHART_MAX_Y);
-        yAxis.setLabelCount(10, true);
         yAxis.setDrawZeroLine(false);
         yAxis.setDrawLimitLinesBehindData(false);
         yAxis.setValueFormatter(new AxisValueFormatter() {
@@ -335,7 +347,7 @@ public class DsoActivity extends AppCompatActivity {
         showToast(getString(R.string.request_sent));
     }
 
-    private void readDso(Message msg) {
+    private void readDso(Message msg) throws NumberFormatException {
         String data = (String) msg.obj;
         String[] arrays = data.split(";");
         if (arrays[0].startsWith("����x:")) {
@@ -370,9 +382,15 @@ public class DsoActivity extends AppCompatActivity {
             }
             if (mXReceived) {
                 mXReceived = false;
+                showProgressDialog();
                 reloadData(mYVals, mXVals);
             }
         }
+    }
+
+    private void showProgressDialog() {
+        mProgressDialog = ProgressDialog.show(this, getString(R.string.receiving_data),
+                getString(R.string.please_wait), false, false);
     }
 
     private View.OnClickListener mListener = v -> {
@@ -680,6 +698,7 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private void capture() {
+        showProgressDialog();
         sendMessage(Constants.C);
         mCaptureButton.setEnabled(false);
         mStopButton.setEnabled(true);
@@ -785,6 +804,18 @@ public class DsoActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+//        loadTestData();
+    }
+
+    private void loadTestData() {
+        Random rand = new Random();
+        for (int i = 0; i < 1000; i++) {
+            float x = (float) i * 0.001f;
+            float y = rand.nextFloat() * (16f - (-16f)) + (-16f);
+            mYVals.add(y);
+            mXVals.add(x);
+        }
+        reloadData(mYVals, mXVals);
     }
 
     private void addEntryToSet(float x, Entry entry, ILineDataSet[] lineDataSets) {

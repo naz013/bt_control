@@ -66,4 +66,6 @@
     <string name="x_axis">X axis</string>
     <string name="y_trace">Y Trace</string>
     <string name="x_trace">X Trace</string>
+    <string name="receiving_data">Receiving data</string>
+    <string name="please_wait">Please wait...</string>
 </resources>
