@@ -66,7 +66,9 @@ public class DsoActivity extends AppCompatActivity {
     private static final float Y_SCALE_BASE = 31.25f;
     private static final float CHART_POINT_SIZE = 0.5f;
     private static final float RANGE_DIVIDER = 2f;
-    private static final float NUM_OF_SETS = 5;
+    private static final float NUM_OF_SETS = 5f;
+    private static final float Y_MAX = 16f;
+    private static final float Y_MIN = -16f;
     private static final String TAG = "DsoActivity";
 
     private boolean mIsYTracing = false;
@@ -175,7 +177,7 @@ public class DsoActivity extends AppCompatActivity {
 
     private float getYPositionByTouch(float x, float y) {
         MPPointD pointD = mChart.getValuesByTouchPoint(x, y, YAxis.AxisDependency.LEFT);
-        return (float) pointD.y + 500f;
+        return (float) pointD.y + CHART_MAX_Y / 2;
     }
 
     private void initChart() {
@@ -382,7 +384,7 @@ public class DsoActivity extends AppCompatActivity {
             }
             if (mXReceived) {
                 mXReceived = false;
-                showProgressDialog();
+                hideProgressDialog();
                 reloadData(mYVals, mXVals);
             }
         }
@@ -448,7 +450,7 @@ public class DsoActivity extends AppCompatActivity {
         mIsXTracing = false;
         mChart.getXAxis().removeAllLimitLines();
         if (mIsYTracing) {
-            drawHorizontalLine(500f);
+            drawHorizontalLine(CHART_MAX_Y / 2);
         } else {
             mChart.getAxisLeft().removeAllLimitLines();
             mChart.invalidate();
@@ -505,7 +507,7 @@ public class DsoActivity extends AppCompatActivity {
         mIsYTracing = false;
         mChart.getAxisLeft().removeAllLimitLines();
         if (mIsXTracing) {
-            drawVerticalLine(500f);
+            drawVerticalLine(CHART_MAX_X / 2);
         } else {
             mChart.getXAxis().removeAllLimitLines();
             mChart.invalidate();
@@ -617,8 +619,8 @@ public class DsoActivity extends AppCompatActivity {
             float maxY = baseY + ((yMoveMiddle - mYMoveStep) * baseY);
             float minY = mYMoveStep != yMoveMiddle ? (maxY - baseY * 2) : -deviationY;
             if (mYScaleStep == 0) {
-                maxY = 16.0f;
-                minY = -16.0f;
+                maxY = Y_MAX;
+                minY = Y_MIN;
             }
             IScatterDataSet dataSet = scatterData.getDataSetByIndex(0);
             dataSet.clear();
@@ -655,8 +657,8 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private float getYDeviation() {
-        if (mYScaleStep == 0) return 16f;
-        else return 16f / (float) Math.pow(4, mYScaleStep);
+        if (mYScaleStep == 0) return Y_MAX;
+        else return Y_MAX / (float) Math.pow(4, mYScaleStep);
     }
 
     private float getXScale() {
@@ -804,14 +806,14 @@ public class DsoActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        loadTestData();
+        loadTestData();
     }
 
     private void loadTestData() {
         Random rand = new Random();
-        for (int i = 0; i < 1000; i++) {
-            float x = (float) i * 0.001f;
-            float y = rand.nextFloat() * (16f - (-16f)) + (-16f);
+        for (int i = 0; i < CHART_MAX_X; i++) {
+            float x = (float) i * ((float) 1 / CHART_MAX_X);
+            float y = rand.nextFloat() * (Y_MAX - (Y_MIN)) + (Y_MIN);
             mYVals.add(y);
             mXVals.add(x);
         }
