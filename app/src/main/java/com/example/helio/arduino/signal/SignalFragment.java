@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -206,6 +207,7 @@ public class SignalFragment extends Fragment {
             return;
         }
         String msg = Constants.G + ";w:" + wave + ";f:" + frequency;
+        Log.d("TAG", "sendSignal: " + msg);
         if (mFragmentListener != null) {
             mFragmentListener.onAction(msg);
         }
