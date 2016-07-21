@@ -189,7 +189,7 @@ public class SignalFragment extends Fragment {
             return;
         }
         long frequency = Long.parseLong(freqString);
-        int wave = mWaveSelector.getSelectedItemPosition();
+        int wave = mWaveSelector.getSelectedItemPosition() + 1;
         int multi = mFrequencySelector.getSelectedItemPosition();
         long eval = 1;
         if (multi == 0) {

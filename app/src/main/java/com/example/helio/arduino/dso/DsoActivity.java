@@ -161,7 +161,7 @@ public class DsoActivity extends AppCompatActivity {
 
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
-        //mBlockView.setVisibility(View.VISIBLE);
+        mBlockView.setVisibility(View.VISIBLE);
         mBlockView.setOnTouchListener((v, event) -> true);
     }
 
@@ -359,7 +359,7 @@ public class DsoActivity extends AppCompatActivity {
             for (String xVal : parts) {
                 if (TextUtils.isEmpty(xVal.trim())) continue;
                 float x = Float.parseFloat(xVal.trim());
-                mXVals.add(x);
+                mXVals.add(x / CHART_MAX_X);
             }
             mXReceived = true;
         } else if (arrays[0].startsWith(Constants.rX)) {
@@ -369,7 +369,7 @@ public class DsoActivity extends AppCompatActivity {
             for (String xVal : parts) {
                 if (TextUtils.isEmpty(xVal.trim())) continue;
                 float x = Float.parseFloat(xVal.trim());
-                mXVals.add(x);
+                mXVals.add(x / CHART_MAX_X);
             }
             mXReceived = true;
         }
@@ -593,6 +593,8 @@ public class DsoActivity extends AppCompatActivity {
 
     private synchronized void reloadData(List<Float> mYValues, List<Float> mXValues) {
         if (mYValues.size() > 0 && mXValues.size() > 0) {
+            Log.d(TAG, "reloadData: x size " + mXValues.size());
+            Log.d(TAG, "reloadData: y size " + mYValues.size());
             List<Float> xList = new ArrayList<>(mXValues);
             List<Float> yList = new ArrayList<>(mYValues);
             mChart.getScatterData().clearValues();
@@ -806,7 +808,7 @@ public class DsoActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadTestData();
+//        loadTestData();
     }
 
     private void loadTestData() {

@@ -22,7 +22,6 @@
     <array name="wave_types">
         <item>Square Wave</item>
         <item>Sine Wave</item>
-        <item>Triangular Wave</item>
     </array>
 
     <array name="frequency_measure">
@@ -46,7 +45,7 @@
     <string name="empty_frequency">Empty frequency!</string>
     <string name="go_to_main_menu">Go to main menu</string>
     <string name="arduino_vhart">Arduino chart</string>
-    <string name="wait_while_connection_was_established">Wait while connection was established</string>
+    <string name="wait_while_connection_was_established">Please wait</string>
     <string name="max_frequency4">Maximum frequency is 20MHz</string>
     <string name="no_data_available">No data available</string>
 
@@ -67,5 +66,5 @@
     <string name="y_trace">Y Trace</string>
     <string name="x_trace">X Trace</string>
     <string name="receiving_data">Receiving data</string>
-    <string name="please_wait">Please wait...</string>
+    <string name="please_wait">Please wait…</string>
 </resources>
