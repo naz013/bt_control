@@ -61,6 +61,7 @@ public class DsoActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT = 3;
     private static final float CHART_MAX_Y = 1000f;
     private static final float CHART_MAX_X = 15000f;
+    private static final float MAX_X = 1500f;
     private static final float X_SCALE_BASE = 10000f;
     private static final float Y_SCALE_BASE = 31.25f;
     private static final float CHART_POINT_SIZE = 0.5f;
@@ -354,7 +355,7 @@ public class DsoActivity extends AppCompatActivity {
             for (String xVal : parts) {
                 if (TextUtils.isEmpty(xVal.trim())) continue;
                 float x = Float.parseFloat(xVal.trim());
-                mXVals.add(x / CHART_MAX_X);
+                mXVals.add(x / MAX_X);
             }
             mXReceived = true;
         } else if (arrays[0].startsWith(Constants.rX)) {
@@ -364,7 +365,7 @@ public class DsoActivity extends AppCompatActivity {
             for (String xVal : parts) {
                 if (TextUtils.isEmpty(xVal.trim())) continue;
                 float x = Float.parseFloat(xVal.trim());
-                mXVals.add(x / CHART_MAX_X);
+                mXVals.add(x / MAX_X);
             }
             mXReceived = true;
         }
@@ -477,15 +478,15 @@ public class DsoActivity extends AppCompatActivity {
         if (value == CHART_MAX_Y && !trace) {
             return String.format(Locale.getDefault(), getYUnitLabel(), f);
         } else {
-            return String.format(Locale.getDefault(), "%.0f", f);
+            return String.format(Locale.getDefault(), "%.2f", f);
         }
     }
 
     private String getYUnitLabel() {
         if (mYScaleStep > 2) {
-            return "(mv)\n%.0f";
+            return "(mv)\n%.2f";
         } else {
-            return "(v)\n%.0f";
+            return "(v)\n%.2f";
         }
     }
 
@@ -904,14 +905,14 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private void loadTestData() {
-        float step = 0.25f;
+        float step = 0.05f;
         float y = 0f;
-        for (int i = 0; i < 1500; i++) {
-            float x = (float) i * ((float) 1 / 1000);
+        int testCount = 15000;
+        for (int i = 0; i < testCount; i++) {
+            float x = ((float) i / ((float) testCount / MAX_X)) * (1f / 1000f);
             y += step;
-            if (y == 16.0f) step = -0.25f;
-            else if (y == -16.0f) step = 0.25f;
-            Log.d(TAG, "loadTestData: " + y);
+            if (Math.round(y) == 16f) step = -0.05f;
+            else if (Math.round(y) == -16.0f) step = 0.05f;
             mYVals.add(y);
             mXVals.add(x);
         }
