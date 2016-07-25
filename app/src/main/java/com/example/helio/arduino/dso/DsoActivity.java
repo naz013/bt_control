@@ -632,7 +632,7 @@ public class DsoActivity extends AppCompatActivity {
             for (int i = 0; i < xList.size(); i++) {
                 float x = xList.get(i);
                 float y = yList.get(i);
-                if (x >= minX && x <= maxX) {
+                if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
                     int xSc = (int) (x * scaleX - slideX);
                     int ySc = (int) ((y + (deviationY * deviationCorrector)) * scaleY);
                     Entry entry = new Entry(xSc, ySc);
