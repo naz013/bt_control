@@ -87,7 +87,6 @@ public class DsoActivity extends AppCompatActivity {
     private FloatingActionButton zoomInY, zoomOutY;
     private FloatingActionButton moveRight, moveLeft;
     private FloatingActionButton moveTop, moveBottom;
-    private FloatingActionButton mCaptureButton, mStopButton;
 
     private BluetoothAdapter mBtAdapter = null;
     private ProgressDialog mProgressDialog;
@@ -307,8 +306,6 @@ public class DsoActivity extends AppCompatActivity {
         zoomOutX = (FloatingActionButton) findViewById(R.id.zoomOutX);
         zoomInY = (FloatingActionButton) findViewById(R.id.zoomInY);
         zoomOutY = (FloatingActionButton) findViewById(R.id.zoomOutY);
-        mCaptureButton = (FloatingActionButton) findViewById(R.id.captureButton);
-        mStopButton = (FloatingActionButton) findViewById(R.id.stopButton);
         zoomInX.setOnClickListener(mListener);
         zoomOutX.setOnClickListener(mListener);
         zoomInY.setOnClickListener(mListener);
@@ -690,8 +687,6 @@ public class DsoActivity extends AppCompatActivity {
 
     private void stopCapturing() {
         sendMessage(Constants.S);
-        mCaptureButton.setEnabled(true);
-        mStopButton.setEnabled(false);
     }
 
     private void showScreenshots() {
@@ -703,8 +698,6 @@ public class DsoActivity extends AppCompatActivity {
     private void capture() {
         showProgressDialog();
         sendMessage(Constants.C);
-        mCaptureButton.setEnabled(false);
-        mStopButton.setEnabled(true);
     }
 
     private boolean checkPermission() {
