@@ -53,7 +53,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 
 import de.greenrobot.event.EventBus;
 
@@ -508,12 +507,20 @@ public class DsoActivity extends AppCompatActivity {
         float scalar = getXFormatScale();
         float f = (value + getSlideX()) / (scalar * 10);
         if (mXScaleStep == 0) {
-            f = (value + getSlideX()) / (scalar / 100);
+            f = (value + getSlideX()) / (scalar * 10);
         }
         if (value > 14500 && !trace) {
             return String.format(Locale.getDefault(), getXUnitLabel(), f);
         } else {
-            return String.format(Locale.getDefault(), "%.0f", f);
+            return String.format(Locale.getDefault(), getXLabel(), f);
+        }
+    }
+
+    private String getXLabel() {
+        if (mXScaleStep > 0) {
+            return "%.0f";
+        } else {
+            return "%.2f";
         }
     }
 
@@ -521,7 +528,7 @@ public class DsoActivity extends AppCompatActivity {
         if (mXScaleStep > 0) {
             return "%.0f(uS)";
         } else {
-            return "%.0f(mS)";
+            return "%.2f(mS)";
         }
     }
 
@@ -650,18 +657,27 @@ public class DsoActivity extends AppCompatActivity {
             IScatterDataSet dataSet = scatterData.getDataSetByIndex(0);
             dataSet.clear();
             ILineDataSet lineDataSet = lineData.getDataSetByIndex(0);
-            lineDataSet.clear();
             Log.d(TAG, "reloadData: minX " + minX + ", maxX " + maxX);
             Log.d(TAG, "reloadData: minY " + minY + ", maxY " + maxY);
+            boolean hasPrev = false;
+            int index = 0;
             for (int i = 0; i < xList.size(); i++) {
                 float x = xList.get(i);
                 float y = yList.get(i);
                 if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
+                    if (!hasPrev && i > 0) {
+                        initSet(lineData, index);
+                        lineDataSet = lineData.getDataSetByIndex(index);
+                    }
                     int xSc = (int) (x * scaleX - slideX);
                     int ySc = (int) ((y + (deviationY * deviationCorrector)) * scaleY);
                     Entry entry = new Entry(xSc, ySc);
                     dataSet.addEntry(entry);
                     lineDataSet.addEntry(entry);
+                    hasPrev = true;
+                } else if (hasPrev && x >= minX && x <= maxX) {
+                    index++;
+                    hasPrev = false;
                 }
             }
             if (dataSet.getEntryCount() == 0) {
@@ -675,6 +691,57 @@ public class DsoActivity extends AppCompatActivity {
         mChart.notifyDataSetChanged();
         mChart.invalidate();
         reloadTraceLines();
+    }
+
+    private void addEntryToSet(float x, Entry entry, ILineDataSet[] lineDataSets) {
+        for (int i = 0; i < lineDataSets.length; i++) {
+            if (i < x) {
+                lineDataSets[i].addEntry(entry);
+            }
+        }
+    }
+
+    private ILineDataSet[] getLineDataSets(LineData lineData) {
+        ILineDataSet[] sets = new LineDataSet[lineData.getDataSets().size()];
+        for (int i = 0; i < lineData.getDataSetCount(); i++) {
+            sets[i] = lineData.getDataSetByIndex(i);
+            sets[i].clear();
+        }
+        return sets;
+    }
+
+    private void initLineDataSets(LineData lineData) {
+        for (int i = 0; i < NUM_OF_SETS; i++) {
+            initSet(lineData, i);
+        }
+    }
+
+    private void initSet(ScatterData scatterData, int i) {
+        IScatterDataSet scatterDataSet;
+        try {
+            scatterDataSet = scatterData.getDataSetByIndex(i);
+            if (scatterDataSet == null) {
+                scatterDataSet = createSet();
+                scatterData.addDataSet(scatterDataSet);
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            scatterDataSet = createSet();
+            scatterData.addDataSet(scatterDataSet);
+        }
+    }
+
+    private void initSet(LineData lineData, int i) {
+        ILineDataSet lineDataSet;
+        try {
+            lineDataSet = lineData.getDataSetByIndex(i);
+            if (lineDataSet == null) {
+                lineDataSet = createLineSet();
+                lineData.addDataSet(lineDataSet);
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            lineDataSet = createLineSet();
+            lineData.addDataSet(lineDataSet);
+        }
     }
 
     private float getDeviationCorrector() {
@@ -837,65 +904,18 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private void loadTestData() {
-        Random rand = new Random();
+        float step = 0.25f;
+        float y = 0f;
         for (int i = 0; i < 1500; i++) {
             float x = (float) i * ((float) 1 / 1000);
-            float y = rand.nextFloat() * (Y_MAX - (Y_MIN)) + (Y_MIN);
+            y += step;
+            if (y == 16.0f) step = -0.25f;
+            else if (y == -16.0f) step = 0.25f;
+            Log.d(TAG, "loadTestData: " + y);
             mYVals.add(y);
             mXVals.add(x);
         }
         reloadData(mYVals, mXVals);
-    }
-
-    private void addEntryToSet(float x, Entry entry, ILineDataSet[] lineDataSets) {
-        for (int i = 0; i < lineDataSets.length; i++) {
-            if (i < x) {
-                lineDataSets[i].addEntry(entry);
-            }
-        }
-    }
-
-    private ILineDataSet[] getLineDataSets(LineData lineData) {
-        ILineDataSet[] sets = new LineDataSet[lineData.getDataSets().size()];
-        for (int i = 0; i < lineData.getDataSetCount(); i++) {
-            sets[i] = lineData.getDataSetByIndex(i);
-            sets[i].clear();
-        }
-        return sets;
-    }
-
-    private void initLineDataSets(LineData lineData) {
-        for (int i = 0; i < NUM_OF_SETS; i++) {
-            initSet(lineData, i);
-        }
-    }
-
-    private void initSet(ScatterData scatterData, int i) {
-        IScatterDataSet scatterDataSet;
-        try {
-            scatterDataSet = scatterData.getDataSetByIndex(i);
-            if (scatterDataSet == null) {
-                scatterDataSet = createSet();
-                scatterData.addDataSet(scatterDataSet);
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            scatterDataSet = createSet();
-            scatterData.addDataSet(scatterDataSet);
-        }
-    }
-
-    private void initSet(LineData lineData, int i) {
-        ILineDataSet lineDataSet;
-        try {
-            lineDataSet = lineData.getDataSetByIndex(i);
-            if (lineDataSet == null) {
-                lineDataSet = createLineSet();
-                lineData.addDataSet(lineDataSet);
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            lineDataSet = createLineSet();
-            lineData.addDataSet(lineDataSet);
-        }
     }
 
     @Override
