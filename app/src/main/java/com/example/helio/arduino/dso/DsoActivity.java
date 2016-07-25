@@ -237,7 +237,7 @@ public class DsoActivity extends AppCompatActivity {
         yAxis.setValueFormatter(new AxisValueFormatter() {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                return getYLabelFormatted(value);
+                return getYLabelFormatted(value, false);
             }
 
             @Override
@@ -253,7 +253,7 @@ public class DsoActivity extends AppCompatActivity {
         xAxis.setValueFormatter(new AxisValueFormatter() {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                return getXLabelFormatted(value);
+                return getXLabelFormatted(value, false);
             }
 
             @Override
@@ -457,7 +457,7 @@ public class DsoActivity extends AppCompatActivity {
         mChart.getAxisLeft().removeAllLimitLines();
         LimitLine yLimit = new LimitLine(position);
         yLimit.setLineColor(getResources().getColor(R.color.colorRed));
-        yLimit.setLabel(getYLabelFormatted(position));
+        yLimit.setLabel(getYLabelFormatted(position, true));
         yLimit.setTextSize(20f);
         if (position > CHART_MAX_Y / 2) yLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
         else yLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
@@ -467,7 +467,7 @@ public class DsoActivity extends AppCompatActivity {
         mChart.invalidate();
     }
 
-    private String getYLabelFormatted(float value) {
+    private String getYLabelFormatted(float value, boolean trace) {
         float scalar = getYFormatScale();
         float deviation = getYDeviation();
         float deviationCorrector = getDeviationCorrector();
@@ -475,14 +475,26 @@ public class DsoActivity extends AppCompatActivity {
         if (mYScaleStep > 0 && mYMoveStep != getYParts() / 2) {
             f = f - (deviation * (deviationCorrector - 1));
         }
-        return String.format(Locale.getDefault(), "%.2f", f);
+        if (value == CHART_MAX_Y && !trace) {
+            return String.format(Locale.getDefault(), getYUnitLabel(), f);
+        } else {
+            return String.format(Locale.getDefault(), "%.0f", f);
+        }
+    }
+
+    private String getYUnitLabel() {
+        if (mYScaleStep > 2) {
+            return "(mv)\n%.0f";
+        } else {
+            return "(v)\n%.0f";
+        }
     }
 
     private void drawVerticalLine(float position) {
         mChart.getXAxis().removeAllLimitLines();
         LimitLine xLimit = new LimitLine(position);
         xLimit.setLineColor(getResources().getColor(R.color.colorRed));
-        xLimit.setLabel(getXLabelFormatted(position));
+        xLimit.setLabel(getXLabelFormatted(position, true));
         xLimit.setTextSize(20f);
         if (position > CHART_MAX_X / 2) xLimit.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
         else xLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
@@ -492,10 +504,25 @@ public class DsoActivity extends AppCompatActivity {
         mChart.invalidate();
     }
 
-    private String getXLabelFormatted(float value) {
+    private String getXLabelFormatted(float value, boolean trace) {
         float scalar = getXFormatScale();
         float f = (value + getSlideX()) / (scalar * 10);
-        return String.format(Locale.getDefault(), "%.2f", f);
+        if (mXScaleStep == 0) {
+            f = (value + getSlideX()) / (scalar / 100);
+        }
+        if (value > 14500 && !trace) {
+            return String.format(Locale.getDefault(), getXUnitLabel(), f);
+        } else {
+            return String.format(Locale.getDefault(), "%.0f", f);
+        }
+    }
+
+    private String getXUnitLabel() {
+        if (mXScaleStep > 0) {
+            return "%.0f(uS)";
+        } else {
+            return "%.0f(mS)";
+        }
     }
 
     private void traceX() {
@@ -697,6 +724,12 @@ public class DsoActivity extends AppCompatActivity {
 
     private void capture() {
         showProgressDialog();
+        mXScallar = 1f;
+        mXScaleStep = 0;
+        mYScaleStep = 0;
+        mXMoveStep = 0;
+        mYMoveStep = getYParts() / 2;
+        setUpClearGraph();
         sendMessage(Constants.C);
     }
 
