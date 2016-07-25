@@ -217,7 +217,7 @@ public class DsoActivity extends AppCompatActivity {
         lineDataSet.setCircleColor(Color.BLACK);
         lineDataSet.setCircleRadius(0.5f);
         lineDataSet.setLineWidth(0.1f);
-        lineDataSet.setMode(LineDataSet.Mode.LINEAR);
+        lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         LineData lineData = new LineData(lineDataSet);
         lineData.setDrawValues(false);
         mChart.setData(scatterData);
@@ -857,7 +857,7 @@ public class DsoActivity extends AppCompatActivity {
         lineDataSet.setCircleColor(Color.BLACK);
         lineDataSet.setCircleRadius(0.5f);
         lineDataSet.setLineWidth(0.1f);
-        lineDataSet.setMode(LineDataSet.Mode.LINEAR);
+        lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         return lineDataSet;
     }
 
