@@ -61,8 +61,8 @@ public class DsoActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 3;
     private static final float CHART_MAX_Y = 1000f;
-    private static final float CHART_MAX_X = 1000f;
-    private static final float X_SCALE_BASE = 1000f;
+    private static final float CHART_MAX_X = 15000f;
+    private static final float X_SCALE_BASE = 10000f;
     private static final float Y_SCALE_BASE = 31.25f;
     private static final float CHART_POINT_SIZE = 0.5f;
     private static final float RANGE_DIVIDER = 2f;
@@ -161,7 +161,7 @@ public class DsoActivity extends AppCompatActivity {
 
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
-        mBlockView.setVisibility(View.VISIBLE);
+//        mBlockView.setVisibility(View.VISIBLE);
         mBlockView.setOnTouchListener((v, event) -> true);
     }
 
@@ -169,10 +169,9 @@ public class DsoActivity extends AppCompatActivity {
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
-    private float getXPositionByTouch(float x) {
-        MPPointD pointLeft = mChart.getPixelsForValues(0, 0, YAxis.AxisDependency.LEFT);
-        MPPointD pointRight = mChart.getPixelsForValues(1000, 0, YAxis.AxisDependency.LEFT);
-        return (CHART_MAX_X * (x / (float) (pointRight.x - pointLeft.x))) - 100f;
+    private float getXPositionByTouch(float x, float y) {
+        MPPointD pointD = mChart.getValuesByTouchPoint(x, y, YAxis.AxisDependency.LEFT);
+        return (float) pointD.x;
     }
 
     private float getYPositionByTouch(float x, float y) {
@@ -192,7 +191,7 @@ public class DsoActivity extends AppCompatActivity {
                     float x = motionEvent.getRawX();
                     float y = motionEvent.getRawY();
                     if (mIsXTracing) {
-                        drawVerticalLine(getXPositionByTouch(x));
+                        drawVerticalLine(getXPositionByTouch(x, y));
                     } else if (mIsYTracing) {
                         drawHorizontalLine(getYPositionByTouch(x, y));
                     }
@@ -270,7 +269,7 @@ public class DsoActivity extends AppCompatActivity {
         if (mXScallar > 1000000) {
             return mXScallar / 1000000;
         } else if (mXScallar > 1000) {
-            return mXScallar / 1000;
+            return mXScallar / 10000;
         } else if (mXScallar == 1000 || mXScallar == 1) {
             return 1000;
         } else {
@@ -498,7 +497,7 @@ public class DsoActivity extends AppCompatActivity {
 
     private String getXLabelFormatted(float value) {
         float scalar = getXFormatScale();
-        float f = (value + getSlideX()) / scalar;
+        float f = (value + getSlideX()) / (scalar * 10);
         return String.format(Locale.getDefault(), "%.2f", f);
     }
 
@@ -577,9 +576,9 @@ public class DsoActivity extends AppCompatActivity {
 
     private void scaleX(int i) {
         if (i < 0 && mXScaleStep == 0) return;
-        if (i > 0 && mXScaleStep == 6) return;
-        if (i > 0) mXScallar *= 10;
-        if (i < 0) mXScallar /= 10;
+        if (i > 0 && mXScaleStep == 5) return;
+        if (i > 0) mXScallar *= 2;
+        if (i < 0) mXScallar /= 2;
         mXMoveStep = 0;
         mXScaleStep += i;
         int mYParts = getYParts();
@@ -633,7 +632,7 @@ public class DsoActivity extends AppCompatActivity {
             for (int i = 0; i < xList.size(); i++) {
                 float x = xList.get(i);
                 float y = yList.get(i);
-                if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
+                if (x >= minX && x <= maxX) {
                     int xSc = (int) (x * scaleX - slideX);
                     int ySc = (int) ((y + (deviationY * deviationCorrector)) * scaleY);
                     Entry entry = new Entry(xSc, ySc);
@@ -668,7 +667,7 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private float getSlideX() {
-        return X_SCALE_BASE / 2 * mXMoveStep;
+        return CHART_MAX_X / 2 * mXMoveStep;
     }
 
     private float getYScale() {
@@ -808,13 +807,13 @@ public class DsoActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        loadTestData();
+        loadTestData();
     }
 
     private void loadTestData() {
         Random rand = new Random();
-        for (int i = 0; i < CHART_MAX_X; i++) {
-            float x = (float) i * ((float) 1 / CHART_MAX_X);
+        for (int i = 0; i < 1500; i++) {
+            float x = (float) i * ((float) 1 / 1000);
             float y = rand.nextFloat() * (Y_MAX - (Y_MIN)) + (Y_MIN);
             mYVals.add(y);
             mXVals.add(x);
