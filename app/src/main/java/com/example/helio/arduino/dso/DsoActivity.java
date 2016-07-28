@@ -472,7 +472,9 @@ public class DsoActivity extends AppCompatActivity {
         float deviation = getYDeviation();
         float deviationCorrector = getDeviationCorrector();
         float f = ((value - CHART_MAX_Y / 2) / scalar);
-        if (mYScaleStep > 0 && mYMoveStep != getYParts() / 2) {
+        if (mYScaleStep > 2  && mYMoveStep != getYParts() / 2) {
+            f = f - ((deviation * (deviationCorrector - 1)) * CHART_MAX_Y);
+        } else if (mYScaleStep > 0 && mYMoveStep != getYParts() / 2) {
             f = f - (deviation * (deviationCorrector - 1));
         }
         if (value == CHART_MAX_Y && !trace) {
@@ -671,11 +673,13 @@ public class DsoActivity extends AppCompatActivity {
                     if (!hasPrev && i > 0) {
                         initSet(lineData, index);
                         lineDataSet = lineData.getDataSetByIndex(index);
-                        float prevY = yList.get(i - 1);
-                        if (prevY > y) {
-                            lineDataSet.addEntry(new Entry(xSc, 1500f));
-                        } else {
-                            lineDataSet.addEntry(new Entry(xSc, 0f));
+                        if (mYScaleStep > 1) {
+                            float prevY = yList.get(i - 1);
+                            if (prevY > y) {
+                                lineDataSet.addEntry(new Entry(xSc, 1500f));
+                            } else {
+                                lineDataSet.addEntry(new Entry(xSc, 0f));
+                            }
                         }
                     }
                     Entry entry = new Entry(xSc, ySc);
@@ -685,7 +689,7 @@ public class DsoActivity extends AppCompatActivity {
                 } else if (hasPrev && x >= minX && x <= maxX) {
                     index++;
                     hasPrev = false;
-                    if (i + 1 < xList.size()) {
+                    if (i + 1 < xList.size() && mYScaleStep > 1) {
                         float nextY = yList.get(i + 1);
                         int xSc = (int) (x * scaleX - slideX);
                         if (nextY > y) {
