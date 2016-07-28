@@ -64,7 +64,7 @@ public class DsoActivity extends AppCompatActivity {
     private static final float MAX_X = 1500f;
     private static final float X_SCALE_BASE = 10000f;
     private static final float Y_SCALE_BASE = 31.25f;
-    private static final float CHART_POINT_SIZE = 0.5f;
+    private static final float CHART_POINT_SIZE = 1.5f;
     private static final float RANGE_DIVIDER = 2f;
     private static final float NUM_OF_SETS = 5f;
     private static final float Y_MAX = 16f;
@@ -216,7 +216,7 @@ public class DsoActivity extends AppCompatActivity {
         LineDataSet lineDataSet = new LineDataSet(entries, getString(R.string.arduino_vhart));
         lineDataSet.setColor(Color.BLACK);
         lineDataSet.setCircleColor(Color.BLACK);
-        lineDataSet.setCircleRadius(0.5f);
+        lineDataSet.setCircleRadius(0.1f);
         lineDataSet.setLineWidth(0.1f);
         lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         LineData lineData = new LineData(lineDataSet);
@@ -666,12 +666,18 @@ public class DsoActivity extends AppCompatActivity {
                 float x = xList.get(i);
                 float y = yList.get(i);
                 if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
+                    int xSc = (int) (x * scaleX - slideX);
+                    int ySc = (int) ((y + (deviationY * deviationCorrector)) * scaleY);
                     if (!hasPrev && i > 0) {
                         initSet(lineData, index);
                         lineDataSet = lineData.getDataSetByIndex(index);
+                        float prevY = yList.get(i - 1);
+                        if (prevY > y) {
+                            lineDataSet.addEntry(new Entry(xSc, 1500f));
+                        } else {
+                            lineDataSet.addEntry(new Entry(xSc, 0f));
+                        }
                     }
-                    int xSc = (int) (x * scaleX - slideX);
-                    int ySc = (int) ((y + (deviationY * deviationCorrector)) * scaleY);
                     Entry entry = new Entry(xSc, ySc);
                     dataSet.addEntry(entry);
                     lineDataSet.addEntry(entry);
@@ -679,6 +685,15 @@ public class DsoActivity extends AppCompatActivity {
                 } else if (hasPrev && x >= minX && x <= maxX) {
                     index++;
                     hasPrev = false;
+                    if (i + 1 < xList.size()) {
+                        float nextY = yList.get(i + 1);
+                        int xSc = (int) (x * scaleX - slideX);
+                        if (nextY > y) {
+                            lineDataSet.addEntry(new Entry(xSc, 1500f));
+                        } else {
+                            lineDataSet.addEntry(new Entry(xSc, 0f));
+                        }
+                    }
                 }
             }
             if (dataSet.getEntryCount() == 0) {
@@ -856,7 +871,7 @@ public class DsoActivity extends AppCompatActivity {
         LineDataSet lineDataSet = new LineDataSet(null, getString(R.string.arduino_vhart));
         lineDataSet.setColor(Color.BLACK);
         lineDataSet.setCircleColor(Color.BLACK);
-        lineDataSet.setCircleRadius(0.5f);
+        lineDataSet.setCircleRadius(0.1f);
         lineDataSet.setLineWidth(0.1f);
         lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         return lineDataSet;
@@ -907,7 +922,7 @@ public class DsoActivity extends AppCompatActivity {
     private void loadTestData() {
         float step = 0.05f;
         float y = 0f;
-        int testCount = 15000;
+        int testCount = 5000;
         for (int i = 0; i < testCount; i++) {
             float x = ((float) i / ((float) testCount / MAX_X)) * (1f / 1000f);
             y += step;
