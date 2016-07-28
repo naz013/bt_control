@@ -43,23 +43,25 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <com.getbase.floatingactionbutton.FloatingActionButton
+                    <android.support.design.widget.FloatingActionButton
                         android:id="@+id/zoomOutY"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:fab_colorNormal="@color/colorBlue"
-                        app:fab_colorPressed="@color/colorGray"
-                        app:fab_icon="@drawable/ic_zoom_out_black_24px"
-                        app:fab_size="mini" />
+                        android:layout_margin="@dimen/dso_fab_margin"
+                        android:src="@drawable/ic_zoom_out_black_24px"
+                        app:backgroundTint="@color/colorBlue"
+                        app:fabSize="mini"
+                        app:rippleColor="@color/colorGray" />
 
-                    <com.getbase.floatingactionbutton.FloatingActionButton
+                    <android.support.design.widget.FloatingActionButton
                         android:id="@+id/zoomInY"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:fab_colorNormal="@color/colorBlue"
-                        app:fab_colorPressed="@color/colorGray"
-                        app:fab_icon="@drawable/ic_zoom_in_black_24px"
-                        app:fab_size="mini" />
+                        android:layout_margin="@dimen/dso_fab_margin"
+                        android:src="@drawable/ic_zoom_in_black_24px"
+                        app:backgroundTint="@color/colorBlue"
+                        app:fabSize="mini"
+                        app:rippleColor="@color/colorGray" />
 
                 </LinearLayout>
 
@@ -68,23 +70,25 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <com.getbase.floatingactionbutton.FloatingActionButton
+                    <android.support.design.widget.FloatingActionButton
                         android:id="@+id/moveTop"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:fab_colorNormal="@color/colorBlue"
-                        app:fab_colorPressed="@color/colorGray"
-                        app:fab_icon="@drawable/ic_expand_less_black_24dp"
-                        app:fab_size="mini" />
+                        android:layout_margin="@dimen/dso_fab_margin"
+                        android:src="@drawable/ic_expand_less_black_24dp"
+                        app:backgroundTint="@color/colorBlue"
+                        app:fabSize="mini"
+                        app:rippleColor="@color/colorGray" />
 
-                    <com.getbase.floatingactionbutton.FloatingActionButton
+                    <android.support.design.widget.FloatingActionButton
                         android:id="@+id/moveBottom"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:fab_colorNormal="@color/colorBlue"
-                        app:fab_colorPressed="@color/colorGray"
-                        app:fab_icon="@drawable/ic_expand_more_black_24dp"
-                        app:fab_size="mini" />
+                        android:layout_margin="@dimen/dso_fab_margin"
+                        android:src="@drawable/ic_expand_more_black_24dp"
+                        app:backgroundTint="@color/colorBlue"
+                        app:fabSize="mini"
+                        app:rippleColor="@color/colorGray" />
 
                 </LinearLayout>
 
@@ -93,23 +97,25 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <com.getbase.floatingactionbutton.FloatingActionButton
+                    <android.support.design.widget.FloatingActionButton
                         android:id="@+id/traceY"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:fab_colorNormal="@color/colorBlue"
-                        app:fab_colorPressed="@color/colorGray"
-                        app:fab_icon="@drawable/ic_trace_y"
-                        app:fab_size="mini" />
+                        android:layout_margin="@dimen/dso_fab_margin"
+                        android:src="@drawable/ic_trace_y"
+                        app:backgroundTint="@color/colorBlue"
+                        app:fabSize="mini"
+                        app:rippleColor="@color/colorGray" />
 
-                    <com.getbase.floatingactionbutton.FloatingActionButton
+                    <android.support.design.widget.FloatingActionButton
                         android:id="@+id/screenshot_item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:fab_colorNormal="@color/colorRed"
-                        app:fab_colorPressed="@color/colorGray"
-                        app:fab_icon="@drawable/ic_camera_alt_black_24dp"
-                        app:fab_size="mini" />
+                        android:layout_margin="@dimen/dso_fab_margin"
+                        android:src="@drawable/ic_camera_alt_black_24dp"
+                        app:backgroundTint="@color/colorRed"
+                        app:fabSize="mini"
+                        app:rippleColor="@color/colorGray" />
 
                 </LinearLayout>
 
@@ -120,33 +126,36 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.getbase.floatingactionbutton.FloatingActionButton
+                <android.support.design.widget.FloatingActionButton
                     android:id="@+id/captureButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    app:fab_colorNormal="@color/colorWhite"
-                    app:fab_colorPressed="@color/colorGray"
-                    app:fab_icon="@drawable/ic_chart_areaspline"
-                    app:fab_size="mini" />
+                    android:layout_margin="@dimen/dso_fab_margin"
+                    android:src="@drawable/ic_chart_areaspline"
+                    app:backgroundTint="@color/colorWhite"
+                    app:fabSize="mini"
+                    app:rippleColor="@color/colorGray" />
 
-                <com.getbase.floatingactionbutton.FloatingActionButton
+                <android.support.design.widget.FloatingActionButton
                     android:id="@+id/stopButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:fab_colorNormal="@color/colorWhite"
-                    app:fab_colorPressed="@color/colorGray"
-                    app:fab_icon="@drawable/ic_stop_black_24dp"
-                    app:fab_size="mini" />
+                    android:layout_margin="@dimen/dso_fab_margin"
+                    android:src="@drawable/ic_stop_black_24dp"
+                    app:backgroundTint="@color/colorWhite"
+                    app:fabSize="mini"
+                    app:rippleColor="@color/colorGray" />
 
-                <com.getbase.floatingactionbutton.FloatingActionButton
+                <android.support.design.widget.FloatingActionButton
                     android:id="@+id/clearButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:fab_colorNormal="@color/colorWhite"
-                    app:fab_colorPressed="@color/colorGray"
-                    app:fab_icon="@drawable/ic_delete_black_24dp"
-                    app:fab_size="mini" />
+                    android:layout_margin="@dimen/dso_fab_margin"
+                    android:src="@drawable/ic_delete_black_24dp"
+                    app:backgroundTint="@color/colorWhite"
+                    app:fabSize="mini"
+                    app:rippleColor="@color/colorGray" />
 
             </LinearLayout>
 
@@ -160,23 +169,25 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <com.getbase.floatingactionbutton.FloatingActionButton
+                    <android.support.design.widget.FloatingActionButton
                         android:id="@+id/zoomOutX"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:fab_colorNormal="@color/colorGreen"
-                        app:fab_colorPressed="@color/colorGray"
-                        app:fab_icon="@drawable/ic_zoom_out_black_24px"
-                        app:fab_size="mini" />
+                        android:layout_margin="@dimen/dso_fab_margin"
+                        android:src="@drawable/ic_zoom_out_black_24px"
+                        app:backgroundTint="@color/colorGreen"
+                        app:fabSize="mini"
+                        app:rippleColor="@color/colorGray" />
 
-                    <com.getbase.floatingactionbutton.FloatingActionButton
+                    <android.support.design.widget.FloatingActionButton
                         android:id="@+id/zoomInX"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:fab_colorNormal="@color/colorGreen"
-                        app:fab_colorPressed="@color/colorGray"
-                        app:fab_icon="@drawable/ic_zoom_in_black_24px"
-                        app:fab_size="mini" />
+                        android:layout_margin="@dimen/dso_fab_margin"
+                        android:src="@drawable/ic_zoom_in_black_24px"
+                        app:backgroundTint="@color/colorGreen"
+                        app:fabSize="mini"
+                        app:rippleColor="@color/colorGray" />
 
                 </LinearLayout>
 
@@ -185,23 +196,25 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <com.getbase.floatingactionbutton.FloatingActionButton
+                    <android.support.design.widget.FloatingActionButton
                         android:id="@+id/moveLeft"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:fab_colorNormal="@color/colorGreen"
-                        app:fab_colorPressed="@color/colorGray"
-                        app:fab_icon="@drawable/ic_chevron_left_black_24dp"
-                        app:fab_size="mini" />
+                        android:layout_margin="@dimen/dso_fab_margin"
+                        android:src="@drawable/ic_chevron_left_black_24dp"
+                        app:backgroundTint="@color/colorGreen"
+                        app:fabSize="mini"
+                        app:rippleColor="@color/colorGray" />
 
-                    <com.getbase.floatingactionbutton.FloatingActionButton
+                    <android.support.design.widget.FloatingActionButton
                         android:id="@+id/moveRight"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:fab_colorNormal="@color/colorGreen"
-                        app:fab_colorPressed="@color/colorGray"
-                        app:fab_icon="@drawable/ic_chevron_right_black_24dp"
-                        app:fab_size="mini" />
+                        android:layout_margin="@dimen/dso_fab_margin"
+                        android:src="@drawable/ic_chevron_right_black_24dp"
+                        app:backgroundTint="@color/colorGreen"
+                        app:fabSize="mini"
+                        app:rippleColor="@color/colorGray" />
 
                 </LinearLayout>
 
@@ -210,23 +223,25 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <com.getbase.floatingactionbutton.FloatingActionButton
+                    <android.support.design.widget.FloatingActionButton
                         android:id="@+id/gallery_item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:fab_colorNormal="@color/colorRed"
-                        app:fab_colorPressed="@color/colorGray"
-                        app:fab_icon="@drawable/ic_collections_black_24dp"
-                        app:fab_size="mini" />
+                        android:layout_margin="@dimen/dso_fab_margin"
+                        android:src="@drawable/ic_collections_black_24dp"
+                        app:backgroundTint="@color/colorRed"
+                        app:fabSize="mini"
+                        app:rippleColor="@color/colorGray" />
 
-                    <com.getbase.floatingactionbutton.FloatingActionButton
+                    <android.support.design.widget.FloatingActionButton
                         android:id="@+id/traceX"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:fab_colorNormal="@color/colorGreen"
-                        app:fab_colorPressed="@color/colorGray"
-                        app:fab_icon="@drawable/ic_trace_x"
-                        app:fab_size="mini" />
+                        android:layout_margin="@dimen/dso_fab_margin"
+                        android:src="@drawable/ic_trace_x"
+                        app:backgroundTint="@color/colorGreen"
+                        app:fabSize="mini"
+                        app:rippleColor="@color/colorGray" />
 
                 </LinearLayout>
 

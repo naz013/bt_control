@@ -82,5 +82,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_margin="16dp"
+        app:fabSize="normal"
         android:src="@drawable/book_open_variant" />
 </RelativeLayout>

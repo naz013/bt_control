@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -31,7 +32,6 @@ import com.example.helio.arduino.core.ConnectionEvent;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.ControlEvent;
 import com.example.helio.arduino.core.ResponseEvent;
-import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.github.mikephil.charting.charts.ScatterChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.LimitLine;
@@ -64,7 +64,7 @@ public class DsoActivity extends AppCompatActivity {
     private static final float MAX_X = 1500f;
     private static final float X_SCALE_BASE = 10000f;
     private static final float Y_SCALE_BASE = 31.25f;
-    private static final float CHART_POINT_SIZE = 1.5f;
+    private static final float CHART_POINT_SIZE = 1.0f;
     private static final float RANGE_DIVIDER = 2f;
     private static final float NUM_OF_SETS = 5f;
     private static final float Y_MAX = 16f;
@@ -218,7 +218,7 @@ public class DsoActivity extends AppCompatActivity {
         lineDataSet.setCircleColor(Color.BLACK);
         lineDataSet.setCircleRadius(0.1f);
         lineDataSet.setLineWidth(0.1f);
-        lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        lineDataSet.setMode(LineDataSet.Mode.LINEAR);
         LineData lineData = new LineData(lineDataSet);
         lineData.setDrawValues(false);
         mChart.setData(scatterData);
@@ -873,7 +873,7 @@ public class DsoActivity extends AppCompatActivity {
         lineDataSet.setCircleColor(Color.BLACK);
         lineDataSet.setCircleRadius(0.1f);
         lineDataSet.setLineWidth(0.1f);
-        lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        lineDataSet.setMode(LineDataSet.Mode.LINEAR);
         return lineDataSet;
     }
 
