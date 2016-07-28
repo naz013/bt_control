@@ -44,7 +44,7 @@ android {
 }
 
 ext {
-    supportLibraryVersion = "24.0.0"
+    supportLibraryVersion = "24.1.1"
 }
 
 repositories {
@@ -60,9 +60,10 @@ dependencies {
     compile project(':imagePreview')
     compile "com.android.support:support-v13:${supportLibraryVersion}"
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.android.support:support-v4:24.0.0'
+    compile 'com.android.support:support-v4:24.1.1'
     compile 'de.greenrobot:eventbus:2.4.1'
     compile project(':MPChartLib')
+    compile 'com.github.barteksc:android-pdf-viewer:1.4.0'
 }
 
 import java.text.DateFormat

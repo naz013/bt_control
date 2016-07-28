@@ -67,4 +67,5 @@
     <string name="x_trace">X Trace</string>
     <string name="receiving_data">Receiving data</string>
     <string name="please_wait">Please wait…</string>
+    <string name="failed_to_open_file">Failed to open Manual file</string>
 </resources>
