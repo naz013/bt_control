@@ -705,7 +705,7 @@ public class DsoActivity extends AppCompatActivity {
                 dataSet.addEntry(entry);
                 lineDataSet.addEntry(entry);
             }
-            if (mYScaleStep > 0) {
+            if (mYScaleStep > 0 || mXScaleStep > 0) {
                 dataSet.addEntry(new Entry(0f, 0f));
                 dataSet.addEntry(new Entry(15000f, 1000f));
             }
