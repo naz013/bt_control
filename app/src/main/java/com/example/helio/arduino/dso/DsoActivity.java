@@ -702,8 +702,9 @@ public class DsoActivity extends AppCompatActivity {
             }
             if (dataSet.getEntryCount() == 0) {
                 Entry entry = new Entry(0f, 0f);
+                Entry entry1 = new Entry(15000f, 1000f);
                 dataSet.addEntry(entry);
-                lineDataSet.addEntry(entry);
+                dataSet.addEntry(entry1);
             }
             if (mYScaleStep > 0 || mXScaleStep > 0) {
                 dataSet.addEntry(new Entry(0f, 0f));
