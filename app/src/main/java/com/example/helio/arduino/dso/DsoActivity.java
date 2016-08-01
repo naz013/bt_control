@@ -22,6 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -83,12 +84,12 @@ public class DsoActivity extends AppCompatActivity {
 
     private ScatterChart mChart;
     private TextView mBlockView;
-    private FloatingActionButton zoomInX, zoomOutX;
-    private FloatingActionButton zoomInY, zoomOutY;
-    private FloatingActionButton moveRight, moveLeft;
-    private FloatingActionButton moveTop, moveBottom;
+    private ImageButton zoomInX, zoomOutX;
+    private ImageButton zoomInY, zoomOutY;
+    private ImageButton moveRight, moveLeft;
+    private ImageButton moveTop, moveBottom;
 
-    private BluetoothAdapter mBtAdapter = null;
+    //    private BluetoothAdapter mBtAdapter = null;
     private ProgressDialog mProgressDialog;
 
     private static Activity activity;
@@ -165,7 +166,7 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private void initBtAdapter() {
-        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
+//        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
     private float getXPositionByTouch(float x, float y) {
@@ -298,14 +299,14 @@ public class DsoActivity extends AppCompatActivity {
         findViewById(R.id.gallery_item).setOnClickListener(mListener);
         findViewById(R.id.traceY).setOnClickListener(mListener);
         findViewById(R.id.traceX).setOnClickListener(mListener);
-        moveBottom = (FloatingActionButton) findViewById(R.id.moveBottom);
-        moveTop = (FloatingActionButton) findViewById(R.id.moveTop);
-        moveLeft = (FloatingActionButton) findViewById(R.id.moveLeft);
-        moveRight = (FloatingActionButton) findViewById(R.id.moveRight);
-        zoomInX = (FloatingActionButton) findViewById(R.id.zoomInX);
-        zoomOutX = (FloatingActionButton) findViewById(R.id.zoomOutX);
-        zoomInY = (FloatingActionButton) findViewById(R.id.zoomInY);
-        zoomOutY = (FloatingActionButton) findViewById(R.id.zoomOutY);
+        moveBottom = (ImageButton) findViewById(R.id.moveBottom);
+        moveTop = (ImageButton) findViewById(R.id.moveTop);
+        moveLeft = (ImageButton) findViewById(R.id.moveLeft);
+        moveRight = (ImageButton) findViewById(R.id.moveRight);
+        zoomInX = (ImageButton) findViewById(R.id.zoomInX);
+        zoomOutX = (ImageButton) findViewById(R.id.zoomOutX);
+        zoomInY = (ImageButton) findViewById(R.id.zoomInY);
+        zoomOutY = (ImageButton) findViewById(R.id.zoomOutY);
         zoomInX.setOnClickListener(mListener);
         zoomOutX.setOnClickListener(mListener);
         zoomInY.setOnClickListener(mListener);
@@ -333,11 +334,11 @@ public class DsoActivity extends AppCompatActivity {
     }
 
     private void checkBtAdapterStatus() {
-        if (!mBtAdapter.isEnabled()) {
-            requestBtEnable();
-        } else {
-            startService(new Intent(this, BluetoothService.class));
-        }
+//        if (!mBtAdapter.isEnabled()) {
+//            requestBtEnable();
+//        } else {
+//            startService(new Intent(this, BluetoothService.class));
+//        }
     }
 
     private void sendMessage(String message) {
@@ -459,7 +460,8 @@ public class DsoActivity extends AppCompatActivity {
         yLimit.setLineColor(getResources().getColor(R.color.colorRed));
         yLimit.setLabel(getYLabelFormatted(position, true));
         yLimit.setTextSize(20f);
-        if (position > CHART_MAX_Y / 2) yLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
+        if (position > CHART_MAX_Y / 2)
+            yLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
         else yLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
         yLimit.setTextColor(getResources().getColor(R.color.colorBlue));
         mChart.getAxisLeft().setDrawLimitLinesBehindData(false);
@@ -472,7 +474,7 @@ public class DsoActivity extends AppCompatActivity {
         float deviation = getYDeviation();
         float deviationCorrector = getDeviationCorrector();
         float f = ((value - CHART_MAX_Y / 2) / scalar);
-        if (mYScaleStep > 2  && mYMoveStep != getYParts() / 2) {
+        if (mYScaleStep > 2 && mYMoveStep != getYParts() / 2) {
             f = f - ((deviation * (deviationCorrector - 1)) * CHART_MAX_Y);
         } else if (mYScaleStep > 0 && mYMoveStep != getYParts() / 2) {
             f = f - (deviation * (deviationCorrector - 1));
@@ -498,7 +500,8 @@ public class DsoActivity extends AppCompatActivity {
         xLimit.setLineColor(getResources().getColor(R.color.colorRed));
         xLimit.setLabel(getXLabelFormatted(position, true));
         xLimit.setTextSize(20f);
-        if (position > CHART_MAX_X / 2) xLimit.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
+        if (position > CHART_MAX_X / 2)
+            xLimit.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
         else xLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
         xLimit.setTextColor(getResources().getColor(R.color.colorGreen));
         mChart.getXAxis().addLimitLine(xLimit);

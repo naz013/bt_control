@@ -43,25 +43,23 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <android.support.design.widget.FloatingActionButton
+                    <ImageButton
                         android:id="@+id/zoomOutY"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/dso_fab_margin"
-                        android:src="@drawable/ic_zoom_out_black_24px"
-                        app:backgroundTint="@color/colorBlue"
-                        app:fabSize="mini"
-                        app:rippleColor="@color/colorGray" />
+                        android:background="@color/colorBlue"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_zoom_out_black_24px" />
 
-                    <android.support.design.widget.FloatingActionButton
+                    <ImageButton
                         android:id="@+id/zoomInY"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/dso_fab_margin"
-                        android:src="@drawable/ic_zoom_in_black_24px"
-                        app:backgroundTint="@color/colorBlue"
-                        app:fabSize="mini"
-                        app:rippleColor="@color/colorGray" />
+                        android:background="@color/colorBlue"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_zoom_in_black_24px" />
 
                 </LinearLayout>
 
@@ -70,25 +68,23 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <android.support.design.widget.FloatingActionButton
+                    <ImageButton
                         android:id="@+id/moveTop"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/dso_fab_margin"
-                        android:src="@drawable/ic_expand_less_black_24dp"
-                        app:backgroundTint="@color/colorBlue"
-                        app:fabSize="mini"
-                        app:rippleColor="@color/colorGray" />
+                        android:background="@color/colorBlue"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_expand_less_black_24dp" />
 
-                    <android.support.design.widget.FloatingActionButton
+                    <ImageButton
                         android:id="@+id/moveBottom"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/dso_fab_margin"
-                        android:src="@drawable/ic_expand_more_black_24dp"
-                        app:backgroundTint="@color/colorBlue"
-                        app:fabSize="mini"
-                        app:rippleColor="@color/colorGray" />
+                        android:background="@color/colorBlue"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_expand_more_black_24dp" />
 
                 </LinearLayout>
 
@@ -97,25 +93,23 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <android.support.design.widget.FloatingActionButton
+                    <ImageButton
                         android:id="@+id/traceY"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/dso_fab_margin"
-                        android:src="@drawable/ic_trace_y"
-                        app:backgroundTint="@color/colorBlue"
-                        app:fabSize="mini"
-                        app:rippleColor="@color/colorGray" />
+                        android:background="@color/colorBlue"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_trace_y" />
 
-                    <android.support.design.widget.FloatingActionButton
+                    <ImageButton
                         android:id="@+id/screenshot_item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/dso_fab_margin"
-                        android:src="@drawable/ic_camera_alt_black_24dp"
-                        app:backgroundTint="@color/colorRed"
-                        app:fabSize="mini"
-                        app:rippleColor="@color/colorGray" />
+                        android:background="@color/colorRed"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_camera_alt_black_24dp" />
 
                 </LinearLayout>
 
@@ -126,36 +120,33 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <android.support.design.widget.FloatingActionButton
+                <ImageButton
                     android:id="@+id/captureButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_margin="@dimen/dso_fab_margin"
-                    android:src="@drawable/ic_chart_areaspline"
-                    app:backgroundTint="@color/colorWhite"
-                    app:fabSize="mini"
-                    app:rippleColor="@color/colorGray" />
+                    android:background="@color/colorWhite"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_chart_areaspline" />
 
-                <android.support.design.widget.FloatingActionButton
+                <ImageButton
                     android:id="@+id/stopButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/dso_fab_margin"
-                    android:src="@drawable/ic_stop_black_24dp"
-                    app:backgroundTint="@color/colorWhite"
-                    app:fabSize="mini"
-                    app:rippleColor="@color/colorGray" />
+                    android:background="@color/colorWhite"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_stop_black_24dp" />
 
-                <android.support.design.widget.FloatingActionButton
+                <ImageButton
                     android:id="@+id/clearButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/dso_fab_margin"
-                    android:src="@drawable/ic_delete_black_24dp"
-                    app:backgroundTint="@color/colorWhite"
-                    app:fabSize="mini"
-                    app:rippleColor="@color/colorGray" />
+                    android:background="@color/colorWhite"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_delete_black_24dp" />
 
             </LinearLayout>
 
@@ -169,25 +160,23 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <android.support.design.widget.FloatingActionButton
+                    <ImageButton
                         android:id="@+id/zoomOutX"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/dso_fab_margin"
-                        android:src="@drawable/ic_zoom_out_black_24px"
-                        app:backgroundTint="@color/colorGreen"
-                        app:fabSize="mini"
-                        app:rippleColor="@color/colorGray" />
+                        android:background="@color/colorGreen"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_zoom_out_black_24px" />
 
-                    <android.support.design.widget.FloatingActionButton
+                    <ImageButton
                         android:id="@+id/zoomInX"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/dso_fab_margin"
-                        android:src="@drawable/ic_zoom_in_black_24px"
-                        app:backgroundTint="@color/colorGreen"
-                        app:fabSize="mini"
-                        app:rippleColor="@color/colorGray" />
+                        android:background="@color/colorGreen"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_zoom_in_black_24px" />
 
                 </LinearLayout>
 
@@ -196,25 +185,23 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <android.support.design.widget.FloatingActionButton
+                    <ImageButton
                         android:id="@+id/moveLeft"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/dso_fab_margin"
-                        android:src="@drawable/ic_chevron_left_black_24dp"
-                        app:backgroundTint="@color/colorGreen"
-                        app:fabSize="mini"
-                        app:rippleColor="@color/colorGray" />
+                        android:background="@color/colorGreen"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_chevron_left_black_24dp" />
 
-                    <android.support.design.widget.FloatingActionButton
+                    <ImageButton
                         android:id="@+id/moveRight"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/dso_fab_margin"
-                        android:src="@drawable/ic_chevron_right_black_24dp"
-                        app:backgroundTint="@color/colorGreen"
-                        app:fabSize="mini"
-                        app:rippleColor="@color/colorGray" />
+                        android:background="@color/colorGreen"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_chevron_right_black_24dp" />
 
                 </LinearLayout>
 
@@ -223,25 +210,23 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <android.support.design.widget.FloatingActionButton
+                    <ImageButton
                         android:id="@+id/gallery_item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/dso_fab_margin"
-                        android:src="@drawable/ic_collections_black_24dp"
-                        app:backgroundTint="@color/colorRed"
-                        app:fabSize="mini"
-                        app:rippleColor="@color/colorGray" />
+                        android:background="@color/colorRed"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_collections_black_24dp" />
 
-                    <android.support.design.widget.FloatingActionButton
+                    <ImageButton
                         android:id="@+id/traceX"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/dso_fab_margin"
-                        android:src="@drawable/ic_trace_x"
-                        app:backgroundTint="@color/colorGreen"
-                        app:fabSize="mini"
-                        app:rippleColor="@color/colorGray" />
+                        android:background="@color/colorGreen"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_trace_x" />
 
                 </LinearLayout>
 
