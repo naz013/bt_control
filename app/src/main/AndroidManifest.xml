@@ -25,41 +25,38 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".SettingsActivity"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".StartActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Fullscreen" />
-
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".dso.DsoActivity"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".MultimeterActivity"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".signal.SignalActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateVisible|adjustResize" />
-
         <activity
             android:name=".dso.ImagesActivity"
             android:screenOrientation="portrait" />
-
-        <activity android:name=".dso.ImagePreviewActivity" />
+        <activity
+            android:name=".dso.ImagePreviewActivity"
+            android:screenOrientation="portrait" />
 
         <service android:name=".core.BluetoothService" />
 
+        <activity
+            android:name=".ManualActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

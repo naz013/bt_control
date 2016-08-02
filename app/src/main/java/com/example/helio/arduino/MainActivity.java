@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.multimeterButton).setOnClickListener(mListener);
         findViewById(R.id.dsoButton).setOnClickListener(mListener);
         findViewById(R.id.signalButton).setOnClickListener(mListener);
+        findViewById(R.id.fab).setOnClickListener(mListener);
     }
 
     private void initActionBar() {
@@ -76,8 +77,15 @@ public class MainActivity extends AppCompatActivity {
             case R.id.signalButton:
                 openSignal();
                 break;
+            case R.id.fab:
+                openManual();
+                break;
         }
     };
+
+    private void openManual() {
+        startActivity(new Intent(this, ManualActivity.class));
+    }
 
     private void requestBtEnabling(int requestCode) {
         Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);

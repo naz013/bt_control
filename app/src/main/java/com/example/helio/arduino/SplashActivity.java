@@ -8,8 +8,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.helio.arduino.core.Constants;
-import com.example.helio.arduino.dso.DsoActivity;
-import com.example.helio.arduino.signal.SignalActivity;
 
 public class SplashActivity extends AppCompatActivity {
 

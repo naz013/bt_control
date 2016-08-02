@@ -208,7 +208,7 @@ public class ConnectionManager {
 
         public void run() {
             if (D) Log.i(TAG, "ConnectedThread run");
-            byte[] buffer = new byte[512];
+            byte[] buffer = new byte[240000];
             int bytes;
             StringBuilder readMessage = new StringBuilder();
             while (true) {

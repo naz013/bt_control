@@ -11,7 +11,7 @@
     <string name="i">I</string>
     <string name="omega">Ω</string>
     <string name="capture">CAPTURE</string>
-    <string name="screenshot">SCREENSHOT</string>
+    <string name="screenshot">S</string>
     <string name="generate">GENERATE</string>
     <string name="signal_type">Signal type</string>
     <string name="frequency">Frequency</string>
@@ -22,7 +22,6 @@
     <array name="wave_types">
         <item>Square Wave</item>
         <item>Sine Wave</item>
-        <item>Triangular Wave</item>
     </array>
 
     <array name="frequency_measure">
@@ -46,7 +45,7 @@
     <string name="empty_frequency">Empty frequency!</string>
     <string name="go_to_main_menu">Go to main menu</string>
     <string name="arduino_vhart">Arduino chart</string>
-    <string name="wait_while_connection_was_established">Wait while connection was established</string>
+    <string name="wait_while_connection_was_established">Please wait</string>
     <string name="max_frequency4">Maximum frequency is 20MHz</string>
     <string name="no_data_available">No data available</string>
 
@@ -57,6 +56,16 @@
     <string name="request_sent">Request sent</string>
     <string name="bt_service_started">Bluetooth service started</string>
     <string name="reset">Reset</string>
-    <string name="clear">CLEAR</string>
-    <string name="gallery">GALLERY</string>
+    <string name="clear">C</string>
+    <string name="gallery">G</string>
+    <string name="a">A</string>
+    <string name="v_low">v</string>
+    <string name="user_manual">User Manual</string>
+    <string name="y_axis">Y axis</string>
+    <string name="x_axis">X axis</string>
+    <string name="y_trace">Y Trace</string>
+    <string name="x_trace">X Trace</string>
+    <string name="receiving_data">Receiving data</string>
+    <string name="please_wait">Please wait…</string>
+    <string name="failed_to_open_file">Failed to open Manual file</string>
 </resources>
