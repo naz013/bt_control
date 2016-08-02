@@ -66,7 +66,6 @@ public class DsoActivity extends AppCompatActivity {
     private static final float Y_SCALE_BASE = 31.25f;
     private static final float CHART_POINT_SIZE = 1.0f;
     private static final float RANGE_DIVIDER = 2f;
-    private static final float NUM_OF_SETS = 5f;
     private static final float Y_MAX = 16f;
     private static final float Y_MIN = -16f;
     private static final String TAG = "DsoActivity";
@@ -355,7 +354,7 @@ public class DsoActivity extends AppCompatActivity {
             for (String xVal : parts) {
                 if (TextUtils.isEmpty(xVal.trim())) continue;
                 float x = Float.parseFloat(xVal.trim());
-                mXVals.add(x / MAX_X);
+                mXVals.add(x / 1000f);
             }
             mXReceived = true;
         } else if (arrays[0].startsWith(Constants.rX)) {
@@ -365,7 +364,7 @@ public class DsoActivity extends AppCompatActivity {
             for (String xVal : parts) {
                 if (TextUtils.isEmpty(xVal.trim())) continue;
                 float x = Float.parseFloat(xVal.trim());
-                mXVals.add(x / MAX_X);
+                mXVals.add(x / 1000f);
             }
             mXReceived = true;
         }
@@ -718,29 +717,6 @@ public class DsoActivity extends AppCompatActivity {
         reloadTraceLines();
     }
 
-    private void addEntryToSet(float x, Entry entry, ILineDataSet[] lineDataSets) {
-        for (int i = 0; i < lineDataSets.length; i++) {
-            if (i < x) {
-                lineDataSets[i].addEntry(entry);
-            }
-        }
-    }
-
-    private ILineDataSet[] getLineDataSets(LineData lineData) {
-        ILineDataSet[] sets = new LineDataSet[lineData.getDataSets().size()];
-        for (int i = 0; i < lineData.getDataSetCount(); i++) {
-            sets[i] = lineData.getDataSetByIndex(i);
-            sets[i].clear();
-        }
-        return sets;
-    }
-
-    private void initLineDataSets(LineData lineData) {
-        for (int i = 0; i < NUM_OF_SETS; i++) {
-            initSet(lineData, i);
-        }
-    }
-
     private void initSet(ScatterData scatterData, int i) {
         IScatterDataSet scatterDataSet;
         try {
@@ -925,7 +901,7 @@ public class DsoActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadTestData();
+//        loadTestData();
     }
 
     private void loadTestData() {
