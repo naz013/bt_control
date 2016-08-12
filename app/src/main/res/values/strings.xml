@@ -68,4 +68,6 @@
     <string name="receiving_data">Receiving data</string>
     <string name="please_wait">Please wait…</string>
     <string name="failed_to_open_file">Failed to open Manual file</string>
+    <string name="snapshot">Snapshot</string>
+    <string name="auto_refresh">Auto Refresh</string>
 </resources>
