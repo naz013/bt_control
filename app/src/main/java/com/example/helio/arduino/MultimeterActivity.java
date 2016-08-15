@@ -21,8 +21,12 @@ import com.example.helio.arduino.core.ConnectionEvent;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.ControlEvent;
 import com.example.helio.arduino.core.ResponseEvent;
+import com.example.helio.arduino.multimeter.WriteExcel;
+
+import java.io.IOException;
 
 import de.greenrobot.event.EventBus;
+import jxl.write.WriteException;
 
 public class MultimeterActivity extends AppCompatActivity {
 
@@ -40,6 +44,8 @@ public class MultimeterActivity extends AppCompatActivity {
     private BluetoothAdapter mBtAdapter = null;
 
     private static Activity activity;
+
+    private WriteExcel mWriteExcell;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,14 +111,22 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private void showCurrent() {
         sendMessage(Constants.I);
+        initExcelFile(Constants.I);
     }
 
     private void showResistance() {
         sendMessage(Constants.R);
+        initExcelFile(Constants.R);
+    }
+
+    private void initExcelFile(String type) {
+        mWriteExcell = new WriteExcel(this);
+        mWriteExcell.setOutput(type);
     }
 
     private void showVoltage() {
         sendMessage(Constants.V);
+        initExcelFile(Constants.V);
     }
 
     private final View.OnClickListener mListener = new View.OnClickListener() {
@@ -176,6 +190,7 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private void reset() {
+        closeExcelFile();
         sendMessage(Constants.D);
         deselectAll();
         enableAll();
@@ -183,6 +198,18 @@ public class MultimeterActivity extends AppCompatActivity {
         isReading = false;
         mSelectedId = -1;
         mSctStatus.setBackgroundResource(R.drawable.gray_circle);
+    }
+
+    private void closeExcelFile() {
+        if (mWriteExcell != null) {
+            try {
+                mWriteExcell.write();
+                mWriteExcell.close();
+            } catch (IOException | WriteException e) {
+                e.printStackTrace();
+            }
+            mWriteExcell = null;
+        }
     }
 
     private void enableAll() {
@@ -233,12 +260,15 @@ public class MultimeterActivity extends AppCompatActivity {
         String v = "";
         if (data.startsWith(Constants.rV)) {
             v = extractV(data) + " " + getString(R.string.v_low);
+            saveToExcel(v);
             mSctStatus.setBackgroundResource(R.drawable.gray_circle);
         } else if (data.startsWith(Constants.rI)) {
             v = extractI(data) + " " + getString(R.string.a);
+            saveToExcel(v);
             mSctStatus.setBackgroundResource(R.drawable.gray_circle);
         } else if (data.startsWith(Constants.rR)) {
             v = extractR(data) + " " + getString(R.string.omega);
+            saveToExcel(v);
             mSctStatus.setBackgroundResource(R.drawable.gray_circle);
         } else if (data.startsWith(Constants.sCT)) {
             int value = extractSct(data);
@@ -250,6 +280,17 @@ public class MultimeterActivity extends AppCompatActivity {
             v = "";
         }
         mMeterField.setText(v);
+    }
+
+    private void saveToExcel(String value) {
+        if (mWriteExcell != null) {
+            try {
+                mWriteExcell.addValue(value);
+                mWriteExcell.write();
+            } catch (WriteException | IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private int extractSct(String data) {
@@ -299,6 +340,7 @@ public class MultimeterActivity extends AppCompatActivity {
         super.onDestroy();
         mBlockView.setVisibility(View.VISIBLE);
         stopService(new Intent(this, BluetoothService.class));
+        closeExcelFile();
     }
 
     @Override

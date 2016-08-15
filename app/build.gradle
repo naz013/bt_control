@@ -4,7 +4,7 @@ apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.0"
+    buildToolsVersion "24.0.1"
 
     defaultConfig {
         applicationId "com.example.helio.arduino"
@@ -12,6 +12,7 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     signingConfigs {
         debugApp {
@@ -64,6 +65,7 @@ dependencies {
     compile 'de.greenrobot:eventbus:2.4.1'
     compile project(':MPChartLib')
     compile 'com.github.barteksc:android-pdf-viewer:1.4.0'
+    compile 'com.android.support:multidex:1.0.1'
 }
 
 import java.text.DateFormat
