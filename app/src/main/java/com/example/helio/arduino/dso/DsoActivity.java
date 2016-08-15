@@ -1,9 +1,11 @@
 package com.example.helio.arduino.dso;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -30,14 +32,28 @@ import com.example.helio.arduino.signal.FragmentListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import de.greenrobot.event.EventBus;
 
 public class DsoActivity extends AppCompatActivity implements FragmentListener {
 
     private static final int REQUEST_ENABLE_BT = 3;
+    public static final float CHART_MAX_Y = 1000f;
+    public static final float CHART_MAX_X = 15000f;
+    public static final float MAX_X = 1500f;
+    public static final float X_SCALE_BASE = 10000f;
+    public static final float Y_SCALE_BASE = 31.25f;
+    public static final float CHART_POINT_SIZE = 1.0f;
+    public static final float RANGE_DIVIDER = 2f;
+    public static final float Y_MAX = 16f;
+    public static final float Y_MIN = -16f;
     private static final String TAG = "DsoActivity";
     private static final boolean D = BuildConfig.DEBUG;
+    private static final int SNAPSHOT = 0;
+    private static final int AUTO_REFRESH = 1;
+    private static final int REALTIME = 2;
+    private static final int NONE = -1;
 
     private TextView mBlockView;
 
@@ -45,6 +61,21 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
 
     private static Activity activity;
     private boolean mXReceived;
+    private int mEnabledAction;
+    private List<Float> mXVals = new ArrayList<>();
+
+    private DsoPagerAdapter mPagerAdapter;
+
+    private int mSelectedPage;
+    private Handler mHandler = new Handler();
+    private Runnable mAutoRunnable = new Runnable() {
+        @Override
+        public void run() {
+            loadTestData();
+            mHandler.removeCallbacks(mAutoRunnable);
+            mHandler.postDelayed(mAutoRunnable, 15);
+        }
+    };
 
     public void onEvent(ResponseEvent responseEvent) {
         try {
@@ -70,7 +101,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
 
         @Override
         public void onPageSelected(int position) {
-
+            mSelectedPage = position;
         }
 
         @Override
@@ -91,11 +122,10 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
     }
 
     private void initTabNavigation() {
-        DsoPagerAdapter mPagerAdapter = new DsoPagerAdapter(this, getFragmentManager());
+        mPagerAdapter = new DsoPagerAdapter(this, getFragmentManager());
         ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.addOnPageChangeListener(mPageListener);
-
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
     }
@@ -150,7 +180,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         if (arrays[0].startsWith("����x:")) {
             String xArray = arrays[0].replace("����x:", "");
             String[] parts = xArray.split(Constants.COMMA);
-            List<Float> mXVals = new ArrayList<>();
+            mXVals.clear();
             for (String xVal : parts) {
                 if (TextUtils.isEmpty(xVal.trim())) continue;
                 float x = Float.parseFloat(xVal.trim());
@@ -160,7 +190,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         } else if (arrays[0].startsWith(Constants.rX)) {
             String xArray = arrays[0].replace(Constants.rX, "");
             String[] parts = xArray.split(Constants.COMMA);
-            List<Float> mXVals = new ArrayList<>();
+            mXVals.clear();
             for (String xVal : parts) {
                 if (TextUtils.isEmpty(xVal.trim())) continue;
                 float x = Float.parseFloat(xVal.trim());
@@ -179,9 +209,43 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
             }
             if (mXReceived) {
                 mXReceived = false;
-                // TODO: 12.08.2016 transfer data
+                sendDataToFragment(mXVals, mYVals);
             }
         }
+    }
+
+    private void sendDataToFragment(List<Float> mXVals, List<Float> mYVals) {
+        Fragment fragment = mPagerAdapter.getFragment(mSelectedPage);
+        Log.d(TAG, "sendDataToFragment: " + fragment);
+        switch (mEnabledAction) {
+            case SNAPSHOT:
+                if (fragment instanceof SnapshotFragment) {
+                    ((SnapshotFragment) fragment).setData(mXVals, mYVals);
+                }
+                break;
+            case AUTO_REFRESH:
+                if (fragment instanceof AutoRefreshFragment) {
+                    ((AutoRefreshFragment) fragment).setData(mXVals, mYVals);
+                }
+                break;
+        }
+    }
+
+    private void loadTestData() {
+        float step = new Random().nextFloat() * (0.2f - 0.05f) + 0.05f;
+        float y = 0f;
+        int testCount = 1500;
+        mXVals.clear();
+        List<Float> mYVals = new ArrayList<>();
+        for (int i = 0; i < testCount; i++) {
+            float x = ((float) i / ((float) testCount / MAX_X)) * (1f / 1000f);
+            y += step;
+            if (Math.round(y) == 16f) step = -step;
+            else if (Math.round(y) == -16.0f) step = Math.abs(step);
+            mYVals.add(y);
+            mXVals.add(x);
+        }
+        sendDataToFragment(mXVals, mYVals);
     }
 
     private void showBlockView() {
@@ -262,5 +326,17 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         if (D) Log.d(TAG, "onAction: " + message);
         EventBus.getDefault().post(new ControlEvent(message));
         showToast(getString(R.string.request_sent));
+        if (message.matches(Constants.C)) {
+            mEnabledAction = SNAPSHOT;
+            loadTestData();
+        } else if (message.matches(Constants.A)) {
+            mEnabledAction = AUTO_REFRESH;
+            mHandler.post(mAutoRunnable);
+        } else if (message.matches(Constants.L)) {
+            mEnabledAction = REALTIME;
+        } else if (message.matches(Constants.S)) {
+            mEnabledAction = NONE;
+            mHandler.removeCallbacks(mAutoRunnable);
+        }
     }
 }

@@ -3,7 +3,6 @@ package com.example.helio.arduino.dso;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -46,11 +45,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class SnapshotFragment extends Fragment {
+public class AutoRefreshFragment extends Fragment {
 
     private FragmentListener mFragmentListener;
 
-    private static final String TAG = "SnapshotFragment";
+    private static final String TAG = "AutoRefreshFragment";
 
     private boolean mIsYTracing = false;
     private boolean mIsXTracing = false;
@@ -67,20 +66,18 @@ public class SnapshotFragment extends Fragment {
     private ImageButton zoomInY, zoomOutY;
     private ImageButton moveRight, moveLeft;
     private ImageButton moveTop, moveBottom;
-    private ProgressDialog mProgressDialog;
 
-    public SnapshotFragment() {
+    public AutoRefreshFragment() {
     }
 
-    public static SnapshotFragment newInstance() {
-        return new SnapshotFragment();
+    public static AutoRefreshFragment newInstance() {
+        return new AutoRefreshFragment();
     }
 
     public void setData(List<Float> xVals, List<Float> yVals) {
         if (xVals.size() == 0 || yVals.size() == 0) return;
         this.mXVals = new ArrayList<>(xVals);
         this.mYVals = new ArrayList<>(yVals);
-        hideProgressDialog();
         reloadData(mYVals, mXVals);
     }
 
@@ -92,17 +89,6 @@ public class SnapshotFragment extends Fragment {
         initChart(view);
         setUpClearGraph();
         return view;
-    }
-
-    private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.dismiss();
-        }
-    }
-
-    private void showProgressDialog() {
-        mProgressDialog = ProgressDialog.show(getActivity(), getString(R.string.receiving_data),
-                getString(R.string.please_wait), false, false);
     }
 
     private void setUpClearGraph() {
@@ -676,14 +662,13 @@ public class SnapshotFragment extends Fragment {
     }
 
     private void capture() {
-        showProgressDialog();
         mXScallar = 1f;
         mXScaleStep = 0;
         mYScaleStep = 0;
         mXMoveStep = 0;
         mYMoveStep = getYParts() / 2;
         setUpClearGraph();
-        sendMessage(Constants.C);
+        sendMessage(Constants.A);
     }
 
     private boolean checkPermission() {

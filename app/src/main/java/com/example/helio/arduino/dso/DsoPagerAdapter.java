@@ -6,25 +6,29 @@ import android.content.Context;
 import android.support.v13.app.FragmentPagerAdapter;
 
 import com.example.helio.arduino.R;
-import com.example.helio.arduino.signal.PwmFragment;
-import com.example.helio.arduino.signal.SignalFragment;
 
 public class DsoPagerAdapter extends FragmentPagerAdapter {
 
     private Context mContext;
+    private Fragment[] fragment = new Fragment[2];
 
     public DsoPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
         this.mContext = context;
     }
 
+    public Fragment getFragment(int position) {
+        return fragment[position];
+    }
+
     @Override
     public Fragment getItem(int position) {
         if (position == 0) {
-            return SnapshotFragment.newInstance();
+            fragment[position] = SnapshotFragment.newInstance();
         } else {
-            return SnapshotFragment.newInstance();
+            fragment[position] = AutoRefreshFragment.newInstance();
         }
+        return fragment[position];
     }
 
     @Override

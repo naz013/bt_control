@@ -19,6 +19,8 @@ public class Constants {
     public static final String V = "v";
 
     public static final String C = "c";
+    public static final String A = "a";
+    public static final String L = "l";
     public static final String S = "s";
 
     public static final String G = "g";
@@ -28,11 +30,6 @@ public class Constants {
     public static final String E = "e";
 
     public static final String Q = "q";
-
-    public static final String OPEN_X = "j";
-    public static final String OPEN_Y = "m";
-    public static final String CLOSE_X = "k";
-    public static final String CLOSE_Y = "n";
 
     public static final String DIV = ";";
     public static final String COMMA = ",";
