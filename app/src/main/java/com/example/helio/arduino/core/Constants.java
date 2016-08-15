@@ -17,6 +17,7 @@ public class Constants {
     public static final String D = "d";
     public static final String I = "i";
     public static final String V = "v";
+    public static final String W = "w";
 
     public static final String C = "c";
     public static final String A = "a";

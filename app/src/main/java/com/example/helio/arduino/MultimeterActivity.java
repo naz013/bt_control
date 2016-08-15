@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +30,7 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private TextView mMeterField;
     private TextView mBlockView;
+    private EditText mRefreshRateField;
     private Button mResetButton;
     private View mSctStatus;
 
@@ -47,6 +49,7 @@ public class MultimeterActivity extends AppCompatActivity {
         initBluetoothAdapter();
         initActionBar();
         initButtons();
+        mRefreshRateField = (EditText) findViewById(R.id.refreshRateField);
         mMeterField = (TextView) findViewById(R.id.meterField);
         mSctStatus = findViewById(R.id.sctStatus);
         initBlockView();
@@ -70,7 +73,7 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
-        mBlockView.setVisibility(View.VISIBLE);
+//        mBlockView.setVisibility(View.VISIBLE);
         mBlockView.setOnTouchListener((v, event) -> true);
     }
 
@@ -83,6 +86,7 @@ public class MultimeterActivity extends AppCompatActivity {
         findViewById(R.id.voltageButton).setOnClickListener(mListener);
         findViewById(R.id.currentButton).setOnClickListener(mListener);
         findViewById(R.id.sctButton).setOnClickListener(mListener);
+        findViewById(R.id.setRateButton).setOnClickListener(mListener);
         mResetButton = (Button) findViewById(R.id.resetButton);
         mResetButton.setOnClickListener(mListener);
         mResetButton.setEnabled(false);
@@ -137,9 +141,26 @@ public class MultimeterActivity extends AppCompatActivity {
                 case R.id.resetButton:
                     reset();
                     break;
+                case R.id.setRateButton:
+                    sendRefreshRate();
+                    break;
             }
         }
     };
+
+    private void sendRefreshRate() {
+        String rateRaw = mRefreshRateField.getText().toString().trim();
+        if (rateRaw.isEmpty()) {
+            showToast(getString(R.string.empty_refresh_rate));
+            return;
+        }
+        int rate = Integer.parseInt(rateRaw);
+        if (rate == 0) {
+            showToast(getString(R.string.refresh_cannot_be_zero));
+            return;
+        }
+        sendMessage(Constants.W + ":" + rate);
+    }
 
     private void showSct() {
         sendMessage(Constants.Q);

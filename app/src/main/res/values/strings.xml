@@ -70,4 +70,8 @@
     <string name="failed_to_open_file">Failed to open Manual file</string>
     <string name="snapshot">Snapshot</string>
     <string name="auto_refresh">Auto Refresh</string>
+    <string name="refresh_rate">Refresh rate (mS)</string>
+    <string name="set_refrash_rate">Set refrash rate</string>
+    <string name="empty_refresh_rate">Empty refresh rate value</string>
+    <string name="refresh_cannot_be_zero">Refresh rate cannot be 0</string>
 </resources>

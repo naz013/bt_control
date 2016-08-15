@@ -15,7 +15,7 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startActivity(new Intent(this, DsoActivity.class));
+        startActivity(new Intent(this, MultimeterActivity.class));
 //        selectScreen();
         finish();
     }
