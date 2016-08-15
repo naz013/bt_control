@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
+import com.example.helio.arduino.R;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.TinyDB;
 
@@ -169,14 +170,14 @@ public class WriteExcel {
 
     private void createLabel() throws WriteException, IOException {
         if (type.matches(Constants.V)) {
-            addCaption(0, 0, "Voltage");
+            addCaption(0, 0, mContext.getString(R.string.voltage));
         } else if (type.matches(Constants.R)) {
-            addCaption(0, 0, "Resistance");
+            addCaption(0, 0, mContext.getString(R.string.resistance));
         } else {
-            addCaption(0, 0, "Current");
+            addCaption(0, 0, mContext.getString(R.string.current));
         }
-        addCaption(1, 0, "Value");
-        addCaption(2, 0, "Time");
+        addCaption(1, 0, mContext.getString(R.string.value));
+        addCaption(2, 0, mContext.getString(R.string.time));
         write();
         updatePointer();
     }

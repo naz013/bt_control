@@ -1,4 +1,4 @@
-package com.example.helio.arduino;
+package com.example.helio.arduino.multimeter;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -16,12 +16,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.helio.arduino.R;
+import com.example.helio.arduino.SettingsActivity;
 import com.example.helio.arduino.core.BluetoothService;
 import com.example.helio.arduino.core.ConnectionEvent;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.ControlEvent;
 import com.example.helio.arduino.core.ResponseEvent;
-import com.example.helio.arduino.multimeter.WriteExcel;
 
 import java.io.IOException;
 
@@ -45,7 +46,7 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private static Activity activity;
 
-    private WriteExcel mWriteExcell;
+    private WriteExcel mWriteExcel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,8 +121,8 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private void initExcelFile(String type) {
-        mWriteExcell = new WriteExcel(this);
-        mWriteExcell.setOutput(type);
+        mWriteExcel = new WriteExcel(this);
+        mWriteExcel.setOutput(type);
     }
 
     private void showVoltage() {
@@ -201,14 +202,14 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private void closeExcelFile() {
-        if (mWriteExcell != null) {
+        if (mWriteExcel != null) {
             try {
-                mWriteExcell.write();
-                mWriteExcell.close();
+                mWriteExcel.write();
+                mWriteExcel.close();
             } catch (IOException | WriteException e) {
                 e.printStackTrace();
             }
-            mWriteExcell = null;
+            mWriteExcel = null;
         }
     }
 
@@ -283,10 +284,10 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private void saveToExcel(String value) {
-        if (mWriteExcell != null) {
+        if (mWriteExcel != null) {
             try {
-                mWriteExcell.addValue(value);
-                mWriteExcell.write();
+                mWriteExcel.addValue(value);
+                mWriteExcel.write();
             } catch (WriteException | IOException e) {
                 e.printStackTrace();
             }

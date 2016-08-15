@@ -74,4 +74,9 @@
     <string name="set_refrash_rate">Set refrash rate</string>
     <string name="empty_refresh_rate">Empty refresh rate value</string>
     <string name="refresh_cannot_be_zero">Refresh rate cannot be 0</string>
+    <string name="value">Value</string>
+    <string name="time">Time</string>
+    <string name="current">Current</string>
+    <string name="resistance">Resistance</string>
+    <string name="voltage">Voltage</string>
 </resources>

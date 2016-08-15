@@ -39,7 +39,7 @@
             android:name=".dso.DsoActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MultimeterActivity"
+            android:name=".multimeter.MultimeterActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".signal.SignalActivity"
