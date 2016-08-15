@@ -29,7 +29,7 @@
             android:name=".SettingsActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".StartActivity"
+            android:name=".connecting.StartActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Fullscreen" />
         <activity

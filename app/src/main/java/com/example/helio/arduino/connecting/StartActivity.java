@@ -1,4 +1,4 @@
-package com.example.helio.arduino;
+package com.example.helio.arduino.connecting;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -22,6 +22,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.helio.arduino.MainActivity;
+import com.example.helio.arduino.R;
 import com.example.helio.arduino.core.ConnectionManager;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.DeviceData;

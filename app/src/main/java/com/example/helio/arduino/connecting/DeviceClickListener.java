@@ -1,4 +1,4 @@
-package com.example.helio.arduino;
+package com.example.helio.arduino.connecting;
 
 import android.view.View;
 
