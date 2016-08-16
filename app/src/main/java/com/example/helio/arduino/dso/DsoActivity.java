@@ -323,7 +323,6 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
 
     @Override
     public void onAction(String message) {
-        if (D) Log.d(TAG, "onAction: " + message);
         EventBus.getDefault().post(new ControlEvent(message));
         showToast(getString(R.string.request_sent));
         if (message.matches(Constants.C)) {
