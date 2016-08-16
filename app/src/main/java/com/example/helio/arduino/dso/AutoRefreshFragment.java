@@ -75,6 +75,7 @@ public class AutoRefreshFragment extends Fragment {
     }
 
     public void setData(List<Float> xVals, List<Float> yVals) {
+        Log.d(TAG, "setData: " + xVals.size() + ", " + yVals.size());
         if (xVals.size() == 0 || yVals.size() == 0) return;
         this.mXVals = new ArrayList<>(xVals);
         this.mYVals = new ArrayList<>(yVals);

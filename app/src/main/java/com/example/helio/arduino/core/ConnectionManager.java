@@ -208,7 +208,7 @@ public class ConnectionManager {
 
         public void run() {
             if (D) Log.i(TAG, "ConnectedThread run");
-            byte[] buffer = new byte[240000];
+            byte[] buffer = new byte[52000];
             int bytes;
             StringBuilder readMessage = new StringBuilder();
             while (true) {
@@ -220,7 +220,6 @@ public class ConnectionManager {
                         mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
                         readMessage.setLength(0);
                     }
-
                 } catch (IOException e) {
                     if (D) Log.e(TAG, "disconnected", e);
                     connectionLost();
@@ -244,6 +243,7 @@ public class ConnectionManager {
             buffer[0] = command;
             try {
                 mmOutStream.write(buffer);
+                mmOutStream.flush();
                 mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer).sendToTarget();
             } catch (IOException e) {
                 if (D) Log.e(TAG, "Exception during write", e);

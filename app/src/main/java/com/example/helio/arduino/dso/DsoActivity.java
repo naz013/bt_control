@@ -32,7 +32,6 @@ import com.example.helio.arduino.signal.FragmentListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import de.greenrobot.event.EventBus;
 
@@ -231,8 +230,13 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         }
     }
 
+    private float step = 0.05f;
+    private float corrector = 0.001f;
+
     private void loadTestData() {
-        float step = new Random().nextFloat() * (0.2f - 0.05f) + 0.05f;
+        step += corrector;
+        if (step > 0.23 && step <= 0.25) corrector = -0.001f;
+        else if (step >= 0.05 && step < 0.06) corrector = 0.001f;
         float y = 0f;
         int testCount = 1500;
         mXVals.clear();
@@ -327,10 +331,10 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         showToast(getString(R.string.request_sent));
         if (message.matches(Constants.C)) {
             mEnabledAction = SNAPSHOT;
-            loadTestData();
+//            loadTestData();
         } else if (message.matches(Constants.A)) {
             mEnabledAction = AUTO_REFRESH;
-            mHandler.post(mAutoRunnable);
+//            mHandler.post(mAutoRunnable);
         } else if (message.matches(Constants.L)) {
             mEnabledAction = REALTIME;
         } else if (message.matches(Constants.S)) {
