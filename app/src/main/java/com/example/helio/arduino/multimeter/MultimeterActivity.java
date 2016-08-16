@@ -80,7 +80,7 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
-//        mBlockView.setVisibility(View.VISIBLE);
+        mBlockView.setVisibility(View.VISIBLE);
         mBlockView.setOnTouchListener((v, event) -> true);
     }
 
@@ -134,7 +134,7 @@ public class MultimeterActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             if (mSelectedId != v.getId() || mSelectedId == -1) {
-                if (v.getId() != R.id.resetButton) {
+                if (v.getId() != R.id.resetButton && v.getId() != R.id.setRateButton) {
                     selectButton(v);
                 }
             } else {
@@ -174,7 +174,7 @@ public class MultimeterActivity extends AppCompatActivity {
             showToast(getString(R.string.refresh_cannot_be_zero));
             return;
         }
-        sendMessage(Constants.W + ":" + rate);
+        sendMessage(Constants.W + ": " + rate);
     }
 
     private void showSct() {
@@ -287,8 +287,7 @@ public class MultimeterActivity extends AppCompatActivity {
         if (mWriteExcel != null) {
             try {
                 mWriteExcel.addValue(value);
-                mWriteExcel.write();
-            } catch (WriteException | IOException e) {
+            } catch (WriteException e) {
                 e.printStackTrace();
             }
         }
@@ -349,6 +348,7 @@ public class MultimeterActivity extends AppCompatActivity {
         super.onStop();
         sendMessage(Constants.D);
         EventBus.getDefault().unregister(this);
+        closeExcelFile();
     }
 
     @Override

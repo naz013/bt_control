@@ -136,7 +136,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
 
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
-//        mBlockView.setVisibility(View.VISIBLE);
+        mBlockView.setVisibility(View.VISIBLE);
         mBlockView.setOnTouchListener((v, event) -> true);
     }
 

@@ -178,7 +178,6 @@ public class WriteExcel {
         }
         addCaption(1, 0, mContext.getString(R.string.value));
         addCaption(2, 0, mContext.getString(R.string.time));
-        write();
         updatePointer();
     }
 
@@ -211,11 +210,6 @@ public class WriteExcel {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZ", Locale.getDefault());
         String timeStamp = sdf.format(new Date());
         mExcelSheet.addCell(new Label(2, pointer, timeStamp, times));
-        try {
-            write();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         updatePointer();
     }
 }
