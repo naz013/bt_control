@@ -79,4 +79,5 @@
     <string name="current">Current</string>
     <string name="resistance">Resistance</string>
     <string name="voltage">Voltage</string>
+    <string name="exported_data">Exported data</string>
 </resources>

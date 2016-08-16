@@ -94,6 +94,7 @@ public class MultimeterActivity extends AppCompatActivity {
         findViewById(R.id.currentButton).setOnClickListener(mListener);
         findViewById(R.id.sctButton).setOnClickListener(mListener);
         findViewById(R.id.setRateButton).setOnClickListener(mListener);
+        findViewById(R.id.filesButton).setOnClickListener(mListener);
         mResetButton = (Button) findViewById(R.id.resetButton);
         mResetButton.setOnClickListener(mListener);
         mResetButton.setEnabled(false);
@@ -134,9 +135,7 @@ public class MultimeterActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             if (mSelectedId != v.getId() || mSelectedId == -1) {
-                if (v.getId() != R.id.resetButton && v.getId() != R.id.setRateButton) {
-                    selectButton(v);
-                }
+                checkButton(v);
             } else {
                 return;
             }
@@ -159,9 +158,22 @@ public class MultimeterActivity extends AppCompatActivity {
                 case R.id.setRateButton:
                     sendRefreshRate();
                     break;
+                case R.id.filesButton:
+                    showSavedFiles();
+                    break;
             }
         }
     };
+
+    private void checkButton(View v) {
+        if (v.getId() != R.id.resetButton && v.getId() != R.id.setRateButton && v.getId() != R.id.filesButton) {
+            selectButton(v);
+        }
+    }
+
+    private void showSavedFiles() {
+        startActivity(new Intent(this, FileListActivity.class));
+    }
 
     private void sendRefreshRate() {
         String rateRaw = mRefreshRateField.getText().toString().trim();
