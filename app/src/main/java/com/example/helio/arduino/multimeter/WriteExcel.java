@@ -2,7 +2,6 @@ package com.example.helio.arduino.multimeter;
 
 import android.content.Context;
 import android.os.Environment;
-import android.util.Log;
 
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.core.Constants;
@@ -203,11 +202,10 @@ public class WriteExcel {
     }
 
     public void addValue(String s) throws WriteException {
-        Log.d(TAG, "addValue: " + pointer);
         if (mExcelSheet == null) return;
         addNumber(0, pointer, pointer);
         mExcelSheet.addCell(new Label(1, pointer, s, times));
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZ", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault());
         String timeStamp = sdf.format(new Date());
         mExcelSheet.addCell(new Label(2, pointer, timeStamp, times));
         updatePointer();
