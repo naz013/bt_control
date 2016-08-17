@@ -59,9 +59,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
     private BluetoothAdapter mBtAdapter = null;
 
     private static Activity activity;
-    private boolean mXReceived;
     private int mEnabledAction;
-    private List<Float> mXVals = new ArrayList<>();
 
     private DsoPagerAdapter mPagerAdapter;
 
@@ -175,41 +173,19 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
 
     private void readDso(Message msg) throws NumberFormatException {
         String data = (String) msg.obj;
-        String[] arrays = data.split(";");
-        if (arrays[0].startsWith("����x:")) {
-            String xArray = arrays[0].replace("����x:", "");
-            String[] parts = xArray.split(Constants.COMMA);
-            mXVals.clear();
-            for (String xVal : parts) {
-                if (TextUtils.isEmpty(xVal.trim())) continue;
-                float x = Float.parseFloat(xVal.trim());
-                mXVals.add(x / 1000f);
-            }
-            mXReceived = true;
-        } else if (arrays[0].startsWith(Constants.rX)) {
-            String xArray = arrays[0].replace(Constants.rX, "");
-            String[] parts = xArray.split(Constants.COMMA);
-            mXVals.clear();
-            for (String xVal : parts) {
-                if (TextUtils.isEmpty(xVal.trim())) continue;
-                float x = Float.parseFloat(xVal.trim());
-                mXVals.add(x / 1000f);
-            }
-            mXReceived = true;
-        }
-        if (arrays[1].startsWith(Constants.rY)) {
-            String yArray = arrays[1].replace(Constants.rY, "");
+        if (data.startsWith(Constants.rY)) {
+            String yArray = data.replace(Constants.rY, "");
             String[] parts = yArray.split(Constants.COMMA);
             List<Float> mYVals = new ArrayList<>();
-            for (String yVal : parts) {
+            List<Float> mXVals = new ArrayList<>();
+            for (int i = 0; i < parts.length; i++) {
+                String yVal = parts[i];
                 if (TextUtils.isEmpty(yVal.trim())) continue;
                 float y = Float.parseFloat(yVal.trim());
                 mYVals.add(y);
+                mXVals.add(i * 1.5f / 1000f);
             }
-            if (mXReceived) {
-                mXReceived = false;
-                sendDataToFragment(mXVals, mYVals);
-            }
+            sendDataToFragment(mXVals, mYVals);
         }
     }
 
@@ -238,16 +214,15 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         if (step > 0.23 && step <= 0.25) corrector = -0.001f;
         else if (step >= 0.05 && step < 0.06) corrector = 0.001f;
         float y = 0f;
-        int testCount = 1500;
-        mXVals.clear();
+        int testCount = 1000;
         List<Float> mYVals = new ArrayList<>();
+        List<Float> mXVals = new ArrayList<>();
         for (int i = 0; i < testCount; i++) {
-            float x = ((float) i / ((float) testCount / MAX_X)) * (1f / 1000f);
             y += step;
             if (Math.round(y) == 16f) step = -step;
             else if (Math.round(y) == -16.0f) step = Math.abs(step);
             mYVals.add(y);
-            mXVals.add(x);
+            mXVals.add(i * 1.5f / 1000f);
         }
         sendDataToFragment(mXVals, mYVals);
     }
@@ -334,7 +309,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
 //            loadTestData();
         } else if (message.matches(Constants.A)) {
             mEnabledAction = AUTO_REFRESH;
-            mHandler.post(mAutoRunnable);
+//            mHandler.post(mAutoRunnable);
         } else if (message.matches(Constants.L)) {
             mEnabledAction = REALTIME;
         } else if (message.matches(Constants.S)) {
