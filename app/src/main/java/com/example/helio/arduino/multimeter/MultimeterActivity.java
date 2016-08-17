@@ -36,6 +36,7 @@ public class MultimeterActivity extends AppCompatActivity {
     private static final int VOLTAGE = R.id.voltageButton;
     private static final int CURRENT = R.id.currentButton;
     private static final int RESISTANCE = R.id.resistanceButton;
+    private static final int SCT = R.id.sctButton;
 
     private TextView mMeterField;
     private TextView mBlockView;
@@ -94,10 +95,10 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private void initButtons() {
-        findViewById(R.id.resistanceButton).setOnClickListener(mListener);
-        findViewById(R.id.voltageButton).setOnClickListener(mListener);
-        findViewById(R.id.currentButton).setOnClickListener(mListener);
-        findViewById(R.id.sctButton).setOnClickListener(mListener);
+        findViewById(RESISTANCE).setOnClickListener(mListener);
+        findViewById(VOLTAGE).setOnClickListener(mListener);
+        findViewById(CURRENT).setOnClickListener(mListener);
+        findViewById(SCT).setOnClickListener(mListener);
         findViewById(R.id.setRateButton).setOnClickListener(mListener);
         findViewById(R.id.filesButton).setOnClickListener(mListener);
         mExportButton = (ImageButton) findViewById(R.id.exportButton);
@@ -164,16 +165,16 @@ public class MultimeterActivity extends AppCompatActivity {
                 return;
             }
             switch (v.getId()) {
-                case R.id.resistanceButton:
+                case RESISTANCE:
                     showResistance();
                     break;
-                case R.id.voltageButton:
+                case VOLTAGE:
                     showVoltage();
                     break;
-                case R.id.currentButton:
+                case CURRENT:
                     showCurrent();
                     break;
-                case R.id.sctButton:
+                case SCT:
                     showSct();
                     break;
                 case R.id.resetButton:
@@ -260,25 +261,25 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private void enableAll() {
-        findViewById(R.id.resistanceButton).setEnabled(true);
-        findViewById(R.id.voltageButton).setEnabled(true);
-        findViewById(R.id.currentButton).setEnabled(true);
-        findViewById(R.id.sctButton).setEnabled(true);
+        findViewById(RESISTANCE).setEnabled(true);
+        findViewById(VOLTAGE).setEnabled(true);
+        findViewById(CURRENT).setEnabled(true);
+        findViewById(SCT).setEnabled(true);
         mResetButton.setEnabled(false);
     }
 
     private void disableAll(int id) {
-        if (id != R.id.resistanceButton) findViewById(R.id.resistanceButton).setEnabled(false);
-        if (id != R.id.voltageButton) findViewById(R.id.voltageButton).setEnabled(false);
-        if (id != R.id.currentButton) findViewById(R.id.currentButton).setEnabled(false);
-        if (id != R.id.sctButton) findViewById(R.id.sctButton).setEnabled(false);
+        if (id != RESISTANCE) findViewById(RESISTANCE).setEnabled(false);
+        if (id != VOLTAGE) findViewById(VOLTAGE).setEnabled(false);
+        if (id != CURRENT) findViewById(CURRENT).setEnabled(false);
+        if (id != SCT) findViewById(SCT).setEnabled(false);
     }
 
     private void deselectAll() {
-        findViewById(R.id.resistanceButton).setSelected(false);
-        findViewById(R.id.voltageButton).setSelected(false);
-        findViewById(R.id.currentButton).setSelected(false);
-        findViewById(R.id.sctButton).setSelected(false);
+        findViewById(RESISTANCE).setSelected(false);
+        findViewById(VOLTAGE).setSelected(false);
+        findViewById(CURRENT).setSelected(false);
+        findViewById(SCT).setSelected(false);
     }
 
     private void requestBtEnable() {
