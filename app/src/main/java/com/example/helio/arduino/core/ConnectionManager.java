@@ -11,6 +11,8 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class ConnectionManager {
 
@@ -208,17 +210,41 @@ public class ConnectionManager {
 
         public void run() {
             if (D) Log.i(TAG, "ConnectedThread run");
-            byte[] buffer = new byte[256];
+            byte[] buffer = new byte[128];
+            byte[] byteBuffer = new byte[2000];
+            boolean isDsoData = false;
             int bytes;
+            int pointer = 0;
             StringBuilder readMessage = new StringBuilder();
             while (true) {
                 try {
                     bytes = mmInStream.read(buffer);
-                    String readed = new String(buffer, 0, bytes);
-                    readMessage.append(readed);
-                    if (readed.contains("\n")) {
-                        mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
-                        readMessage.setLength(0);
+                    if (bytes == 1 && buffer[0] == 121 && buffer[1] == 0 && buffer[2] == 0) {
+                        isDsoData = true;
+                    } else if (isDsoData && bytes > 2 && checkQueue(buffer[bytes - 3], buffer[bytes - 2], buffer[bytes - 1])) {
+                        isDsoData = false;
+                        for (int i = 0; i < bytes - 3; i++) {
+                            byteBuffer[pointer] = buffer[i];
+                            pointer++;
+                        }
+                        pointer = 0;
+                        short[] shorts = new short[byteBuffer.length / 2];
+                        ByteBuffer.wrap(byteBuffer).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts);
+                        mHandler.obtainMessage(Constants.ARRAY_READ, bytes, -1, shorts).sendToTarget();
+                        byteBuffer = new byte[2000];
+                        buffer = new byte[128];
+                    } else if (isDsoData) {
+                        for (int i = 0; i < bytes; i++) {
+                            byteBuffer[pointer] = buffer[i];
+                            pointer++;
+                        }
+                    } else {
+                        String readed = new String(buffer, 0, bytes);
+                        readMessage.append(readed);
+                        if (readed.contains("\n")) {
+                            mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
+                            readMessage.setLength(0);
+                        }
                     }
                 } catch (IOException e) {
                     if (D) Log.e(TAG, "disconnected", e);
@@ -257,5 +283,9 @@ public class ConnectionManager {
                 if (D) Log.e(TAG, "close() of connect socket failed", e);
             }
         }
+    }
+
+    private boolean checkQueue(byte b, byte b1, byte b2) {
+        return b == 0 && b1 == 1 && b2 == 2;
     }
 }

@@ -62,6 +62,8 @@ public class SnapshotFragment extends Fragment {
     private List<Float> mYVals = new ArrayList<>();
     private List<Float> mXVals = new ArrayList<>();
 
+    private long startTime = 0;
+
     private ScatterChart mChart;
     private ImageButton zoomInX, zoomOutX;
     private ImageButton zoomInY, zoomOutY;
@@ -95,12 +97,14 @@ public class SnapshotFragment extends Fragment {
     }
 
     private void hideProgressDialog() {
+        Log.d(TAG, "hideProgressDialog: wait time " + (System.currentTimeMillis() - startTime));
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
         }
     }
 
     private void showProgressDialog() {
+        startTime = System.currentTimeMillis();
         mProgressDialog = ProgressDialog.show(getActivity(), getString(R.string.receiving_data),
                 getString(R.string.please_wait), false, false);
     }

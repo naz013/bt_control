@@ -6,12 +6,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +25,7 @@ import com.example.helio.arduino.core.BluetoothService;
 import com.example.helio.arduino.core.ConnectionEvent;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.ControlEvent;
-import com.example.helio.arduino.core.ResponseEvent;
+import com.example.helio.arduino.core.DsoEvent;
 import com.example.helio.arduino.signal.FragmentListener;
 
 import java.util.ArrayList;
@@ -60,6 +58,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
 
     private static Activity activity;
     private int mEnabledAction;
+    private long mTime;
 
     private DsoPagerAdapter mPagerAdapter;
 
@@ -74,9 +73,9 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         }
     };
 
-    public void onEvent(ResponseEvent responseEvent) {
+    public void onEvent(DsoEvent dsoEvent) {
         try {
-            readDso(responseEvent.getMsg());
+            readDso(dsoEvent.getArray());
         } catch (NumberFormatException e) {
 
         }
@@ -171,22 +170,17 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         showToast(getString(R.string.request_sent));
     }
 
-    private void readDso(Message msg) throws NumberFormatException {
-        String data = (String) msg.obj;
-        if (data.startsWith(Constants.rY)) {
-            String yArray = data.replace(Constants.rY, "");
-            String[] parts = yArray.split(Constants.COMMA);
-            List<Float> mYVals = new ArrayList<>();
-            List<Float> mXVals = new ArrayList<>();
-            for (int i = 0; i < parts.length; i++) {
-                String yVal = parts[i];
-                if (TextUtils.isEmpty(yVal.trim())) continue;
-                float y = Float.parseFloat(yVal.trim());
-                mYVals.add(y);
-                mXVals.add(i * 1.5f / 1000f);
-            }
-            sendDataToFragment(mXVals, mYVals);
+    private void readDso(short[] array) {
+        List<Float> mYVals = new ArrayList<>();
+        List<Float> mXVals = new ArrayList<>();
+        for (int i = 0; i < array.length; i++) {
+            float x = ((float) i / ((float) array.length / MAX_X)) * (1f / 1000f);
+            short yVal = array[i];
+            float y = (float) yVal / 1000f;
+            mYVals.add(y);
+            mXVals.add(x);
         }
+        sendDataToFragment(mXVals, mYVals);
     }
 
     private void sendDataToFragment(List<Float> mXVals, List<Float> mYVals) {
@@ -218,11 +212,12 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         List<Float> mYVals = new ArrayList<>();
         List<Float> mXVals = new ArrayList<>();
         for (int i = 0; i < testCount; i++) {
+            float x = ((float) i / ((float) testCount / MAX_X)) * (1f / 1000f);
             y += step;
             if (Math.round(y) == 16f) step = -step;
             else if (Math.round(y) == -16.0f) step = Math.abs(step);
             mYVals.add(y);
-            mXVals.add(i * 1.5f / 1000f);
+            mXVals.add(x);
         }
         sendDataToFragment(mXVals, mYVals);
     }
@@ -302,6 +297,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
 
     @Override
     public void onAction(String message) {
+        mTime = System.currentTimeMillis();
         EventBus.getDefault().post(new ControlEvent(message));
         showToast(getString(R.string.request_sent));
         if (message.matches(Constants.C)) {
