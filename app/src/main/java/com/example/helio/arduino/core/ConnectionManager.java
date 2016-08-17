@@ -271,11 +271,11 @@ public class ConnectionManager {
             }
         }
 
-        public void writeData(byte[] chunk) {
+        public void writeData(byte[] buffer) {
             try {
-                mmOutStream.write(chunk);
+                mmOutStream.write(buffer);
                 mmOutStream.flush();
-                mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, chunk).sendToTarget();
+                mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer).sendToTarget();
             } catch (IOException e) {
                 if (D) Log.e(TAG, "Exception during write", e);
             }
