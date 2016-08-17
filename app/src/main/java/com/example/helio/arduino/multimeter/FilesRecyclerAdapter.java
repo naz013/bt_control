@@ -3,10 +3,12 @@ package com.example.helio.arduino.multimeter;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.helio.arduino.R;
@@ -50,13 +52,34 @@ public class FilesRecyclerAdapter extends RecyclerView.Adapter<FilesRecyclerAdap
             super(itemView);
             fileNameView = (TextView) itemView.findViewById(R.id.nameView);
             fileNameView.setOnClickListener(v -> handleClick(getAdapterPosition()));
+            ImageButton button = (ImageButton) itemView.findViewById(R.id.deleteButton);
+            button.setOnClickListener(view -> showDeleteDialog(getAdapterPosition()));
         }
     }
 
-    private void handleClick(int adapterPosition) {
+    private void showDeleteDialog(int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setCancelable(true);
+        builder.setMessage(mContext.getString(R.string.are_you_sure));
+        builder.setPositiveButton(mContext.getString(R.string.remove), (dialog, which) -> {
+            dialog.dismiss();
+            removeItem(position);
+        });
+        builder.setNegativeButton(mContext.getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void removeItem(int position) {
+        mDataList.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(0, mDataList.size());
+    }
+
+    private void handleClick(int position) {
         Intent intent = new Intent();
-        intent.setAction(android.content.Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(new File(mDataList.get(adapterPosition).getFullPath())), "application/vnd.ms-excel");
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(new File(mDataList.get(position).getFullPath())), "application/vnd.ms-excel");
         mContext.startActivity(intent);
     }
 }
