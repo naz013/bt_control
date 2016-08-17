@@ -205,7 +205,7 @@ public class WriteExcel {
         if (mExcelSheet == null) return;
         addNumber(0, pointer, pointer);
         mExcelSheet.addCell(new Label(1, pointer, s, times));
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
         String timeStamp = sdf.format(new Date());
         mExcelSheet.addCell(new Label(2, pointer, timeStamp, times));
         updatePointer();

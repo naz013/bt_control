@@ -71,6 +71,7 @@ public class FilesRecyclerAdapter extends RecyclerView.Adapter<FilesRecyclerAdap
     }
 
     private void removeItem(int position) {
+        new File(mDataList.get(position).getFullPath()).delete();
         mDataList.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(0, mDataList.size());

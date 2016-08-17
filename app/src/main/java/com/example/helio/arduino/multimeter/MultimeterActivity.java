@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,11 +33,15 @@ import jxl.write.WriteException;
 public class MultimeterActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT = 3;
+    private static final int VOLTAGE = R.id.voltageButton;
+    private static final int CURRENT = R.id.currentButton;
+    private static final int RESISTANCE = R.id.resistanceButton;
 
     private TextView mMeterField;
     private TextView mBlockView;
     private EditText mRefreshRateField;
     private Button mResetButton;
+    private ImageButton mExportButton;
     private View mSctStatus;
 
     private int mSelectedId;
@@ -95,6 +100,9 @@ public class MultimeterActivity extends AppCompatActivity {
         findViewById(R.id.sctButton).setOnClickListener(mListener);
         findViewById(R.id.setRateButton).setOnClickListener(mListener);
         findViewById(R.id.filesButton).setOnClickListener(mListener);
+        mExportButton = (ImageButton) findViewById(R.id.exportButton);
+        mExportButton.setOnClickListener(mListener);
+        mExportButton.setSelected(false);
         mResetButton = (Button) findViewById(R.id.resetButton);
         mResetButton.setOnClickListener(mListener);
         mResetButton.setEnabled(false);
@@ -113,28 +121,44 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private void showCurrent() {
         sendMessage(Constants.I);
-        initExcelFile(Constants.I);
+        refreshExcel();
     }
 
     private void showResistance() {
         sendMessage(Constants.R);
-        initExcelFile(Constants.R);
+        refreshExcel();
     }
 
-    private void initExcelFile(String type) {
+    private void refreshExcel() {
+        if (mWriteExcel != null) {
+            closeExcelFile();
+        }
+        if (!mExportButton.isSelected()) return;
+        if (mSelectedId == VOLTAGE) {
+            initExcel(Constants.V);
+        } else if (mSelectedId == CURRENT) {
+            initExcel(Constants.I);
+        } else if (mSelectedId == RESISTANCE) {
+            initExcel(Constants.R);
+        }
+    }
+
+    private void initExcel(String type) {
         mWriteExcel = new WriteExcel(this);
         mWriteExcel.setOutput(type);
     }
 
     private void showVoltage() {
         sendMessage(Constants.V);
-        initExcelFile(Constants.V);
+        refreshExcel();
     }
 
     private final View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (mSelectedId != v.getId() || mSelectedId == -1) {
+            if (v.getId() == R.id.exportButton) {
+                switchExport();
+            } else if (mSelectedId != v.getId() || mSelectedId == -1) {
                 checkButton(v);
             } else {
                 return;
@@ -164,6 +188,16 @@ public class MultimeterActivity extends AppCompatActivity {
             }
         }
     };
+
+    private void switchExport() {
+        if (mWriteExcel != null || mExportButton.isSelected()) {
+            mExportButton.setSelected(false);
+            closeExcelFile();
+        } else {
+            mExportButton.setSelected(true);
+            refreshExcel();
+        }
+    }
 
     private void checkButton(View v) {
         if (v.getId() != R.id.resetButton && v.getId() != R.id.setRateButton && v.getId() != R.id.filesButton) {

@@ -120,7 +120,7 @@
                     <Button
                         android:id="@+id/resetButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="56dp"
                         android:layout_gravity="center"
                         android:background="@drawable/button_red_selector"
                         android:padding="5dp"
@@ -131,10 +131,19 @@
                         android:textSize="30sp" />
 
                     <ImageButton
+                        android:id="@+id/exportButton"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_marginLeft="16dp"
+                        android:background="@drawable/button_export_selector"
+                        android:src="@drawable/file_export_dark" />
+
+                    <ImageButton
                         android:id="@+id/filesButton"
                         android:layout_width="56dp"
                         android:layout_height="56dp"
                         android:layout_marginLeft="16dp"
+                        android:background="@color/colorBlue"
                         android:src="@drawable/file_document" />
 
                 </LinearLayout>
