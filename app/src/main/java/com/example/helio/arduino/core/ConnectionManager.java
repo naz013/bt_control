@@ -11,6 +11,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 public class ConnectionManager {
 
@@ -208,18 +209,23 @@ public class ConnectionManager {
 
         public void run() {
             if (D) Log.i(TAG, "ConnectedThread run");
-            byte[] buffer = new byte[52000];
+            byte[] buffer = new byte[128];
+            byte[] byteBuffer = new byte[3000];
+            boolean isDsoData = false;
             int bytes;
-            StringBuilder readMessage = new StringBuilder();
+//            StringBuilder readMessage = new StringBuilder();
             while (true) {
                 try {
                     bytes = mmInStream.read(buffer);
-                    String readed = new String(buffer, 0, bytes);
-                    readMessage.append(readed);
-                    if (readed.contains("\n")) {
-                        mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
-                        readMessage.setLength(0);
-                    }
+                    if (bytes == 1 && buffer[0] == 121)
+                    Log.d(TAG, "run: buffer " + Arrays.toString(buffer));
+                    Log.d(TAG, "run: bytes " + bytes);
+//                    String readed = new String(buffer, 0, bytes);
+//                    readMessage.append(readed);
+//                    if (readed.contains("\n")) {
+//                        mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
+//                        readMessage.setLength(0);
+//                    }
                 } catch (IOException e) {
                     if (D) Log.e(TAG, "disconnected", e);
                     connectionLost();
