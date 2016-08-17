@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
 public class ConnectionManager {
 
@@ -210,7 +211,6 @@ public class ConnectionManager {
 
         public void run() {
             if (D) Log.i(TAG, "ConnectedThread run");
-            byte[] buffer = new byte[128];
             byte[] byteBuffer = new byte[2000];
             boolean isDsoData = false;
             int bytes;
@@ -218,11 +218,16 @@ public class ConnectionManager {
             StringBuilder readMessage = new StringBuilder();
             while (true) {
                 try {
+                    byte[] buffer = new byte[128];
                     bytes = mmInStream.read(buffer);
+                    Log.d(TAG, "run: " + bytes);
+                    Log.d(TAG, "run: bytes buffer " + Arrays.toString(buffer));
                     if (bytes == 1 && buffer[0] == 121 && buffer[1] == 0 && buffer[2] == 0) {
                         isDsoData = true;
+                        Log.d(TAG, "run: 0");
                     } else if (isDsoData && bytes > 2 && checkQueue(buffer[bytes - 3], buffer[bytes - 2], buffer[bytes - 1])) {
                         isDsoData = false;
+                        Log.d(TAG, "run: 1");
                         for (int i = 0; i < bytes - 3; i++) {
                             byteBuffer[pointer] = buffer[i];
                             pointer++;
@@ -230,15 +235,27 @@ public class ConnectionManager {
                         pointer = 0;
                         short[] shorts = new short[byteBuffer.length / 2];
                         ByteBuffer.wrap(byteBuffer).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts);
-                        mHandler.obtainMessage(Constants.ARRAY_READ, bytes, -1, shorts).sendToTarget();
                         byteBuffer = new byte[2000];
-                        buffer = new byte[128];
+                        mHandler.obtainMessage(Constants.ARRAY_READ, bytes, -1, shorts).sendToTarget();
+                    } else if (isDsoData && bytes > 3 && checkQueue(buffer[bytes - 4], buffer[bytes - 3], buffer[bytes - 2])) {
+                        Log.d(TAG, "run: 2");
+                        for (int i = 0; i < bytes - 3; i++) {
+                            byteBuffer[pointer] = buffer[i];
+                            pointer++;
+                        }
+                        pointer = 0;
+                        short[] shorts = new short[byteBuffer.length / 2];
+                        ByteBuffer.wrap(byteBuffer).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts);
+                        byteBuffer = new byte[2000];
+                        mHandler.obtainMessage(Constants.ARRAY_READ, bytes, -1, shorts).sendToTarget();
                     } else if (isDsoData) {
+                        Log.d(TAG, "run: 3");
                         for (int i = 0; i < bytes; i++) {
                             byteBuffer[pointer] = buffer[i];
                             pointer++;
                         }
                     } else {
+                        Log.d(TAG, "run: 4");
                         String readed = new String(buffer, 0, bytes);
                         readMessage.append(readed);
                         if (readed.contains("\n")) {
