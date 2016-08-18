@@ -302,10 +302,8 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         showToast(getString(R.string.request_sent));
         if (message.matches(Constants.C)) {
             mEnabledAction = SNAPSHOT;
-//            loadTestData();
         } else if (message.matches(Constants.A)) {
             mEnabledAction = AUTO_REFRESH;
-//            mHandler.post(mAutoRunnable);
         } else if (message.matches(Constants.L)) {
             mEnabledAction = REALTIME;
         } else if (message.matches(Constants.S)) {

@@ -305,6 +305,8 @@ public class MultimeterActivity extends AppCompatActivity {
             return;
         }
         String data = (String) msg.obj;
+        data = data.replaceAll("\n", "");
+        data = data.replaceAll(" ", "");
         String v = "";
         if (data.startsWith(Constants.rV)) {
             v = extractV(data) + " " + getString(R.string.v_low);

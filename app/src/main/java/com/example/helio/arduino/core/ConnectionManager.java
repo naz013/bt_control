@@ -225,9 +225,7 @@ public class ConnectionManager {
                     int endPosition = checkQueue(buffer, bytes);
                     if (bytes == 1 && buffer[0] == 121) {
                         isDsoData = true;
-                        Log.d(TAG, "run: var 0");
                     } else if (!isDsoData && buffer[0] == 121) {
-                        Log.d(TAG, "run: var 5");
                         isDsoData = true;
                         byteBuffer = new byte[2000];
                         pointer = 0;
@@ -238,7 +236,6 @@ public class ConnectionManager {
                             }
                         }
                     } else if (hasMarkerStart && (buffer[0] == 2 || (buffer[0] == 1 && buffer[1] == 2))) {
-                        Log.d(TAG, "run: var 1");
                         isDsoData = false;
                         int start = 1;
                         if (buffer[0] == 1 && buffer[1] == 2) start = 2;
@@ -258,7 +255,6 @@ public class ConnectionManager {
                         }
                     } else if (isDsoData && bytes > 2 && endPosition != -1) {
                         isDsoData = false;
-                        Log.d(TAG, "run: var 2");
                         for (int i = 0; i < endPosition; i++) {
                             byteBuffer[pointer] = buffer[i];
                             pointer++;
@@ -278,14 +274,12 @@ public class ConnectionManager {
                             }
                         }
                     } else if (isDsoData) {
-                        Log.d(TAG, "run: var 3");
                         if (pointer >= 2000) pointer = 0;
                         for (int i = 0; i < bytes; i++) {
                             byteBuffer[pointer] = buffer[i];
                             pointer++;
                         }
                     } else {
-                        Log.d(TAG, "run: var 4");
                         String readed = new String(buffer, 0, bytes);
                         readMessage.append(readed);
                         if (readed.contains("\n")) {
