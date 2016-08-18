@@ -213,49 +213,79 @@ public class ConnectionManager {
             if (D) Log.i(TAG, "ConnectedThread run");
             byte[] byteBuffer = new byte[2000];
             boolean isDsoData = false;
+            boolean hasMarkerStart = false;
             int bytes;
             int pointer = 0;
             StringBuilder readMessage = new StringBuilder();
             while (true) {
                 try {
-                    byte[] buffer = new byte[128];
+                    byte[] buffer = new byte[512];
                     bytes = mmInStream.read(buffer);
-                    Log.d(TAG, "run: " + bytes);
-                    Log.d(TAG, "run: bytes buffer " + Arrays.toString(buffer));
-                    if (bytes == 1 && buffer[0] == 121 && buffer[1] == 0 && buffer[2] == 0) {
+                    Log.d(TAG, "run: " + bytes + " bytes buffer " + Arrays.toString(buffer));
+                    int endPosition = checkQueue(buffer, bytes);
+                    if (bytes == 1 && buffer[0] == 121) {
                         isDsoData = true;
-                        Log.d(TAG, "run: 0");
-                    } else if (isDsoData && bytes > 2 && checkQueue(buffer[bytes - 3], buffer[bytes - 2], buffer[bytes - 1])) {
+                        Log.d(TAG, "run: var 0");
+                    } else if (!isDsoData && buffer[0] == 121) {
+                        Log.d(TAG, "run: var 5");
+                        isDsoData = true;
+                        byteBuffer = new byte[2000];
+                        pointer = 0;
+                        if (bytes > 1) {
+                            for (int i = 1; i < bytes; i++) {
+                                byteBuffer[pointer] = buffer[i];
+                                pointer++;
+                            }
+                        }
+                    } else if (hasMarkerStart && (buffer[0] == 2 || (buffer[0] == 1 && buffer[1] == 2))) {
+                        Log.d(TAG, "run: var 1");
                         isDsoData = false;
-                        Log.d(TAG, "run: 1");
-                        for (int i = 0; i < bytes - 3; i++) {
+                        int start = 1;
+                        if (buffer[0] == 1 && buffer[1] == 2) start = 2;
+                        short[] shorts = new short[byteBuffer.length / 2];
+                        ByteBuffer.wrap(byteBuffer).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts);
+                        mHandler.obtainMessage(Constants.ARRAY_READ, bytes, -1, shorts).sendToTarget();
+                        byteBuffer = new byte[2000];
+                        pointer = 0;
+                        if (bytes - 1 >= start) {
+                            if (buffer[start] == 121) {
+                                isDsoData = true;
+                            }
+                            for (int i = start + 1; i < bytes; i++) {
+                                byteBuffer[pointer] = buffer[i];
+                                pointer++;
+                            }
+                        }
+                    } else if (isDsoData && bytes > 2 && endPosition != -1) {
+                        isDsoData = false;
+                        Log.d(TAG, "run: var 2");
+                        for (int i = 0; i < endPosition; i++) {
                             byteBuffer[pointer] = buffer[i];
                             pointer++;
                         }
-                        pointer = 0;
                         short[] shorts = new short[byteBuffer.length / 2];
                         ByteBuffer.wrap(byteBuffer).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts);
-                        byteBuffer = new byte[2000];
                         mHandler.obtainMessage(Constants.ARRAY_READ, bytes, -1, shorts).sendToTarget();
-                    } else if (isDsoData && bytes > 3 && checkQueue(buffer[bytes - 4], buffer[bytes - 3], buffer[bytes - 2])) {
-                        Log.d(TAG, "run: 2");
-                        for (int i = 0; i < bytes - 3; i++) {
-                            byteBuffer[pointer] = buffer[i];
-                            pointer++;
+                        byteBuffer = new byte[2000];
+                        pointer = 0;
+                        if (bytes - endPosition - 1 > 0) {
+                            if (buffer[endPosition + 3] == 121) {
+                                isDsoData = true;
+                            }
+                            for (int i = endPosition + 4; i < bytes; i++) {
+                                byteBuffer[pointer] = buffer[i];
+                                pointer++;
+                            }
                         }
-                        pointer = 0;
-                        short[] shorts = new short[byteBuffer.length / 2];
-                        ByteBuffer.wrap(byteBuffer).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts);
-                        byteBuffer = new byte[2000];
-                        mHandler.obtainMessage(Constants.ARRAY_READ, bytes, -1, shorts).sendToTarget();
                     } else if (isDsoData) {
-                        Log.d(TAG, "run: 3");
+                        Log.d(TAG, "run: var 3");
+                        if (pointer >= 2000) pointer = 0;
                         for (int i = 0; i < bytes; i++) {
                             byteBuffer[pointer] = buffer[i];
                             pointer++;
                         }
                     } else {
-                        Log.d(TAG, "run: 4");
+                        Log.d(TAG, "run: var 4");
                         String readed = new String(buffer, 0, bytes);
                         readMessage.append(readed);
                         if (readed.contains("\n")) {
@@ -263,6 +293,7 @@ public class ConnectionManager {
                             readMessage.setLength(0);
                         }
                     }
+                    hasMarkerStart = checkMarker(buffer, bytes);
                 } catch (IOException e) {
                     if (D) Log.e(TAG, "disconnected", e);
                     connectionLost();
@@ -302,7 +333,19 @@ public class ConnectionManager {
         }
     }
 
-    private boolean checkQueue(byte b, byte b1, byte b2) {
-        return b == 0 && b1 == 1 && b2 == 2;
+    private boolean checkMarker(byte[] buffer, int size) {
+        return size >= 2 && (buffer[size - 2] == 0 && buffer[size - 1] == 1 || buffer[size - 1] == 0);
+    }
+
+    private int checkQueue(byte[] buffer, int size) {
+        int position = -1;
+        if (size <= 2) return position;
+        for (int i = 0; i < size; i++) {
+            byte b = buffer[i];
+            byte b1 = buffer[i + 1];
+            byte b2 = buffer[i + 2];
+            if (b == 0 && b1 == 1 && b2 == 2) return i;
+        }
+        return position;
     }
 }
