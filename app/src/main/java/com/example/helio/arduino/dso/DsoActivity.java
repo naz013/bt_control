@@ -97,6 +97,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
 
         @Override
         public void onPageSelected(int position) {
+            onAction(Constants.S);
             mSelectedPage = position;
         }
 
