@@ -328,7 +328,11 @@ public class ConnectionManager {
     }
 
     private boolean checkMarker(byte[] buffer, int size) {
-        return size >= 2 && (buffer[size - 2] == 0 && buffer[size - 1] == 1 || buffer[size - 1] == 0);
+        if (size >= 2) {
+            return buffer[size - 2] == 0 && buffer[size - 1] == 1;
+        } else {
+            return buffer[size - 1] == 0;
+        }
     }
 
     private int checkQueue(byte[] buffer, int size) {
