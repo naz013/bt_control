@@ -10,6 +10,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +27,7 @@ import com.example.helio.arduino.core.ConnectionEvent;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.ControlEvent;
 import com.example.helio.arduino.core.DsoEvent;
+import com.example.helio.arduino.core.ResponseEvent;
 import com.example.helio.arduino.signal.FragmentListener;
 
 import java.util.ArrayList;
@@ -76,6 +78,14 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
     public void onEvent(DsoEvent dsoEvent) {
         try {
             readDso(dsoEvent.getArray());
+        } catch (NumberFormatException e) {
+
+        }
+    }
+
+    public void onEvent(ResponseEvent event) {
+        try {
+            readDso((String) event.getMsg().obj);
         } catch (NumberFormatException e) {
 
         }
@@ -180,6 +190,25 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
             float y = (float) yVal / 1000f;
             mYVals.add(y);
             mXVals.add(x);
+        }
+
+    }
+
+    private void readDso(String data) {
+        List<Float> mYVals = new ArrayList<>();
+        List<Float> mXVals = new ArrayList<>();
+        if (data.startsWith(Constants.rY)) {
+            String yArray = data.replace(Constants.rY, "");
+            String[] parts = yArray.split(Constants.COMMA);
+            mYVals.clear();
+            for (int i = 0; i < parts.length; i++) {
+                String yVal = parts[i];
+                float x = ((float) i / ((float) parts.length / MAX_X)) * (1f / 1000f);
+                if (TextUtils.isEmpty(yVal.trim())) continue;
+                float y = Float.parseFloat(yVal.trim());
+                mYVals.add(y);
+                mXVals.add(x);
+            }
         }
         sendDataToFragment(mXVals, mYVals);
     }

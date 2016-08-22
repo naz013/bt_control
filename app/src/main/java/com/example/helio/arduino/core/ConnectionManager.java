@@ -11,8 +11,6 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Arrays;
 
 public class ConnectionManager {
@@ -211,83 +209,19 @@ public class ConnectionManager {
 
         public void run() {
             if (D) Log.i(TAG, "ConnectedThread run");
-            byte[] byteBuffer = new byte[2000];
-            boolean isDsoData = false;
-            boolean hasMarkerStart = false;
+            byte[] buffer = new byte[512];
             int bytes;
-            int pointer = 0;
             StringBuilder readMessage = new StringBuilder();
             while (true) {
                 try {
-                    byte[] buffer = new byte[512];
                     bytes = mmInStream.read(buffer);
                     Log.d(TAG, "run: " + bytes + " bytes buffer " + Arrays.toString(buffer));
-                    int endPosition = checkQueue(buffer, bytes);
-                    if (bytes == 1 && buffer[0] == 121) {
-                        isDsoData = true;
-                    } else if (!isDsoData && buffer[0] == 121) {
-                        isDsoData = true;
-                        byteBuffer = new byte[2000];
-                        pointer = 0;
-                        if (bytes > 1) {
-                            for (int i = 1; i < bytes; i++) {
-                                byteBuffer[pointer] = buffer[i];
-                                pointer++;
-                            }
-                        }
-                    } else if (hasMarkerStart && (buffer[0] == 2 || (buffer[0] == 1 && buffer[1] == 2))) {
-                        isDsoData = false;
-                        int start = 1;
-                        if (buffer[0] == 1 && buffer[1] == 2) start = 2;
-                        short[] shorts = new short[byteBuffer.length / 2];
-                        ByteBuffer.wrap(byteBuffer).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts);
-                        mHandler.obtainMessage(Constants.ARRAY_READ, bytes, -1, shorts).sendToTarget();
-                        byteBuffer = new byte[2000];
-                        pointer = 0;
-                        if (bytes - 1 >= start) {
-                            if (buffer[start] == 121) {
-                                isDsoData = true;
-                            }
-                            for (int i = start + 1; i < bytes; i++) {
-                                byteBuffer[pointer] = buffer[i];
-                                pointer++;
-                            }
-                        }
-                    } else if (isDsoData && bytes > 2 && endPosition != -1) {
-                        isDsoData = false;
-                        for (int i = 0; i < endPosition; i++) {
-                            byteBuffer[pointer] = buffer[i];
-                            pointer++;
-                        }
-                        short[] shorts = new short[byteBuffer.length / 2];
-                        ByteBuffer.wrap(byteBuffer).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts);
-                        mHandler.obtainMessage(Constants.ARRAY_READ, bytes, -1, shorts).sendToTarget();
-                        byteBuffer = new byte[2000];
-                        pointer = 0;
-                        if (bytes - endPosition - 1 > 0) {
-                            if (buffer[endPosition + 3] == 121) {
-                                isDsoData = true;
-                            }
-                            for (int i = endPosition + 4; i < bytes; i++) {
-                                byteBuffer[pointer] = buffer[i];
-                                pointer++;
-                            }
-                        }
-                    } else if (isDsoData) {
-                        if (pointer >= 2000) pointer = 0;
-                        for (int i = 0; i < bytes; i++) {
-                            byteBuffer[pointer] = buffer[i];
-                            pointer++;
-                        }
-                    } else {
-                        String readed = new String(buffer, 0, bytes);
-                        readMessage.append(readed);
-                        if (readed.contains("\n")) {
-                            mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
-                            readMessage.setLength(0);
-                        }
+                    String readed = new String(buffer, 0, bytes);
+                    readMessage.append(readed);
+                    if (readed.contains("\n")) {
+                        mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
+                        readMessage.setLength(0);
                     }
-                    hasMarkerStart = checkMarker(buffer, bytes);
                 } catch (IOException e) {
                     if (D) Log.e(TAG, "disconnected", e);
                     connectionLost();
@@ -325,25 +259,5 @@ public class ConnectionManager {
                 if (D) Log.e(TAG, "close() of connect socket failed", e);
             }
         }
-    }
-
-    private boolean checkMarker(byte[] buffer, int size) {
-        if (size >= 2) {
-            return buffer[size - 2] == 0 && buffer[size - 1] == 1;
-        } else {
-            return buffer[size - 1] == 0;
-        }
-    }
-
-    private int checkQueue(byte[] buffer, int size) {
-        int position = -1;
-        if (size <= 2) return position;
-        for (int i = 0; i < size; i++) {
-            byte b = buffer[i];
-            byte b1 = buffer[i + 1];
-            byte b2 = buffer[i + 2];
-            if (b == 0 && b1 == 1 && b2 == 2) return i;
-        }
-        return position;
     }
 }
