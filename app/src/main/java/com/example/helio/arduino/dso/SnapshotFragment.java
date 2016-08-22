@@ -40,6 +40,7 @@ import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.github.mikephil.charting.utils.MPPointD;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -82,6 +83,11 @@ public class SnapshotFragment extends Fragment {
         if (xVals.size() == 0 || yVals.size() == 0) return;
         this.mXVals = new ArrayList<>(xVals);
         this.mYVals = new ArrayList<>(yVals);
+        try {
+            DsoWriter.writeToFile(mYVals);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         hideProgressDialog();
         reloadData(mYVals, mXVals);
     }
@@ -272,6 +278,9 @@ public class SnapshotFragment extends Fragment {
         zoomOutX = (ImageButton) view.findViewById(R.id.zoomOutX);
         zoomInY = (ImageButton) view.findViewById(R.id.zoomInY);
         zoomOutY = (ImageButton) view.findViewById(R.id.zoomOutY);
+        ImageButton readButton = (ImageButton) view.findViewById(R.id.readButton);
+        if (DsoWriter.hasDsoData()) readButton.setVisibility(View.VISIBLE);
+        readButton.setOnClickListener(view1 -> loadFromFile());
         zoomInX.setOnClickListener(mListener);
         zoomOutX.setOnClickListener(mListener);
         zoomInY.setOnClickListener(mListener);
@@ -280,6 +289,16 @@ public class SnapshotFragment extends Fragment {
         moveRight.setOnClickListener(mListener);
         moveLeft.setOnClickListener(mListener);
         moveTop.setOnClickListener(mListener);
+    }
+
+    private void loadFromFile() {
+        List<Float> mXVals = new ArrayList<>();
+        List<Float> mYVals = DsoWriter.readDsoAsArray();
+        for (int i = 0; i < mYVals.size(); i++) {
+            float x = ((float) i / ((float) mYVals.size() / 1500f)) * (1f / 1000f);
+            mXVals.add(x);
+        }
+        reloadData(mYVals, mXVals);
     }
 
     private View.OnClickListener mListener = v -> {

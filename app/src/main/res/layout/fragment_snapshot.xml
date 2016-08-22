@@ -174,6 +174,16 @@
                     android:padding="8dp"
                     android:src="@drawable/ic_zoom_in_black_24px" />
 
+                <ImageButton
+                    android:id="@+id/readButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/dso_fab_margin"
+                    android:background="@color/colorWhite"
+                    android:padding="8dp"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_sd_storage_black_24dp" />
+
             </LinearLayout>
 
             <LinearLayout

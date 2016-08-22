@@ -62,6 +62,7 @@ dependencies {
     compile project(':MPChartLib')
     compile 'com.github.barteksc:android-pdf-viewer:1.4.0'
     compile 'com.android.support:multidex:1.0.1'
+    compile 'com.google.code.gson:gson:2.4'
 }
 
 import java.text.DateFormat
