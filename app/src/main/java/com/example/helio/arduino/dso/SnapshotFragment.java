@@ -292,8 +292,8 @@ public class SnapshotFragment extends Fragment {
     }
 
     private void loadFromFile() {
-        List<Float> mXVals = new ArrayList<>();
-        List<Float> mYVals = DsoWriter.readDsoAsArray();
+        mXVals.clear();
+        mYVals = DsoWriter.readDsoAsArray();
         for (int i = 0; i < mYVals.size(); i++) {
             float x = ((float) i / ((float) mYVals.size() / 1500f)) * (1f / 1000f);
             mXVals.add(x);
