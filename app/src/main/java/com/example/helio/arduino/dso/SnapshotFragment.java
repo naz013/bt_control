@@ -578,35 +578,62 @@ public class SnapshotFragment extends Fragment {
         for (int i = 0; i < xList.size(); i++) {
             float x = xList.get(i);
             float y = yList.get(i);
-            if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
+            if (x >= minX && x <= maxX) {
                 int xSc = (int) (x * scaleX - slideX);
                 int ySc = (int) ((y + (deviationY * deviationCorrector)) * scaleY);
-                if (!hasPrev && i > 0) {
-                    initSet(lineData, index);
-                    lineDataSet = lineData.getDataSetByIndex(index);
-                    if (mYScaleStep > 1) {
-                        float prevY = yList.get(i - 1);
-                        if (prevY > y) {
-                            lineDataSet.addEntry(new Entry(xSc, 1500f));
-                        } else {
-                            lineDataSet.addEntry(new Entry(xSc, 0f));
+                if (y >= minY && y <= maxY) {
+                    if (!hasPrev && i > 0) {
+                        initSet(lineData, index);
+                        lineDataSet = lineData.getDataSetByIndex(index);
+                        if (mYScaleStep > 1) {
+                            float prevY = yList.get(i - 1);
+                            if (prevY > y) {
+                                lineDataSet.addEntry(new Entry(xSc, 1500f));
+                            } else {
+                                lineDataSet.addEntry(new Entry(xSc, 0f));
+                            }
                         }
                     }
-                }
-                Entry entry = new Entry(xSc, ySc);
-                dataSet.addEntry(entry);
-                lineDataSet.addEntry(entry);
-                hasPrev = true;
-            } else if (hasPrev && x >= minX && x <= maxX) {
-                index++;
-                hasPrev = false;
-                if (i + 1 < xList.size() && mYScaleStep > 1) {
-                    float nextY = yList.get(i + 1);
-                    int xSc = (int) (x * scaleX - slideX);
-                    if (nextY > y) {
-                        lineDataSet.addEntry(new Entry(xSc, 1500f));
-                    } else {
-                        lineDataSet.addEntry(new Entry(xSc, 0f));
+                    Entry entry = new Entry(xSc, ySc);
+                    dataSet.addEntry(entry);
+                    lineDataSet.addEntry(entry);
+                    hasPrev = true;
+                } else if (hasPrev) {
+                    index++;
+                    hasPrev = false;
+                    if (i - 1 > 0 && mYScaleStep > 1) {
+                        float prevY = yList.get(i - 1);
+                        if (prevY > y) {
+                            lineDataSet.addEntry(new Entry(xSc, 0f));
+                        } else {
+                            lineDataSet.addEntry(new Entry(xSc, 1500f));
+                        }
+                    }
+                } else {
+                    initSet(lineData, index);
+                    lineDataSet = lineData.getDataSetByIndex(index);
+                    if (mYScaleStep > 1 && i > 0) {
+                        float prevY = yList.get(i - 1);
+                        int prevX = (int) (xList.get(i - 1) * scaleX - slideX);
+                        int prevYsc = (int) ((prevY + (deviationY * deviationCorrector)) * scaleY);
+                        if (prevY < minY && y > maxY) {
+                            lineDataSet.addEntry(new Entry(prevX, 0f));
+                            lineDataSet.addEntry(new Entry(xSc, 1500f));
+                        } else if (prevY > maxY && y < minY) {
+                            lineDataSet.addEntry(new Entry(prevX, 1500f));
+                            lineDataSet.addEntry(new Entry(xSc, 0f));
+                        } else if (prevY >= minY && prevY <= maxY) {
+                            if (y > maxY) {
+                                lineDataSet.addEntry(new Entry(prevX, prevYsc));
+                                lineDataSet.addEntry(new Entry(xSc, 1500f));
+                            } else if (y < minY) {
+                                lineDataSet.addEntry(new Entry(prevX, prevYsc));
+                                lineDataSet.addEntry(new Entry(xSc, 0f));
+                            }
+                        }
+                        if (y < minY || y > maxY) {
+                            index++;
+                        }
                     }
                 }
             }
