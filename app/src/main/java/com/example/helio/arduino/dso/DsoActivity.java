@@ -38,15 +38,6 @@ import de.greenrobot.event.EventBus;
 public class DsoActivity extends AppCompatActivity implements FragmentListener {
 
     private static final int REQUEST_ENABLE_BT = 3;
-    public static final float CHART_MAX_Y = 1000f;
-    public static final float CHART_MAX_X = 15000f;
-    public static final float MAX_X = 1500f;
-    public static final float X_SCALE_BASE = 10000f;
-    public static final float Y_SCALE_BASE = 31.25f;
-    public static final float CHART_POINT_SIZE = 1.0f;
-    public static final float RANGE_DIVIDER = 2f;
-    public static final float Y_MAX = 16f;
-    public static final float Y_MIN = -16f;
     private static final String TAG = "DsoActivity";
     private static final boolean D = BuildConfig.DEBUG;
     private static final int SNAPSHOT = 0;
@@ -185,7 +176,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         List<Float> mYVals = new ArrayList<>();
         List<Float> mXVals = new ArrayList<>();
         for (int i = 0; i < array.length; i++) {
-            float x = ((float) i / ((float) array.length / MAX_X)) * (1f / 1000f);
+            float x = ((float) i / ((float) array.length / ChartView.MAX_X)) * (1f / 1000f);
             short yVal = array[i];
             float y = (float) yVal / 1000f;
             mYVals.add(y);
@@ -203,7 +194,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
             mYVals.clear();
             for (int i = 0; i < parts.length; i++) {
                 String yVal = parts[i];
-                float x = ((float) i / ((float) parts.length / MAX_X)) * (1f / 1000f);
+                float x = ((float) i / ((float) parts.length / ChartView.MAX_X)) * (1f / 1000f);
                 if (TextUtils.isEmpty(yVal.trim())) continue;
                 float y = Float.parseFloat(yVal.trim());
                 mYVals.add(y);
@@ -242,7 +233,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         List<Float> mYVals = new ArrayList<>();
         List<Float> mXVals = new ArrayList<>();
         for (int i = 0; i < testCount; i++) {
-            float x = ((float) i / ((float) testCount / MAX_X)) * (1f / 1000f);
+            float x = ((float) i / ((float) testCount / ChartView.MAX_X)) * (1f / 1000f);
             y += step;
             if (Math.round(y) == 16f) step = -step;
             else if (Math.round(y) == -16.0f) step = Math.abs(step);
