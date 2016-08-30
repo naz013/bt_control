@@ -585,7 +585,7 @@ public class SnapshotFragment extends Fragment {
                     if (!hasPrev && i > 0) {
                         initSet(lineData, index);
                         lineDataSet = lineData.getDataSetByIndex(index);
-                        if (mYScaleStep > 1) {
+                        if (mYScaleStep > 0) {
                             float prevY = yList.get(i - 1);
                             if (prevY > y) {
                                 lineDataSet.addEntry(new Entry(xSc, 1500f));
@@ -601,7 +601,7 @@ public class SnapshotFragment extends Fragment {
                 } else if (hasPrev) {
                     index++;
                     hasPrev = false;
-                    if (i - 1 > 0 && mYScaleStep > 1) {
+                    if (i - 1 > 0 && mYScaleStep > 0) {
                         float prevY = yList.get(i - 1);
                         if (prevY > y) {
                             lineDataSet.addEntry(new Entry(xSc, 0f));
@@ -612,7 +612,7 @@ public class SnapshotFragment extends Fragment {
                 } else {
                     initSet(lineData, index);
                     lineDataSet = lineData.getDataSetByIndex(index);
-                    if (mYScaleStep > 1 && i > 0) {
+                    if (mYScaleStep > 0 && i > 0) {
                         float prevY = yList.get(i - 1);
                         int prevX = (int) (xList.get(i - 1) * scaleX - slideX);
                         int prevYsc = (int) ((prevY + (deviationY * deviationCorrector)) * scaleY);
