@@ -51,7 +51,6 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
 
     private static Activity activity;
     private int mEnabledAction;
-    private long mTime;
 
     private DsoPagerAdapter mPagerAdapter;
 
@@ -182,7 +181,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
             mYVals.add(y);
             mXVals.add(x);
         }
-
+        sendDataToFragment(mXVals, mYVals);
     }
 
     private void readDso(String data) {
@@ -318,7 +317,6 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
 
     @Override
     public void onAction(String message) {
-        mTime = System.currentTimeMillis();
         EventBus.getDefault().post(new ControlEvent(message));
         showToast(getString(R.string.request_sent));
         if (message.matches(Constants.C)) {
