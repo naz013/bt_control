@@ -42,7 +42,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
     private static final boolean D = BuildConfig.DEBUG;
     private static final int SNAPSHOT = 0;
     private static final int AUTO_REFRESH = 1;
-    private static final int REALTIME = 2;
+    private static final int REAL_TIME = 2;
     private static final int NONE = -1;
 
     private TextView mBlockView;
@@ -326,7 +326,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         } else if (message.matches(Constants.A)) {
             mEnabledAction = AUTO_REFRESH;
         } else if (message.matches(Constants.L)) {
-            mEnabledAction = REALTIME;
+            mEnabledAction = REAL_TIME;
         } else if (message.matches(Constants.S)) {
             mEnabledAction = NONE;
             mHandler.removeCallbacks(mAutoRunnable);

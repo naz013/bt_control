@@ -415,7 +415,10 @@ public class ChartView extends LinearLayout {
 
     private synchronized void reloadData(List<Float> mYValues, List<Float> mXValues) {
         long start = System.currentTimeMillis();
-        if (mYValues.size() == 0 || mXValues.size() == 0) return;
+        if (mYValues.size() == 0 || mXValues.size() == 0) {
+            mChart.invalidate();
+            return;
+        }
         Log.d(TAG, "reloadData: x size " + mXValues.size());
         Log.d(TAG, "reloadData: y size " + mYValues.size());
         List<Float> xList = new ArrayList<>(mXValues);
