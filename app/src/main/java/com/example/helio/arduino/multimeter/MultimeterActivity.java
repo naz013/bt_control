@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,6 +27,7 @@ import com.example.helio.arduino.core.ControlEvent;
 import com.example.helio.arduino.core.ResponseEvent;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import de.greenrobot.event.EventBus;
 import jxl.write.WriteException;
@@ -37,6 +39,7 @@ public class MultimeterActivity extends AppCompatActivity {
     private static final int CURRENT = R.id.currentButton;
     private static final int RESISTANCE = R.id.resistanceButton;
     private static final int SCT = R.id.sctButton;
+    private static final String TAG = "MultimeterActivity";
 
     private TextView mMeterField;
     private TextView mBlockView;
@@ -49,9 +52,7 @@ public class MultimeterActivity extends AppCompatActivity {
     private boolean isReading;
 
     private BluetoothAdapter mBtAdapter = null;
-
     private static Activity activity;
-
     private WriteExcel mWriteExcel;
 
     @Override
@@ -317,7 +318,7 @@ public class MultimeterActivity extends AppCompatActivity {
             saveToExcel(v);
             mSctStatus.setBackgroundResource(R.drawable.gray_circle);
         } else if (data.startsWith(Constants.rR)) {
-            v = extractR(data) + " " + getString(R.string.omega);
+            v = extractR(data);
             saveToExcel(v);
             mSctStatus.setBackgroundResource(R.drawable.gray_circle);
         } else if (data.startsWith(Constants.sCT)) {
@@ -355,7 +356,40 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private String extractR(String data) {
         data = data.replace(Constants.rR, "");
-        return data.trim();
+        data = data.replace(" ", "").trim();
+        try {
+            float resistance = Float.parseFloat(data);
+            return convertResistance(resistance) + "";
+        } catch (NumberFormatException e) {
+            return data;
+        }
+    }
+
+    private String convertResistance(float resistance) throws NumberFormatException{
+        Log.d(TAG, "convertResistance: " + resistance);
+        String res = "" + resistance;
+        if (resistance <= 590) {
+            res = Math.round(resistance) + " " + getString(R.string.omega);
+        } else if (resistance <= 950) {
+            float tmp = resistance / 1000;
+            res = String.format(Locale.getDefault(), "%.3f kΩ", tmp);
+        } else if (resistance <= 9500) {
+            float tmp = resistance / 1000;
+            res = String.format(Locale.getDefault(), "%.2f kΩ", tmp);
+        } else if (resistance <= 95000) {
+            float tmp = resistance / 1000;
+            res = String.format(Locale.getDefault(), "%.1f kΩ", tmp);
+        } else if (resistance <= 590000) {
+            float tmp = resistance / 1000;
+            res = Math.round(tmp) + " kΩ";
+        } else if (resistance <= 950000) {
+            float tmp = resistance / 1000000;
+            res = String.format(Locale.getDefault(), "%.3f MΩ", tmp);
+        } else if (resistance > 950000){
+            float tmp = resistance / 1000000;
+            res = String.format(Locale.getDefault(), "%.2f MΩ", tmp);
+        }
+        return res;
     }
 
     private String extractI(String data) {

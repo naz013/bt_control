@@ -11,7 +11,6 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 public class ConnectionManager {
 
@@ -215,7 +214,7 @@ public class ConnectionManager {
             while (true) {
                 try {
                     bytes = mmInStream.read(buffer);
-                    Log.d(TAG, "run: " + bytes + " bytes buffer " + Arrays.toString(buffer));
+//                    Log.d(TAG, "run: " + bytes + " bytes buffer " + Arrays.toString(buffer));
                     String readed = new String(buffer, 0, bytes);
                     readMessage.append(readed);
                     if (readed.contains("\n")) {
