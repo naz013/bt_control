@@ -78,7 +78,7 @@
                         android:layout_gravity="center"
                         android:background="@drawable/blue_selector"
                         android:padding="5dp"
-                        android:text="@string/i"
+                        android:text="@string/a"
                         android:textColor="@color/colorWhite"
                         android:textSize="30sp" />
 
