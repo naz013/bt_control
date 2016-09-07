@@ -9,6 +9,7 @@ public class Constants {
 
     public static final int MESSAGE_STATE_CHANGE = 1;
     public static final int MESSAGE_READ = 2;
+    public static final int ARRAY_READ = 6;
     public static final int MESSAGE_WRITE = 3;
     public static final int MESSAGE_DEVICE_NAME = 4;
     public static final int MESSAGE_TOAST = 5;
@@ -17,8 +18,11 @@ public class Constants {
     public static final String D = "d";
     public static final String I = "i";
     public static final String V = "v";
+    public static final String W = "w";
 
     public static final String C = "c";
+    public static final String A = "a";
+    public static final String L = "l";
     public static final String S = "s";
 
     public static final String G = "g";
@@ -28,11 +32,6 @@ public class Constants {
     public static final String E = "e";
 
     public static final String Q = "q";
-
-    public static final String OPEN_X = "j";
-    public static final String OPEN_Y = "m";
-    public static final String CLOSE_X = "k";
-    public static final String CLOSE_Y = "n";
 
     public static final String DIV = ";";
     public static final String COMMA = ",";
@@ -46,5 +45,10 @@ public class Constants {
     public static final String DEVICE_ADDRESS = "device_address";
     public static final String PREFS = "app_prefs";
     public static final String SCREENS_FOLDER = "MultiLab";
+    public static final String SHEETS_FOLDER = "sheets";
+
+    public static final String VOLTAGE_ROW = "voltage_row";
+    public static final String CURRENT_ROW = "current_row";
+    public static final String RESISTANCE_ROW = "resistance_row";
 
 }

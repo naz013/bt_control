@@ -11,6 +11,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 public class ConnectionManager {
 
@@ -208,19 +209,19 @@ public class ConnectionManager {
 
         public void run() {
             if (D) Log.i(TAG, "ConnectedThread run");
-            byte[] buffer = new byte[240000];
+            byte[] buffer = new byte[512];
             int bytes;
             StringBuilder readMessage = new StringBuilder();
             while (true) {
                 try {
                     bytes = mmInStream.read(buffer);
+                    Log.d(TAG, "run: " + bytes + " bytes buffer " + Arrays.toString(buffer));
                     String readed = new String(buffer, 0, bytes);
                     readMessage.append(readed);
                     if (readed.contains("\n")) {
                         mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
                         readMessage.setLength(0);
                     }
-
                 } catch (IOException e) {
                     if (D) Log.e(TAG, "disconnected", e);
                     connectionLost();
@@ -229,11 +230,11 @@ public class ConnectionManager {
             }
         }
 
-        public void writeData(byte[] chunk) {
+        public void writeData(byte[] buffer) {
             try {
-                mmOutStream.write(chunk);
+                mmOutStream.write(buffer);
                 mmOutStream.flush();
-                mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, chunk).sendToTarget();
+                mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer).sendToTarget();
             } catch (IOException e) {
                 if (D) Log.e(TAG, "Exception during write", e);
             }
@@ -244,6 +245,7 @@ public class ConnectionManager {
             buffer[0] = command;
             try {
                 mmOutStream.write(buffer);
+                mmOutStream.flush();
                 mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer).sendToTarget();
             } catch (IOException e) {
                 if (D) Log.e(TAG, "Exception during write", e);

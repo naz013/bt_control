@@ -38,6 +38,9 @@ public class BluetoothService extends Service {
                 case Constants.MESSAGE_READ:
                     EventBus.getDefault().post(new ResponseEvent(msg));
                     break;
+                case Constants.ARRAY_READ:
+                    EventBus.getDefault().post(new DsoEvent((short[]) msg.obj));
+                    break;
             }
         }
     };

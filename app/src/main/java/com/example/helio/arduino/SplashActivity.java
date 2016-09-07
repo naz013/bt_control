@@ -7,13 +7,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.example.helio.arduino.connecting.StartActivity;
 import com.example.helio.arduino.core.Constants;
+import com.example.helio.arduino.multimeter.MultimeterActivity;
 
 public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        startActivity(new Intent(this, MultimeterActivity.class));
         selectScreen();
         finish();
     }

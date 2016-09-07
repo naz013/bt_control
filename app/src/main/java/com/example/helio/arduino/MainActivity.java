@@ -13,6 +13,7 @@ import android.view.View;
 
 import com.example.helio.arduino.core.BluetoothService;
 import com.example.helio.arduino.dso.DsoActivity;
+import com.example.helio.arduino.multimeter.MultimeterActivity;
 import com.example.helio.arduino.signal.SignalActivity;
 
 public class MainActivity extends AppCompatActivity {

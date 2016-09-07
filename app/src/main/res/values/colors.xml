@@ -7,6 +7,7 @@
     <color name="colorRed">#F44336</color>
     <color name="colorBlue">#2196F3</color>
     <color name="colorGreen">#4CAF50</color>
+    <color name="colorGreenDark">#1B5E20</color>
     <color name="colorGray">#616161</color>
     <color name="colorGrayTr">#8c616161</color>
     <color name="colorBlackTr">#64616161</color>
