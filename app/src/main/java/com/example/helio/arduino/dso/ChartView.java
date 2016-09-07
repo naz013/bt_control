@@ -469,11 +469,7 @@ public class ChartView extends LinearLayout {
                         lineDataSet = lineData.getDataSetByIndex(index);
                         if (mYScaleStep > 0) {
                             float prevY = yList.get(i - 1);
-                            if (prevY > y) {
-                                lineDataSet.addEntry(new Entry(xSc, 1500f));
-                            } else {
-                                lineDataSet.addEntry(new Entry(xSc, 0f));
-                            }
+                            addPreviousIfHasPoint(prevY, y, xSc, lineDataSet);
                         }
                     }
                     Entry entry = new Entry(xSc, ySc);
@@ -485,11 +481,7 @@ public class ChartView extends LinearLayout {
                     hasPrev = false;
                     if (i - 1 > 0 && mYScaleStep > 0) {
                         float prevY = yList.get(i - 1);
-                        if (prevY > y) {
-                            lineDataSet.addEntry(new Entry(xSc, 0f));
-                        } else {
-                            lineDataSet.addEntry(new Entry(xSc, 1500f));
-                        }
+                        addPreviousIfNoPoint(prevY, y, xSc, lineDataSet);
                     }
                 } else {
                     initSet(lineData, index);
@@ -498,21 +490,7 @@ public class ChartView extends LinearLayout {
                         float prevY = yList.get(i - 1);
                         int prevX = (int) (xList.get(i - 1) * scaleX - slideX);
                         int prevYsc = (int) ((prevY + (deviationY * deviationCorrector)) * scaleY);
-                        if (prevY < minY && y > maxY) {
-                            lineDataSet.addEntry(new Entry(prevX, 0f));
-                            lineDataSet.addEntry(new Entry(xSc, 1500f));
-                        } else if (prevY > maxY && y < minY) {
-                            lineDataSet.addEntry(new Entry(prevX, 1500f));
-                            lineDataSet.addEntry(new Entry(xSc, 0f));
-                        } else if (prevY >= minY && prevY <= maxY) {
-                            if (y > maxY) {
-                                lineDataSet.addEntry(new Entry(prevX, prevYsc));
-                                lineDataSet.addEntry(new Entry(xSc, 1500f));
-                            } else if (y < minY) {
-                                lineDataSet.addEntry(new Entry(prevX, prevYsc));
-                                lineDataSet.addEntry(new Entry(xSc, 0f));
-                            }
-                        }
+                        addFakePoint(prevY, prevX, prevYsc, lineDataSet, xSc, maxY, minY, y);
                         if (y < minY || y > maxY) {
                             index++;
                         }
@@ -520,22 +498,61 @@ public class ChartView extends LinearLayout {
                 }
             }
         }
-        if (dataSet.getEntryCount() == 0) {
-            Entry entry = new Entry(0f, 0f);
-            Entry entry1 = new Entry(15000f, 1000f);
-            dataSet.addEntry(entry);
-            dataSet.addEntry(entry1);
+        addEmptyPoints(dataSet);
+        invalidateChart();
+        reloadTraceLines();
+        Log.d(TAG, "reloadData: refresh time " + (System.currentTimeMillis() - start));
+    }
+
+    private void addFakePoint(float prevY, int prevX, int prevYsc, ILineDataSet lineDataSet, int xSc, float maxY, float minY, float y) {
+        if (prevY < minY && y > maxY) {
+            lineDataSet.addEntry(new Entry(prevX, 0f));
+            lineDataSet.addEntry(new Entry(xSc, 1500f));
+        } else if (prevY > maxY && y < minY) {
+            lineDataSet.addEntry(new Entry(prevX, 1500f));
+            lineDataSet.addEntry(new Entry(xSc, 0f));
+        } else if (prevY >= minY && prevY <= maxY) {
+            if (y > maxY) {
+                lineDataSet.addEntry(new Entry(prevX, prevYsc));
+                lineDataSet.addEntry(new Entry(xSc, 1500f));
+            } else if (y < minY) {
+                lineDataSet.addEntry(new Entry(prevX, prevYsc));
+                lineDataSet.addEntry(new Entry(xSc, 0f));
+            }
         }
-        if (mYScaleStep > 0 || mXScaleStep > 0) {
-            dataSet.addEntry(new Entry(0f, 0f));
-            dataSet.addEntry(new Entry(15000f, 1000f));
+    }
+
+    private void addPreviousIfNoPoint(float prevY, float y, int xSc, ILineDataSet lineDataSet) {
+        if (prevY > y) {
+            lineDataSet.addEntry(new Entry(xSc, 0f));
+        } else {
+            lineDataSet.addEntry(new Entry(xSc, 1500f));
         }
+    }
+
+    private void addPreviousIfHasPoint(float prevY, float y, int xSc, ILineDataSet lineDataSet) {
+        if (prevY > y) {
+            lineDataSet.addEntry(new Entry(xSc, 1500f));
+        } else {
+            lineDataSet.addEntry(new Entry(xSc, 0f));
+        }
+    }
+
+    private void invalidateChart() {
         mChart.getData().notifyDataChanged();
         mChart.getLineData().notifyDataChanged();
         mChart.notifyDataSetChanged();
         mChart.invalidate();
-        reloadTraceLines();
-        Log.d(TAG, "reloadData: refresh time " + (System.currentTimeMillis() - start));
+    }
+
+    private void addEmptyPoints(IScatterDataSet dataSet) {
+        if (dataSet.getEntryCount() == 0) {
+            dataSet.addEntry(new Entry(0f, 0f));
+            dataSet.addEntry(new Entry(15000f, 1000f));
+        } else if (mYScaleStep > 0 || mXScaleStep > 0) {
+            dataSet.addEntry(new Entry(0f, 0f));
+            dataSet.addEntry(new Entry(15000f, 1000f));
+        }
     }
 
     private void initSet(ScatterData scatterData, int i) {
