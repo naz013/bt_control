@@ -39,7 +39,7 @@ public class ChartView extends LinearLayout {
     private static final String TAG = "ChartView";
     public static final float CHART_MAX_Y = 1000f;
     public static final float CHART_MAX_X = 15000f;
-    public static final float MAX_X = 1500f;
+    public static final float MAX_X = 1000f;
     public static final float X_SCALE_BASE = 10000f;
     public static final float Y_SCALE_BASE = 31.25f;
     public static final float CHART_POINT_SIZE = 1.0f;
@@ -513,14 +513,14 @@ public class ChartView extends LinearLayout {
     private void addFakePoint(float prevY, int prevX, int prevYsc, ILineDataSet lineDataSet, int xSc, float maxY, float minY, float y) {
         if (prevY < minY && y > maxY) {
             lineDataSet.addEntry(new Entry(prevX, 0f));
-            lineDataSet.addEntry(new Entry(xSc, 1500f));
+            lineDataSet.addEntry(new Entry(xSc, CHART_MAX_Y));
         } else if (prevY > maxY && y < minY) {
-            lineDataSet.addEntry(new Entry(prevX, 1500f));
+            lineDataSet.addEntry(new Entry(prevX, CHART_MAX_Y));
             lineDataSet.addEntry(new Entry(xSc, 0f));
         } else if (prevY >= minY && prevY <= maxY) {
             if (y > maxY) {
                 lineDataSet.addEntry(new Entry(prevX, prevYsc));
-                lineDataSet.addEntry(new Entry(xSc, 1500f));
+                lineDataSet.addEntry(new Entry(xSc, CHART_MAX_Y));
             } else if (y < minY) {
                 lineDataSet.addEntry(new Entry(prevX, prevYsc));
                 lineDataSet.addEntry(new Entry(xSc, 0f));
@@ -532,13 +532,13 @@ public class ChartView extends LinearLayout {
         if (prevY > y) {
             lineDataSet.addEntry(new Entry(xSc, 0f));
         } else {
-            lineDataSet.addEntry(new Entry(xSc, 1500f));
+            lineDataSet.addEntry(new Entry(xSc, CHART_MAX_Y));
         }
     }
 
     private void addPreviousIfHasPoint(float prevY, float y, int xSc, ILineDataSet lineDataSet) {
         if (prevY > y) {
-            lineDataSet.addEntry(new Entry(xSc, 1500f));
+            lineDataSet.addEntry(new Entry(xSc, CHART_MAX_Y));
         } else {
             lineDataSet.addEntry(new Entry(xSc, 0f));
         }
@@ -554,10 +554,10 @@ public class ChartView extends LinearLayout {
     private void addEmptyPoints(IScatterDataSet dataSet) {
         if (dataSet.getEntryCount() == 0) {
             dataSet.addEntry(new Entry(0f, 0f));
-            dataSet.addEntry(new Entry(15000f, 1000f));
+            dataSet.addEntry(new Entry(CHART_MAX_X, CHART_MAX_Y));
         } else if (mYScaleStep > 0 || mXScaleStep > 0) {
             dataSet.addEntry(new Entry(0f, 0f));
-            dataSet.addEntry(new Entry(15000f, 1000f));
+            dataSet.addEntry(new Entry(CHART_MAX_X, CHART_MAX_Y));
         }
     }
 
