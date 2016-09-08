@@ -376,9 +376,12 @@ public class ChartView extends LinearLayout {
     public void scaleY(int i) {
         if (i < 0 && mYScaleStep == 0) return;
         if (i > 0 && mYScaleStep == 4) return;
-        mYScaleStep += i;
         int mYParts = getYParts();
-        mYMoveStep = mYParts / 2;
+        float percent = (float) mYMoveStep / (float) mYParts;
+        mYScaleStep += i;
+        mYParts = getYParts();
+        mYMoveStep = (int) ((float) mYParts * percent);
+        if (mYMoveStep >= getYParts() - 1) mYMoveStep = getYParts() - 1;
         reloadData(mYVals, mXVals);
     }
 
@@ -404,12 +407,15 @@ public class ChartView extends LinearLayout {
     public void scaleX(int i) {
         if (i < 0 && mXScaleStep == 0) return;
         if (i > 0 && mXScaleStep == 5) return;
+        float xParts = X_SCALE_BASE / getXPartSize();
+        float percent = (float) mXMoveStep / xParts;
         if (i > 0) mXScallar *= 2;
         if (i < 0) mXScallar /= 2;
         mXMoveStep = 0;
         mXScaleStep += i;
-        int mYParts = getYParts();
-        mYMoveStep = mYParts / 2;
+        xParts = X_SCALE_BASE / getXPartSize();
+        mXMoveStep = (int) (xParts * percent);
+        if (mXMoveStep >= (xParts - 2)) mXMoveStep = (int) xParts - 2;
         reloadData(mYVals, mXVals);
     }
 
