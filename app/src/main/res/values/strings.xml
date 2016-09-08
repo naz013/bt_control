@@ -81,4 +81,9 @@
     <string name="voltage">Voltage</string>
     <string name="exported_data">Exported data</string>
     <string name="export">Export</string>
+    <string name="save_to_google_drive">Save to Google Drive</string>
+    <string name="send_via_e_mail">Send via e-mail</string>
+    <string name="send_email">Send email...</string>
+    <string name="google_drive_not_found">Google Drive application not found</string>
+    <string name="no_applications">No application than can perform this action</string>
 </resources>

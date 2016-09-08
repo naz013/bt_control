@@ -1,5 +1,6 @@
 package com.example.helio.arduino.multimeter;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -9,7 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.helio.arduino.R;
 
@@ -53,7 +56,51 @@ public class FilesRecyclerAdapter extends RecyclerView.Adapter<FilesRecyclerAdap
             fileNameView = (TextView) itemView.findViewById(R.id.nameView);
             fileNameView.setOnClickListener(v -> handleClick(getAdapterPosition()));
             ImageButton button = (ImageButton) itemView.findViewById(R.id.deleteButton);
+            ImageButton shareButton = (ImageButton) itemView.findViewById(R.id.shareButton);
             button.setOnClickListener(view -> showDeleteDialog(getAdapterPosition()));
+            shareButton.setOnClickListener(view -> showPopup(getAdapterPosition(), view));
+        }
+    }
+
+    private void showPopup(int position, View view) {
+        PopupMenu popup = new PopupMenu(mContext, view);
+        popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.mail_action:
+                    sendEmail(position);
+                    break;
+                case R.id.drive_action:
+                    saveToDrive(position);
+                    break;
+            }
+            return true;
+        });
+        popup.show();
+    }
+
+    private void saveToDrive(int position) {
+        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(mDataList.get(position).getFullPath())));
+        intent.setPackage("com.google.android.apps.docs");
+        try {
+            mContext.startActivity(Intent.createChooser(intent, ""));
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(mContext, R.string.google_drive_not_found, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void sendEmail(int position) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, mContext.getString(R.string.app_name));
+        Uri uri = Uri.fromFile(new File(mDataList.get(position).getFullPath()));
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        try {
+            mContext.startActivity(Intent.createChooser(intent, mContext.getString(R.string.send_email)));
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(mContext, R.string.no_applications, Toast.LENGTH_SHORT).show();
         }
     }
 
