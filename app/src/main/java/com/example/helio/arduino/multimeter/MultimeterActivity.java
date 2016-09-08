@@ -3,8 +3,10 @@ package com.example.helio.arduino.multimeter;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
@@ -56,16 +58,22 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private int mSelectedId;
     private boolean isReading;
+    private int currVolume;
 
     private BluetoothAdapter mBtAdapter = null;
     private static Activity activity;
     private WriteExcel mWriteExcel;
+    private Sound mSound;
     private CompoundButton.OnCheckedChangeListener mCheckListener = (compoundButton, b) -> switchExport(b);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this;
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        currVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, 25, 0);
+        mSound = new Sound(this);
         setContentView(R.layout.activity_multimeter);
         initBluetoothAdapter();
         initActionBar();
@@ -245,6 +253,11 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private void showSct() {
         sendMessage(Constants.Q);
+        try {
+            mSound.prepareMelody();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void selectButton(View v) {
@@ -341,14 +354,24 @@ public class MultimeterActivity extends AppCompatActivity {
             mSctStatus.setBackgroundResource(R.drawable.gray_circle);
         } else if (data.startsWith(Constants.sCT)) {
             int value = extractSct(data);
-            if (value == 1) {
-                mSctStatus.setBackgroundResource(R.drawable.red_circle);
-            } else {
-                mSctStatus.setBackgroundResource(R.drawable.gray_circle);
-            }
+            performSct(value);
             v = "";
         }
         mMeterField.setText(v);
+    }
+
+    private void performSct(int value) {
+        if (value == 1) {
+            mSctStatus.setBackgroundResource(R.drawable.red_circle);
+            if (mSound.isPaused()) {
+                mSound.resume();
+            } else {
+                mSound.start();
+            }
+        } else {
+            mSctStatus.setBackgroundResource(R.drawable.gray_circle);
+            mSound.pause();
+        }
     }
 
     private void saveToExcel(String value) {
@@ -442,6 +465,8 @@ public class MultimeterActivity extends AppCompatActivity {
         mBlockView.setVisibility(View.VISIBLE);
         stopService(new Intent(this, BluetoothService.class));
         closeExcelFile();
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, currVolume, 0);
     }
 
     @Override
@@ -450,6 +475,7 @@ public class MultimeterActivity extends AppCompatActivity {
         sendMessage(Constants.D);
         EventBus.getDefault().unregister(this);
         closeExcelFile();
+        if (mSound != null) mSound.stop();
     }
 
     @Override
