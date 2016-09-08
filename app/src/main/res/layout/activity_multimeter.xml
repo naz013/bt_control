@@ -90,33 +90,6 @@
                     android:gravity="center"
                     android:orientation="horizontal">
 
-                    <ImageButton
-                        android:id="@+id/sctButton"
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/blue_selector"
-                        android:padding="5dp"
-                        android:src="@drawable/access_point"
-                        android:textColor="@color/colorWhite"
-                        android:textSize="30sp" />
-
-                    <View
-                        android:id="@+id/sctStatus"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginLeft="16dp"
-                        android:background="@drawable/gray_circle" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
                     <Button
                         android:id="@+id/resetButton"
                         android:layout_width="wrap_content"
@@ -131,20 +104,23 @@
                         android:textSize="30sp" />
 
                     <ImageButton
-                        android:id="@+id/exportButton"
+                        android:id="@+id/sctButton"
                         android:layout_width="56dp"
                         android:layout_height="56dp"
+                        android:layout_gravity="center"
                         android:layout_marginLeft="16dp"
-                        android:background="@drawable/button_export_selector"
-                        android:src="@drawable/file_export_dark" />
+                        android:background="@drawable/blue_selector"
+                        android:padding="5dp"
+                        android:src="@drawable/access_point"
+                        android:textColor="@color/colorWhite"
+                        android:textSize="30sp" />
 
-                    <ImageButton
-                        android:id="@+id/filesButton"
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
+                    <View
+                        android:id="@+id/sctStatus"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_marginLeft="16dp"
-                        android:background="@color/colorBlue"
-                        android:src="@drawable/file_document" />
+                        android:background="@drawable/gray_circle" />
 
                 </LinearLayout>
 
@@ -171,6 +147,32 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="16dp"
                         android:text="@string/set_refrash_rate" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="32dp"
+                    android:layout_marginTop="16dp"
+                    android:gravity="right"
+                    android:orientation="horizontal">
+
+                    <android.support.v7.widget.SwitchCompat
+                        android:id="@+id/exportButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="56dp"
+                        android:layout_marginLeft="16dp"
+                        android:src="@drawable/file_export_dark"
+                        android:text="@string/export" />
+
+                    <ImageButton
+                        android:id="@+id/filesButton"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_marginLeft="16dp"
+                        android:background="@color/colorBlue"
+                        android:src="@drawable/file_document" />
 
                 </LinearLayout>
 

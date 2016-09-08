@@ -1,20 +1,26 @@
 package com.example.helio.arduino.multimeter;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +51,7 @@ public class MultimeterActivity extends AppCompatActivity {
     private TextView mBlockView;
     private EditText mRefreshRateField;
     private Button mResetButton;
-    private ImageButton mExportButton;
+    private SwitchCompat mExportButton;
     private View mSctStatus;
 
     private int mSelectedId;
@@ -54,6 +60,7 @@ public class MultimeterActivity extends AppCompatActivity {
     private BluetoothAdapter mBtAdapter = null;
     private static Activity activity;
     private WriteExcel mWriteExcel;
+    private CompoundButton.OnCheckedChangeListener mCheckListener = (compoundButton, b) -> switchExport(b);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,9 +109,9 @@ public class MultimeterActivity extends AppCompatActivity {
         findViewById(SCT).setOnClickListener(mListener);
         findViewById(R.id.setRateButton).setOnClickListener(mListener);
         findViewById(R.id.filesButton).setOnClickListener(mListener);
-        mExportButton = (ImageButton) findViewById(R.id.exportButton);
-        mExportButton.setOnClickListener(mListener);
-        mExportButton.setSelected(false);
+        mExportButton = (SwitchCompat) findViewById(R.id.exportButton);
+        mExportButton.setOnCheckedChangeListener(mCheckListener);
+        mExportButton.setChecked(false);
         mResetButton = (Button) findViewById(R.id.resetButton);
         mResetButton.setOnClickListener(mListener);
         mResetButton.setEnabled(false);
@@ -135,7 +142,7 @@ public class MultimeterActivity extends AppCompatActivity {
         if (mWriteExcel != null) {
             closeExcelFile();
         }
-        if (!mExportButton.isSelected()) return;
+        if (!mExportButton.isChecked()) return;
         if (mSelectedId == VOLTAGE) {
             initExcel(Constants.V);
         } else if (mSelectedId == CURRENT) {
@@ -158,9 +165,7 @@ public class MultimeterActivity extends AppCompatActivity {
     private final View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (v.getId() == R.id.exportButton) {
-                switchExport();
-            } else if (mSelectedId != v.getId() || mSelectedId == -1) {
+            if (mSelectedId != v.getId() || mSelectedId == -1) {
                 checkButton(v);
             } else {
                 return;
@@ -191,14 +196,27 @@ public class MultimeterActivity extends AppCompatActivity {
         }
     };
 
-    private void switchExport() {
-        if (mWriteExcel != null || mExportButton.isSelected()) {
-            mExportButton.setSelected(false);
+    private void switchExport(boolean b) {
+        if (b && !checkPermission()) {
+            mExportButton.setChecked(false);
+            return;
+        }
+        if (!b) {
             closeExcelFile();
         } else {
-            mExportButton.setSelected(true);
             refreshExcel();
         }
+    }
+
+    private boolean checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
+                return false;
+            }
+            return true;
+        }
+        return true;
     }
 
     private void checkButton(View v) {
@@ -468,6 +486,17 @@ public class MultimeterActivity extends AppCompatActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         if (!hasFocus) {
             reset();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 101:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mExportButton.setChecked(true);
+                }
+                break;
         }
     }
 

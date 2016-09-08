@@ -80,4 +80,5 @@
     <string name="resistance">Resistance</string>
     <string name="voltage">Voltage</string>
     <string name="exported_data">Exported data</string>
+    <string name="export">Export</string>
 </resources>
