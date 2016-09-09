@@ -18,6 +18,9 @@ import android.widget.ImageButton;
 
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.core.Constants;
+import com.example.helio.arduino.dso.chart.ChartController;
+import com.example.helio.arduino.dso.chart.ChartListener;
+import com.example.helio.arduino.dso.chart.ChartView;
 import com.example.helio.arduino.signal.FragmentListener;
 
 import java.util.List;
@@ -33,6 +36,30 @@ public class AutoRefreshFragment extends Fragment {
     private ImageButton zoomInY, zoomOutY;
     private ImageButton moveRight, moveLeft;
     private ImageButton moveTop, moveBottom;
+
+    private ChartController mController;
+    private ChartListener mChartCallback = new ChartListener() {
+        @Override
+        public void onRefreshStart() {
+            setButtonEnabled(false);
+        }
+
+        @Override
+        public void onRefreshEnd() {
+            setButtonEnabled(true);
+        }
+    };
+
+    private void setButtonEnabled(boolean b) {
+        moveTop.setEnabled(b);
+        moveBottom.setEnabled(b);
+        moveLeft.setEnabled(b);
+        moveRight.setEnabled(b);
+        zoomInY.setEnabled(b);
+        zoomOutY.setEnabled(b);
+        zoomInX.setEnabled(b);
+        zoomOutX.setEnabled(b);
+    }
 
     public AutoRefreshFragment() {
     }
@@ -57,7 +84,11 @@ public class AutoRefreshFragment extends Fragment {
     }
 
     private void initChart(View v) {
+        mController = new ChartController();
         mChartView = (ChartView) v.findViewById(R.id.chart1);
+        mChartView.setController(mController);
+        mChartView.setChartCallback(mChartCallback);
+        mController.setListener(mChartView.getListener());
     }
 
     private void initButtons(View view) {
@@ -137,35 +168,19 @@ public class AutoRefreshFragment extends Fragment {
     };
 
     private void moveY(int i) {
-        moveTop.setEnabled(false);
-        moveBottom.setEnabled(false);
-        mChartView.moveY(i);
-        moveTop.setEnabled(true);
-        moveBottom.setEnabled(true);
+        mController.moveY(i);
     }
 
     private void moveX(int i) {
-        moveLeft.setEnabled(false);
-        moveRight.setEnabled(false);
-        mChartView.moveX(i);
-        moveLeft.setEnabled(true);
-        moveRight.setEnabled(true);
+        mController.moveX(i);
     }
 
     private void scaleY(int i) {
-        zoomInY.setEnabled(false);
-        zoomOutY.setEnabled(false);
-        mChartView.scaleY(i);
-        zoomInY.setEnabled(true);
-        zoomOutY.setEnabled(true);
+        mController.scaleY(i);
     }
 
     private void scaleX(int i) {
-        zoomInX.setEnabled(false);
-        zoomOutX.setEnabled(false);
-        mChartView.scaleX(i);
-        zoomInX.setEnabled(true);
-        zoomOutX.setEnabled(true);
+        mController.scaleX(i);
     }
 
     private void stopCapturing() {
