@@ -237,17 +237,7 @@ public class PwmFragment extends Fragment {
             mDutyField.setText("");
             return;
         }
-        long frequency = Long.parseLong(freqString);
-        int multi = mFrequencySelector.getSelectedItemPosition();
-        long eval = 1;
-        if (multi == 0) {
-            eval = Constants.HZ;
-        } else if (multi == 1) {
-            eval = Constants.kHZ;
-        } else if (multi == 2) {
-            eval = Constants.MHZ;
-        }
-        frequency = frequency * eval;
+        long frequency = getFrequency();
         if (frequency > Constants.MAX_HZ) {
             showToast(getString(R.string.max_frequency4));
             mFrequencyField.setText("");

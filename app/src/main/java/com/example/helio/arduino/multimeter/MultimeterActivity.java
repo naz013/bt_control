@@ -13,6 +13,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
@@ -136,7 +137,18 @@ public class MultimeterActivity extends AppCompatActivity {
         }
     }
 
-    private void showCurrent() {
+    private void showCurrentDialog(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.make_sure_module_is_enabled);
+        builder.setPositiveButton(R.string.ok, (dialogInterface, i) -> {
+            showCurrent(v);
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void showCurrent(View v) {
+        selectButton(v);
         sendMessage(Constants.I);
         refreshExcel();
     }
@@ -186,7 +198,7 @@ public class MultimeterActivity extends AppCompatActivity {
                     showVoltage();
                     break;
                 case CURRENT:
-                    showCurrent();
+                    showCurrentDialog(v);
                     break;
                 case SCT:
                     showSct();
@@ -228,7 +240,8 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private void checkButton(View v) {
-        if (v.getId() != R.id.resetButton && v.getId() != R.id.setRateButton && v.getId() != R.id.filesButton) {
+        int id = v.getId();
+        if (id != R.id.resetButton && id != R.id.setRateButton && id != R.id.filesButton && id != CURRENT) {
             selectButton(v);
         }
     }
