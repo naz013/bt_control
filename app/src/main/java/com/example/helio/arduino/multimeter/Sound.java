@@ -36,16 +36,20 @@ public class Sound {
 
     public void stop(){
         if (mMediaPlayer != null) {
-            mMediaPlayer.stop();
-            mMediaPlayer.release();
-            isPaused = true;
+            try {
+                mMediaPlayer.stop();
+                mMediaPlayer.release();
+                isPaused = true;
+            } catch (IllegalStateException e) {}
         }
     }
 
     public synchronized void pause(){
         if (isPlaying()) {
-            mMediaPlayer.pause();
-            isPaused = true;
+            try {
+                mMediaPlayer.pause();
+                isPaused = true;
+            } catch (IllegalStateException e) {}
         }
     }
 
@@ -75,7 +79,9 @@ public class Sound {
     public void prepareMelody() throws IOException {
         AssetFileDescriptor afd = mContext.getAssets().openFd("beep.mp3");
         if (mMediaPlayer != null) {
-            mMediaPlayer.stop();
+            try {
+                mMediaPlayer.stop();
+            } catch (IllegalStateException e) {}
         }
         mMediaPlayer = new MediaPlayer();
         try {
@@ -84,7 +90,7 @@ public class Sound {
             e.printStackTrace();
         }
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mMediaPlayer.setLooping(false);
+        mMediaPlayer.setLooping(true);
         try {
             mMediaPlayer.prepareAsync();
         } catch (IllegalStateException e){

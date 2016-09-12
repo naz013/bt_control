@@ -287,6 +287,7 @@ public class MultimeterActivity extends AppCompatActivity {
         sendMessage(Constants.D);
         deselectAll();
         enableAll();
+        if (mSound != null) mSound.stop();
         mMeterField.setText("");
         isReading = false;
         mSelectedId = -1;
