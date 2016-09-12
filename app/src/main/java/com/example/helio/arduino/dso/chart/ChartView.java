@@ -47,12 +47,7 @@ public class ChartView extends LinearLayout {
 
     private ScatterChart mChart;
     private ChartController mControl;
-    private ControlListener mListener = new ControlListener() {
-        @Override
-        public void onChange() {
-            reloadData(mYVals, mXVals);
-        }
-    };
+    private ControlListener mListener = () -> reloadData(mYVals, mXVals);
     private ChartListener mChartCallback;
 
     public ChartView(Context context) {
@@ -170,6 +165,7 @@ public class ChartView extends LinearLayout {
         Entry entry = new Entry(0f, 0f);
         dataSet.addEntry(entry);
         lineDataSet.addEntry(entry);
+        mChart.setAutoScaleMinMaxEnabled(false);
         mChart.getLineData().notifyDataChanged();
         mChart.getScatterData().notifyDataChanged();
         mChart.notifyDataSetChanged();
@@ -336,6 +332,7 @@ public class ChartView extends LinearLayout {
         long start = System.currentTimeMillis();
         if (mYValues.size() == 0 || mXValues.size() == 0) {
             mChart.invalidate();
+            if (mChartCallback != null) mChartCallback.onRefreshEnd();
             return;
         }
         Log.d(TAG, "reloadData: x size " + mXValues.size());
@@ -461,13 +458,8 @@ public class ChartView extends LinearLayout {
     }
 
     private void addEmptyPoints(IScatterDataSet dataSet) {
-        if (dataSet.getEntryCount() == 0) {
-            dataSet.addEntry(new Entry(0f, 0f));
-            dataSet.addEntry(new Entry(ChartController.CHART_MAX_X, ChartController.CHART_MAX_Y));
-        } else if (mControl.getYScaleStep() > 0 || mControl.getXScaleStep() > 0) {
-            dataSet.addEntry(new Entry(0f, 0f));
-            dataSet.addEntry(new Entry(ChartController.CHART_MAX_X, ChartController.CHART_MAX_Y));
-        }
+        dataSet.addEntry(new Entry(0f, 0f));
+        dataSet.addEntry(new Entry(ChartController.CHART_MAX_X, ChartController.CHART_MAX_Y));
     }
 
     private void initSet(ScatterData scatterData, int i) {

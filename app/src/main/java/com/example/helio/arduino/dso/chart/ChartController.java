@@ -1,10 +1,12 @@
 package com.example.helio.arduino.dso.chart;
 
+import android.util.Log;
+
 public class ChartController {
     private static final String TAG = "ChartController";
     public static final float CHART_MAX_Y = 1000f;
     public static final float CHART_MAX_X = 15000f;
-    public static final float MAX_X = 1000f;
+    public static final float MAX_X = 1500f;
     public static final float X_SCALE_BASE = 10000f;
     public static final float Y_SCALE_BASE = 31.25f;
     public static final float CHART_POINT_SIZE = 1.0f;
@@ -152,15 +154,21 @@ public class ChartController {
         if (i < 0 && mYMoveStep == getYParts() - 1) return;
         mYMoveStep -= i;
         if (mListener != null) mListener.onChange();
+        Log.d(TAG, "moveY: " + mYMoveStep);
     }
 
     public void moveX(int i) {
         if (mXScaleStep == 0) return;
         if (i < 0 && mXMoveStep == 0) return;
-        int mXParts = (int) ((int) X_SCALE_BASE / getXPartSize());
+        int mXParts = getXPartsCount();
         if (i > 0 && mXMoveStep == (mXParts - 2)) return;
         mXMoveStep += i;
         if (mListener != null) mListener.onChange();
+        Log.d(TAG, "moveX: " + mXMoveStep);
+    }
+
+    private int getXPartsCount() {
+        return (int) ((int) X_SCALE_BASE / getXPartSize());
     }
 
     private float getXPartSize() {
@@ -178,6 +186,7 @@ public class ChartController {
         if (mYMoveStep >= getYParts() - 1) mYMoveStep = getYParts() - 1;
         else if (mYMoveStep == 0) mYMoveStep = 1;
         if (mListener != null) mListener.onChange();
+        Log.d(TAG, "scaleY: " + mYScaleStep);
     }
 
     private int getYParts() {
@@ -196,8 +205,8 @@ public class ChartController {
         xParts = X_SCALE_BASE / getXPartSize();
         mXMoveStep = (int) (xParts * percent);
         if (mXMoveStep >= (xParts - 2)) mXMoveStep = (int) xParts - 2;
-        if (mXMoveStep == 0) mXMoveStep = 2;
         if (mListener != null) mListener.onChange();
+        Log.d(TAG, "scaleX: " + mXScaleStep);
     }
 
     public float calculateDeviationCorrector() {
