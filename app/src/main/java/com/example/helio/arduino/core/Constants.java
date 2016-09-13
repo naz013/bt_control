@@ -5,7 +5,7 @@ public class Constants {
     public static final long HZ = 1;
     public static final long kHZ = HZ * 1000;
     public static final long MHZ = kHZ * 1000;
-    public static final long MAX_HZ = MHZ * 20;
+    public static final long MAX_HZ = MHZ;
 
     public static final int MESSAGE_STATE_CHANGE = 1;
     public static final int MESSAGE_READ = 2;
@@ -33,10 +33,8 @@ public class Constants {
 
     public static final String Q = "q";
 
-    public static final String DIV = ";";
     public static final String COMMA = ",";
     public static final String rY = "y:";
-    public static final String rX = "x:";
     public static final String rV = "v:";
     public static final String rI = "i:";
     public static final String rR = "r:";

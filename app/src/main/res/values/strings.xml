@@ -46,7 +46,7 @@
     <string name="go_to_main_menu">Go to main menu</string>
     <string name="arduino_vhart">Arduino chart</string>
     <string name="wait_while_connection_was_established">Please wait</string>
-    <string name="max_frequency4">Maximum frequency is 20MHz</string>
+    <string name="max_frequency4">Maximum frequency is 1MHz</string>
     <string name="no_data_available">No data available</string>
 
     <string name="duty_cycle">Duty cycle</string>
@@ -71,7 +71,7 @@
     <string name="snapshot">Snapshot</string>
     <string name="auto_refresh">Auto Refresh</string>
     <string name="refresh_rate">Refresh rate (mS)</string>
-    <string name="set_refrash_rate">Set refrash rate</string>
+    <string name="set_refrash_rate">Set refresh rate</string>
     <string name="empty_refresh_rate">Empty refresh rate value</string>
     <string name="refresh_cannot_be_zero">Refresh rate cannot be 0</string>
     <string name="value">Value</string>
@@ -80,4 +80,12 @@
     <string name="resistance">Resistance</string>
     <string name="voltage">Voltage</string>
     <string name="exported_data">Exported data</string>
+    <string name="export">Export</string>
+    <string name="save_to_google_drive">Save to Google Drive</string>
+    <string name="send_via_e_mail">Send via e-mail</string>
+    <string name="send_email">Send email...</string>
+    <string name="google_drive_not_found">Google Drive application not found</string>
+    <string name="no_applications">No application than can perform this action</string>
+    <string name="make_sure_module_is_enabled">Make sure Current is selected on the Module!</string>
+    <string name="ok">Ok</string>
 </resources>

@@ -26,7 +26,6 @@ public class PwmFragment extends Fragment {
     private FragmentListener mFragmentListener;
 
     private TextView mGenerateButton;
-    private TextView mTerminateButton;
     private Spinner mFrequencySelector;
     private EditText mFrequencyField;
     private EditText mDutyField;
@@ -79,17 +78,7 @@ public class PwmFragment extends Fragment {
     }
 
     public static PwmFragment newInstance() {
-        PwmFragment fragment = new PwmFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
+        return new PwmFragment();
     }
 
     @Override
@@ -166,8 +155,8 @@ public class PwmFragment extends Fragment {
             mCycleLabel.setErrorEnabled(false);
             mCycleLabel.setError("");
         }
-        int perc = Integer.parseInt(mDutyField.getText().toString().trim());
-        if (perc > 100) {
+        int percent = Integer.parseInt(mDutyField.getText().toString().trim());
+        if (percent > 100) {
             mCycleLabel.setErrorEnabled(true);
             mCycleLabel.setError(getString(R.string.must_be_less_than));
             mGenerateButton.setEnabled(false);
@@ -216,13 +205,14 @@ public class PwmFragment extends Fragment {
     private void initButtons(View view) {
         mGenerateButton = (TextView) view.findViewById(R.id.generateButton);
         mGenerateButton.setOnClickListener(mListener);
-        mTerminateButton = (TextView) view.findViewById(R.id.terminateButton);
+        TextView mTerminateButton = (TextView) view.findViewById(R.id.terminateButton);
         mTerminateButton.setOnClickListener(mListener);
         mGenerateButton.setEnabled(false);
     }
 
     private void sendTerminateMessage() {
         String msg = Constants.E;
+        mGenerateButton.setEnabled(true);
         if (mFragmentListener != null) {
             mFragmentListener.onAction(msg);
         }
@@ -247,24 +237,14 @@ public class PwmFragment extends Fragment {
             mDutyField.setText("");
             return;
         }
-        long frequency = Long.parseLong(freqString);
-        int multi = mFrequencySelector.getSelectedItemPosition();
-        long eval = 1;
-        if (multi == 0) {
-            eval = Constants.HZ;
-        } else if (multi == 1) {
-            eval = Constants.kHZ;
-        } else if (multi == 2) {
-            eval = Constants.MHZ;
-        }
-        frequency = frequency * eval;
+        long frequency = getFrequency();
         if (frequency > Constants.MAX_HZ) {
             showToast(getString(R.string.max_frequency4));
             mFrequencyField.setText("");
             return;
         }
-
         String msg = Constants.P + ";d:" + percent + ";f:" + frequency;
+        mGenerateButton.setEnabled(false);
         if (mFragmentListener != null) {
             mFragmentListener.onAction(msg);
         }

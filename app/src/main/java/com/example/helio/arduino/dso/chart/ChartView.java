@@ -1,4 +1,4 @@
-package com.example.helio.arduino.dso;
+package com.example.helio.arduino.dso.chart;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -37,28 +37,18 @@ import java.util.Locale;
 public class ChartView extends LinearLayout {
 
     private static final String TAG = "ChartView";
-    public static final float CHART_MAX_Y = 1000f;
-    public static final float CHART_MAX_X = 15000f;
-    public static final float MAX_X = 1500f;
-    public static final float X_SCALE_BASE = 10000f;
-    public static final float Y_SCALE_BASE = 31.25f;
-    public static final float CHART_POINT_SIZE = 1.0f;
-    public static final float RANGE_DIVIDER = 2f;
-    public static final float Y_MAX = 16f;
-    public static final float Y_MIN = -16f;
+
     private Context mContext;
 
-    private boolean mIsYTracing = false;
-    private boolean mIsXTracing = false;
-    private float mXScallar = 1f;
-    private int mXScaleStep = 0;
-    private int mYScaleStep = 0;
-    private int mXMoveStep = 0;
-    private int mYMoveStep = getYParts() / 2;
     private List<Float> mYVals = new ArrayList<>();
     private List<Float> mXVals = new ArrayList<>();
+    private boolean mIsYTracing = false;
+    private boolean mIsXTracing = false;
 
     private ScatterChart mChart;
+    private ChartController mControl;
+    private ControlListener mListener = () -> reloadData(mYVals, mXVals);
+    private ChartListener mChartCallback;
 
     public ChartView(Context context) {
         super(context);
@@ -82,10 +72,23 @@ public class ChartView extends LinearLayout {
         setUpClearGraph();
     }
 
+    public void setChartCallback(ChartListener chartCallback) {
+        this.mChartCallback = chartCallback;
+    }
+
+    public ControlListener getListener() {
+        return mListener;
+    }
+
     public void setData(List<Float> mYValues, List<Float> mXValues) {
         this.mXVals = mXValues;
         this.mYVals = mYValues;
         reloadData(mYValues, mXValues);
+    }
+
+    public void setController(ChartController controller) {
+        this.mControl = controller;
+        refreshChart();
     }
 
     private void initChart() {
@@ -126,7 +129,7 @@ public class ChartView extends LinearLayout {
         dataSet.setColor(Color.BLACK);
         dataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
         dataSet.setScatterShapeHoleRadius(0f);
-        dataSet.setScatterShapeSize(CHART_POINT_SIZE);
+        dataSet.setScatterShapeSize(ChartController.CHART_POINT_SIZE);
         ScatterData scatterData = new ScatterData(dataSet);
         scatterData.setDrawValues(false);
         LineDataSet lineDataSet = new LineDataSet(entries, mContext.getString(R.string.arduino_vhart));
@@ -141,15 +144,9 @@ public class ChartView extends LinearLayout {
         mChart.setLineData(lineData);
         mChart.getLegend().setEnabled(false);
         mChart.invalidate();
-        refreshChart();
     }
 
     public void setUpClearGraph() {
-        mXScallar = 1f;
-        mXScaleStep = 0;
-        mYScaleStep = 0;
-        mXMoveStep = 0;
-        mYMoveStep = getYParts() / 2;
         clearGraph();
         ScatterData scatterData = mChart.getScatterData();
         if (scatterData != null) {
@@ -168,6 +165,7 @@ public class ChartView extends LinearLayout {
         Entry entry = new Entry(0f, 0f);
         dataSet.addEntry(entry);
         lineDataSet.addEntry(entry);
+        mChart.setAutoScaleMinMaxEnabled(false);
         mChart.getLineData().notifyDataChanged();
         mChart.getScatterData().notifyDataChanged();
         mChart.notifyDataSetChanged();
@@ -181,13 +179,13 @@ public class ChartView extends LinearLayout {
 
     private float getYPositionByTouch(float x, float y) {
         MPPointD pointD = mChart.getValuesByTouchPoint(x, y, YAxis.AxisDependency.LEFT);
-        return (float) pointD.y + CHART_MAX_Y / 2;
+        return (float) pointD.y + ChartController.CHART_MAX_Y / 2;
     }
 
     private void refreshChart() {
         YAxis yAxis = mChart.getAxisLeft();
         yAxis.removeAllLimitLines();
-        yAxis.setAxisMaxValue(CHART_MAX_Y);
+        yAxis.setAxisMaxValue(ChartController.CHART_MAX_Y);
         yAxis.setDrawZeroLine(false);
         yAxis.setDrawLimitLinesBehindData(false);
         yAxis.setValueFormatter(new AxisValueFormatter() {
@@ -205,7 +203,7 @@ public class ChartView extends LinearLayout {
         XAxis xAxis = mChart.getXAxis();
         xAxis.setDrawGridLines(false);
         xAxis.setDrawLimitLinesBehindData(false);
-        xAxis.setAxisMaxValue(CHART_MAX_X);
+        xAxis.setAxisMaxValue(ChartController.CHART_MAX_X);
         xAxis.setValueFormatter(new AxisValueFormatter() {
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
@@ -220,38 +218,12 @@ public class ChartView extends LinearLayout {
         mChart.invalidate();
     }
 
-    private float getXFormatScale() {
-        if (mXScallar > 1000000) {
-            return mXScallar / 1000000;
-        } else if (mXScallar > 1000) {
-            return mXScallar / 10000;
-        } else if (mXScallar == 1000 || mXScallar == 1) {
-            return 1000;
-        } else {
-            return mXScallar;
-        }
-    }
-
-    private float getYFormatScale() {
-        if (mYScaleStep == 1) {
-            return 125f;
-        } else if (mYScaleStep == 2) {
-            return 500f;
-        } else if (mYScaleStep == 3) {
-            return 2f;
-        } else if (mYScaleStep == 4) {
-            return 8f;
-        } else {
-            return 31.25f;
-        }
-    }
-
     public void traceY() {
         mIsYTracing = !mIsYTracing;
         mIsXTracing = false;
         mChart.getXAxis().removeAllLimitLines();
         if (mIsYTracing) {
-            drawHorizontalLine(CHART_MAX_Y / 2);
+            drawHorizontalLine(ChartController.CHART_MAX_Y / 2);
         } else {
             mChart.getAxisLeft().removeAllLimitLines();
             mChart.invalidate();
@@ -264,7 +236,7 @@ public class ChartView extends LinearLayout {
         yLimit.setLineColor(getResources().getColor(R.color.colorRed));
         yLimit.setLabel(getYLabelFormatted(position, true));
         yLimit.setTextSize(20f);
-        if (position > CHART_MAX_Y / 2) yLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
+        if (position > ChartController.CHART_MAX_Y / 2) yLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
         else yLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
         yLimit.setTextColor(getResources().getColor(R.color.colorBlue));
         mChart.getAxisLeft().setDrawLimitLinesBehindData(false);
@@ -273,16 +245,8 @@ public class ChartView extends LinearLayout {
     }
 
     private String getYLabelFormatted(float value, boolean trace) {
-        float scalar = getYFormatScale();
-        float deviation = getYDeviation();
-        float deviationCorrector = getDeviationCorrector();
-        float f = ((value - CHART_MAX_Y / 2) / scalar);
-        if (mYScaleStep > 2  && mYMoveStep != getYParts() / 2) {
-            f = f - ((deviation * (deviationCorrector - 1)) * CHART_MAX_Y);
-        } else if (mYScaleStep > 0 && mYMoveStep != getYParts() / 2) {
-            f = f - (deviation * (deviationCorrector - 1));
-        }
-        if (value == CHART_MAX_Y && !trace) {
+        float f = mControl.calculateYLabel(value);
+        if (value == ChartController.CHART_MAX_Y && !trace) {
             return String.format(Locale.getDefault(), getYUnitLabel(), f);
         } else {
             return String.format(Locale.getDefault(), "%.2f", f);
@@ -290,7 +254,7 @@ public class ChartView extends LinearLayout {
     }
 
     private String getYUnitLabel() {
-        if (mYScaleStep > 2) {
+        if (mControl.getYScaleStep() > 2) {
             return "(mv)\n%.2f";
         } else {
             return "(v)\n%.2f";
@@ -303,7 +267,7 @@ public class ChartView extends LinearLayout {
         xLimit.setLineColor(getResources().getColor(R.color.colorRed));
         xLimit.setLabel(getXLabelFormatted(position, true));
         xLimit.setTextSize(20f);
-        if (position > CHART_MAX_X / 2) xLimit.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
+        if (position > ChartController.CHART_MAX_X / 2) xLimit.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
         else xLimit.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
         xLimit.setTextColor(getResources().getColor(R.color.colorGreen));
         mChart.getXAxis().addLimitLine(xLimit);
@@ -312,11 +276,7 @@ public class ChartView extends LinearLayout {
     }
 
     private String getXLabelFormatted(float value, boolean trace) {
-        float scalar = getXFormatScale();
-        float f = (value + getSlideX()) / (scalar * 10);
-        if (mXScaleStep == 0) {
-            f = (value + getSlideX()) / (scalar * 10);
-        }
+        float f = mControl.calculateXLabel(value);
         if (value > 14500 && !trace) {
             return String.format(Locale.getDefault(), getXUnitLabel(), f);
         } else {
@@ -325,7 +285,7 @@ public class ChartView extends LinearLayout {
     }
 
     private String getXLabel() {
-        if (mXScaleStep > 0) {
+        if (mControl.getXScaleStep() > 0) {
             return "%.0f";
         } else {
             return "%.2f";
@@ -333,7 +293,7 @@ public class ChartView extends LinearLayout {
     }
 
     private String getXUnitLabel() {
-        if (mXScaleStep > 0) {
+        if (mControl.getXScaleStep() > 0) {
             return "%.0f(uS)";
         } else {
             return "%.2f(mS)";
@@ -345,41 +305,11 @@ public class ChartView extends LinearLayout {
         mIsYTracing = false;
         mChart.getAxisLeft().removeAllLimitLines();
         if (mIsXTracing) {
-            drawVerticalLine(CHART_MAX_X / 2);
+            drawVerticalLine(ChartController.CHART_MAX_X / 2);
         } else {
             mChart.getXAxis().removeAllLimitLines();
             mChart.invalidate();
         }
-    }
-
-    public void moveY(int i) {
-        if (mYScaleStep == 0) return;
-        if (i > 0 && mYMoveStep == 1) return;
-        if (i < 0 && mYMoveStep == getYParts() - 1) return;
-        mYMoveStep -= i;
-        reloadData(mYVals, mXVals);
-    }
-
-    public void moveX(int i) {
-        if (mXScaleStep == 0) return;
-        if (i < 0 && mXMoveStep == 0) return;
-        int mXParts = (int) ((int) X_SCALE_BASE / getXPartSize());
-        if (i > 0 && mXMoveStep == (mXParts - 2)) return;
-        mXMoveStep += i;
-        reloadData(mYVals, mXVals);
-    }
-
-    private float getXPartSize() {
-        return X_SCALE_BASE / mXScallar / RANGE_DIVIDER;
-    }
-
-    public void scaleY(int i) {
-        if (i < 0 && mYScaleStep == 0) return;
-        if (i > 0 && mYScaleStep == 4) return;
-        mYScaleStep += i;
-        int mYParts = getYParts();
-        mYMoveStep = mYParts / 2;
-        reloadData(mYVals, mXVals);
     }
 
     private void reloadTraceLines() {
@@ -397,26 +327,12 @@ public class ChartView extends LinearLayout {
         }
     }
 
-    private int getYParts() {
-        return ((int) Math.round(Math.pow(4, mYScaleStep))) * 2;
-    }
-
-    public void scaleX(int i) {
-        if (i < 0 && mXScaleStep == 0) return;
-        if (i > 0 && mXScaleStep == 5) return;
-        if (i > 0) mXScallar *= 2;
-        if (i < 0) mXScallar /= 2;
-        mXMoveStep = 0;
-        mXScaleStep += i;
-        int mYParts = getYParts();
-        mYMoveStep = mYParts / 2;
-        reloadData(mYVals, mXVals);
-    }
-
     private synchronized void reloadData(List<Float> mYValues, List<Float> mXValues) {
+        if (mChartCallback != null) mChartCallback.onRefreshStart();
         long start = System.currentTimeMillis();
         if (mYValues.size() == 0 || mXValues.size() == 0) {
             mChart.invalidate();
+            if (mChartCallback != null) mChartCallback.onRefreshEnd();
             return;
         }
         Log.d(TAG, "reloadData: x size " + mXValues.size());
@@ -435,21 +351,16 @@ public class ChartView extends LinearLayout {
             initSet(lineData, 0);
         }
         if (lineData == null) return;
-        float scaleX = getXScale();
-        float scaleY = getYScale();
-        float slideX = getSlideX();
-        float deviationY = getYDeviation();
-        float maxX = CHART_MAX_X / scaleX + (slideX / scaleX);
-        float minX = mXMoveStep > 0 ? (maxX - (CHART_MAX_X / scaleX)) : 0f;
-        float baseY = (CHART_MAX_Y / 2) / scaleY;
-        float yMoveMiddle = getYParts() / 2;
-        float deviationCorrector = getDeviationCorrector();
-        float maxY = baseY + ((yMoveMiddle - mYMoveStep) * baseY);
-        float minY = mYMoveStep != yMoveMiddle ? (maxY - baseY * 2) : -deviationY;
-        if (mYScaleStep == 0) {
-            maxY = Y_MAX;
-            minY = Y_MIN;
-        }
+        mControl.calculateNewParameters();
+        float scaleX = mControl.getScaleX();
+        float scaleY = mControl.getScaleY();
+        float slideX = mControl.getSlideX();
+        float deviationY = mControl.getDeviationY();
+        float maxX = mControl.getMaxX();
+        float minX = mControl.getMinX();
+        float deviationCorrector = mControl.getDeviationCorrector();
+        float maxY = mControl.getMaxY();
+        float minY = mControl.getMinY();
         IScatterDataSet dataSet = scatterData.getDataSetByIndex(0);
         dataSet.clear();
         ILineDataSet lineDataSet = lineData.getDataSetByIndex(0);
@@ -467,7 +378,7 @@ public class ChartView extends LinearLayout {
                     if (!hasPrev && i > 0) {
                         initSet(lineData, index);
                         lineDataSet = lineData.getDataSetByIndex(index);
-                        if (mYScaleStep > 0) {
+                        if (mControl.getYScaleStep() > 0) {
                             float prevY = yList.get(i - 1);
                             addPreviousIfHasPoint(prevY, y, xSc, lineDataSet);
                         }
@@ -479,14 +390,14 @@ public class ChartView extends LinearLayout {
                 } else if (hasPrev) {
                     index++;
                     hasPrev = false;
-                    if (i - 1 > 0 && mYScaleStep > 0) {
+                    if (i - 1 > 0 && mControl.getYScaleStep() > 0) {
                         float prevY = yList.get(i - 1);
                         addPreviousIfNoPoint(prevY, y, xSc, lineDataSet);
                     }
                 } else {
                     initSet(lineData, index);
                     lineDataSet = lineData.getDataSetByIndex(index);
-                    if (mYScaleStep > 0 && i > 0) {
+                    if (mControl.getYScaleStep() > 0 && i > 0) {
                         float prevY = yList.get(i - 1);
                         int prevX = (int) (xList.get(i - 1) * scaleX - slideX);
                         int prevYsc = (int) ((prevY + (deviationY * deviationCorrector)) * scaleY);
@@ -502,19 +413,20 @@ public class ChartView extends LinearLayout {
         invalidateChart();
         reloadTraceLines();
         Log.d(TAG, "reloadData: refresh time " + (System.currentTimeMillis() - start));
+        if (mChartCallback != null) mChartCallback.onRefreshEnd();
     }
 
     private void addFakePoint(float prevY, int prevX, int prevYsc, ILineDataSet lineDataSet, int xSc, float maxY, float minY, float y) {
         if (prevY < minY && y > maxY) {
             lineDataSet.addEntry(new Entry(prevX, 0f));
-            lineDataSet.addEntry(new Entry(xSc, 1500f));
+            lineDataSet.addEntry(new Entry(xSc, ChartController.CHART_MAX_Y));
         } else if (prevY > maxY && y < minY) {
-            lineDataSet.addEntry(new Entry(prevX, 1500f));
+            lineDataSet.addEntry(new Entry(prevX, ChartController.CHART_MAX_Y));
             lineDataSet.addEntry(new Entry(xSc, 0f));
         } else if (prevY >= minY && prevY <= maxY) {
             if (y > maxY) {
                 lineDataSet.addEntry(new Entry(prevX, prevYsc));
-                lineDataSet.addEntry(new Entry(xSc, 1500f));
+                lineDataSet.addEntry(new Entry(xSc, ChartController.CHART_MAX_Y));
             } else if (y < minY) {
                 lineDataSet.addEntry(new Entry(prevX, prevYsc));
                 lineDataSet.addEntry(new Entry(xSc, 0f));
@@ -526,13 +438,13 @@ public class ChartView extends LinearLayout {
         if (prevY > y) {
             lineDataSet.addEntry(new Entry(xSc, 0f));
         } else {
-            lineDataSet.addEntry(new Entry(xSc, 1500f));
+            lineDataSet.addEntry(new Entry(xSc, ChartController.CHART_MAX_Y));
         }
     }
 
     private void addPreviousIfHasPoint(float prevY, float y, int xSc, ILineDataSet lineDataSet) {
         if (prevY > y) {
-            lineDataSet.addEntry(new Entry(xSc, 1500f));
+            lineDataSet.addEntry(new Entry(xSc, ChartController.CHART_MAX_Y));
         } else {
             lineDataSet.addEntry(new Entry(xSc, 0f));
         }
@@ -546,13 +458,8 @@ public class ChartView extends LinearLayout {
     }
 
     private void addEmptyPoints(IScatterDataSet dataSet) {
-        if (dataSet.getEntryCount() == 0) {
-            dataSet.addEntry(new Entry(0f, 0f));
-            dataSet.addEntry(new Entry(15000f, 1000f));
-        } else if (mYScaleStep > 0 || mXScaleStep > 0) {
-            dataSet.addEntry(new Entry(0f, 0f));
-            dataSet.addEntry(new Entry(15000f, 1000f));
-        }
+        dataSet.addEntry(new Entry(0f, 0f));
+        dataSet.addEntry(new Entry(ChartController.CHART_MAX_X, ChartController.CHART_MAX_Y));
     }
 
     private void initSet(ScatterData scatterData, int i) {
@@ -583,29 +490,6 @@ public class ChartView extends LinearLayout {
         }
     }
 
-    private float getDeviationCorrector() {
-        return mYMoveStep - (getYParts() / 2 - 1);
-    }
-
-    private float getYDeviation() {
-        if (mYScaleStep == 0) return Y_MAX;
-        else return Y_MAX / (float) Math.pow(4, mYScaleStep);
-    }
-
-    private float getXScale() {
-        return (X_SCALE_BASE * mXScallar);
-    }
-
-    private float getSlideX() {
-        return CHART_MAX_X / 2 * mXMoveStep;
-    }
-
-    private float getYScale() {
-        float increment = 1f;
-        if (mYScaleStep > 0) increment = (float) Math.pow(4, mYScaleStep);
-        return Y_SCALE_BASE * increment;
-    }
-
     private void clearGraph() {
         mChart.getScatterData().clearValues();
         mChart.getLineData().clearValues();
@@ -632,7 +516,7 @@ public class ChartView extends LinearLayout {
         dataSet.setColor(Color.BLACK);
         dataSet.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
         dataSet.setScatterShapeHoleRadius(0f);
-        dataSet.setScatterShapeSize(CHART_POINT_SIZE);
+        dataSet.setScatterShapeSize(ChartController.CHART_POINT_SIZE);
         dataSet.setDrawValues(false);
         return dataSet;
     }

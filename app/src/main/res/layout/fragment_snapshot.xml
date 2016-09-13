@@ -15,7 +15,7 @@
         android:layout_marginTop="32dp"
         app:cardElevation="2dp">
 
-        <com.example.helio.arduino.dso.ChartView
+        <com.example.helio.arduino.dso.chart.ChartView
             android:id="@+id/chart1"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

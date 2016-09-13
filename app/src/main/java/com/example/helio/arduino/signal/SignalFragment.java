@@ -27,7 +27,6 @@ public class SignalFragment extends Fragment {
     private FragmentListener mFragmentListener;
 
     private TextView mGenerateButton;
-    private TextView mTerminateButton;
     private Spinner mWaveSelector;
     private Spinner mFrequencySelector;
     private EditText mFrequencyField;
@@ -79,17 +78,7 @@ public class SignalFragment extends Fragment {
     }
 
     public static SignalFragment newInstance() {
-        SignalFragment fragment = new SignalFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
+        return new SignalFragment();
     }
 
     @Override
@@ -170,13 +159,14 @@ public class SignalFragment extends Fragment {
     private void initButtons(View view) {
         mGenerateButton = (TextView) view.findViewById(R.id.generateButton);
         mGenerateButton.setOnClickListener(mListener);
-        mTerminateButton = (TextView) view.findViewById(R.id.terminateButton);
+        TextView mTerminateButton = (TextView) view.findViewById(R.id.terminateButton);
         mTerminateButton.setOnClickListener(mListener);
         mGenerateButton.setEnabled(false);
     }
 
     private void sendTerminateMessage() {
         String msg = Constants.T;
+        mGenerateButton.setEnabled(true);
         if (mFragmentListener != null) {
             mFragmentListener.onAction(msg);
         }
@@ -208,6 +198,7 @@ public class SignalFragment extends Fragment {
         }
         String msg = Constants.G + ";w:" + wave + ";f:" + frequency;
         Log.d("TAG", "sendSignal: " + msg);
+        mGenerateButton.setEnabled(false);
         if (mFragmentListener != null) {
             mFragmentListener.onAction(msg);
         }

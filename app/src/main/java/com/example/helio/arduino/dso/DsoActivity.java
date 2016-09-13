@@ -28,6 +28,7 @@ import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.ControlEvent;
 import com.example.helio.arduino.core.DsoEvent;
 import com.example.helio.arduino.core.ResponseEvent;
+import com.example.helio.arduino.dso.chart.ChartController;
 import com.example.helio.arduino.signal.FragmentListener;
 
 import java.util.ArrayList;
@@ -175,7 +176,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         List<Float> mYVals = new ArrayList<>();
         List<Float> mXVals = new ArrayList<>();
         for (int i = 0; i < array.length; i++) {
-            float x = ((float) i / ((float) array.length / ChartView.MAX_X)) * (1f / 1000f);
+            float x = ((float) i / ((float) array.length / ChartController.MAX_X)) * (1f / 1000f);
             short yVal = array[i];
             float y = (float) yVal / 1000f;
             mYVals.add(y);
@@ -193,7 +194,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
             mYVals.clear();
             for (int i = 0; i < parts.length; i++) {
                 String yVal = parts[i];
-                float x = ((float) i / ((float) parts.length / ChartView.MAX_X)) * (1f / 1000f);
+                float x = ((float) i / ((float) parts.length / ChartController.MAX_X)) * (1f / 1000f);
                 if (TextUtils.isEmpty(yVal.trim())) continue;
                 float y = Float.parseFloat(yVal.trim());
                 mYVals.add(y);
@@ -232,7 +233,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         List<Float> mYVals = new ArrayList<>();
         List<Float> mXVals = new ArrayList<>();
         for (int i = 0; i < testCount; i++) {
-            float x = ((float) i / ((float) testCount / ChartView.MAX_X)) * (1f / 1000f);
+            float x = ((float) i / ((float) testCount / ChartController.MAX_X)) * (1f / 1000f);
             y += step;
             if (Math.round(y) == 16f) step = -step;
             else if (Math.round(y) == -16.0f) step = Math.abs(step);

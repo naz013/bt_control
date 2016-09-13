@@ -1,19 +1,29 @@
 package com.example.helio.arduino.multimeter;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +36,7 @@ import com.example.helio.arduino.core.ControlEvent;
 import com.example.helio.arduino.core.ResponseEvent;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import de.greenrobot.event.EventBus;
 import jxl.write.WriteException;
@@ -37,27 +48,33 @@ public class MultimeterActivity extends AppCompatActivity {
     private static final int CURRENT = R.id.currentButton;
     private static final int RESISTANCE = R.id.resistanceButton;
     private static final int SCT = R.id.sctButton;
+    private static final String TAG = "MultimeterActivity";
 
     private TextView mMeterField;
     private TextView mBlockView;
     private EditText mRefreshRateField;
     private Button mResetButton;
-    private ImageButton mExportButton;
+    private SwitchCompat mExportButton;
     private View mSctStatus;
 
     private int mSelectedId;
     private boolean isReading;
+    private int currVolume;
 
     private BluetoothAdapter mBtAdapter = null;
-
     private static Activity activity;
-
     private WriteExcel mWriteExcel;
+    private Sound mSound;
+    private CompoundButton.OnCheckedChangeListener mCheckListener = (compoundButton, b) -> switchExport(b);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this;
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        currVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, 25, 0);
+        mSound = new Sound(this);
         setContentView(R.layout.activity_multimeter);
         initBluetoothAdapter();
         initActionBar();
@@ -101,9 +118,9 @@ public class MultimeterActivity extends AppCompatActivity {
         findViewById(SCT).setOnClickListener(mListener);
         findViewById(R.id.setRateButton).setOnClickListener(mListener);
         findViewById(R.id.filesButton).setOnClickListener(mListener);
-        mExportButton = (ImageButton) findViewById(R.id.exportButton);
-        mExportButton.setOnClickListener(mListener);
-        mExportButton.setSelected(false);
+        mExportButton = (SwitchCompat) findViewById(R.id.exportButton);
+        mExportButton.setOnCheckedChangeListener(mCheckListener);
+        mExportButton.setChecked(false);
         mResetButton = (Button) findViewById(R.id.resetButton);
         mResetButton.setOnClickListener(mListener);
         mResetButton.setEnabled(false);
@@ -120,7 +137,18 @@ public class MultimeterActivity extends AppCompatActivity {
         }
     }
 
-    private void showCurrent() {
+    private void showCurrentDialog(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.make_sure_module_is_enabled);
+        builder.setPositiveButton(R.string.ok, (dialogInterface, i) -> {
+            showCurrent(v);
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void showCurrent(View v) {
+        selectButton(v);
         sendMessage(Constants.I);
         refreshExcel();
     }
@@ -134,7 +162,7 @@ public class MultimeterActivity extends AppCompatActivity {
         if (mWriteExcel != null) {
             closeExcelFile();
         }
-        if (!mExportButton.isSelected()) return;
+        if (!mExportButton.isChecked()) return;
         if (mSelectedId == VOLTAGE) {
             initExcel(Constants.V);
         } else if (mSelectedId == CURRENT) {
@@ -157,9 +185,7 @@ public class MultimeterActivity extends AppCompatActivity {
     private final View.OnClickListener mListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (v.getId() == R.id.exportButton) {
-                switchExport();
-            } else if (mSelectedId != v.getId() || mSelectedId == -1) {
+            if (mSelectedId != v.getId() || mSelectedId == -1) {
                 checkButton(v);
             } else {
                 return;
@@ -172,7 +198,7 @@ public class MultimeterActivity extends AppCompatActivity {
                     showVoltage();
                     break;
                 case CURRENT:
-                    showCurrent();
+                    showCurrentDialog(v);
                     break;
                 case SCT:
                     showSct();
@@ -190,18 +216,32 @@ public class MultimeterActivity extends AppCompatActivity {
         }
     };
 
-    private void switchExport() {
-        if (mWriteExcel != null || mExportButton.isSelected()) {
-            mExportButton.setSelected(false);
+    private void switchExport(boolean b) {
+        if (b && !checkPermission()) {
+            mExportButton.setChecked(false);
+            return;
+        }
+        if (!b) {
             closeExcelFile();
         } else {
-            mExportButton.setSelected(true);
             refreshExcel();
         }
     }
 
+    private boolean checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
+                return false;
+            }
+            return true;
+        }
+        return true;
+    }
+
     private void checkButton(View v) {
-        if (v.getId() != R.id.resetButton && v.getId() != R.id.setRateButton && v.getId() != R.id.filesButton) {
+        int id = v.getId();
+        if (id != R.id.resetButton && id != R.id.setRateButton && id != R.id.filesButton && id != CURRENT) {
             selectButton(v);
         }
     }
@@ -226,6 +266,11 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private void showSct() {
         sendMessage(Constants.Q);
+        try {
+            mSound.prepareMelody();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void selectButton(View v) {
@@ -242,6 +287,7 @@ public class MultimeterActivity extends AppCompatActivity {
         sendMessage(Constants.D);
         deselectAll();
         enableAll();
+        if (mSound != null) mSound.stop();
         mMeterField.setText("");
         isReading = false;
         mSelectedId = -1;
@@ -317,19 +363,29 @@ public class MultimeterActivity extends AppCompatActivity {
             saveToExcel(v);
             mSctStatus.setBackgroundResource(R.drawable.gray_circle);
         } else if (data.startsWith(Constants.rR)) {
-            v = extractR(data) + " " + getString(R.string.omega);
+            v = extractR(data);
             saveToExcel(v);
             mSctStatus.setBackgroundResource(R.drawable.gray_circle);
         } else if (data.startsWith(Constants.sCT)) {
             int value = extractSct(data);
-            if (value == 1) {
-                mSctStatus.setBackgroundResource(R.drawable.red_circle);
-            } else {
-                mSctStatus.setBackgroundResource(R.drawable.gray_circle);
-            }
+            performSct(value);
             v = "";
         }
         mMeterField.setText(v);
+    }
+
+    private void performSct(int value) {
+        if (value == 1) {
+            mSctStatus.setBackgroundResource(R.drawable.red_circle);
+            if (mSound.isPaused()) {
+                mSound.resume();
+            } else {
+                mSound.start();
+            }
+        } else {
+            mSctStatus.setBackgroundResource(R.drawable.gray_circle);
+            mSound.pause();
+        }
     }
 
     private void saveToExcel(String value) {
@@ -355,7 +411,39 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private String extractR(String data) {
         data = data.replace(Constants.rR, "");
-        return data.trim();
+        data = data.replace(" ", "").trim();
+        try {
+            float resistance = Float.parseFloat(data);
+            return convertResistance(resistance) + "";
+        } catch (NumberFormatException e) {
+            return data;
+        }
+    }
+
+    private String convertResistance(float resistance) throws NumberFormatException{
+        String res = "" + resistance;
+        if (resistance <= 590) {
+            res = Math.round(resistance) + " " + getString(R.string.omega);
+        } else if (resistance <= 950) {
+            float tmp = resistance / 1000;
+            res = String.format(Locale.getDefault(), "%.3f kΩ", tmp);
+        } else if (resistance <= 9500) {
+            float tmp = resistance / 1000;
+            res = String.format(Locale.getDefault(), "%.2f kΩ", tmp);
+        } else if (resistance <= 95000) {
+            float tmp = resistance / 1000;
+            res = String.format(Locale.getDefault(), "%.1f kΩ", tmp);
+        } else if (resistance <= 590000) {
+            float tmp = resistance / 1000;
+            res = Math.round(tmp) + " kΩ";
+        } else if (resistance <= 950000) {
+            float tmp = resistance / 1000000;
+            res = String.format(Locale.getDefault(), "%.3f MΩ", tmp);
+        } else if (resistance > 950000){
+            float tmp = resistance / 1000000;
+            res = String.format(Locale.getDefault(), "%.2f MΩ", tmp);
+        }
+        return res;
     }
 
     private String extractI(String data) {
@@ -390,6 +478,8 @@ public class MultimeterActivity extends AppCompatActivity {
         mBlockView.setVisibility(View.VISIBLE);
         stopService(new Intent(this, BluetoothService.class));
         closeExcelFile();
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, currVolume, 0);
     }
 
     @Override
@@ -398,6 +488,7 @@ public class MultimeterActivity extends AppCompatActivity {
         sendMessage(Constants.D);
         EventBus.getDefault().unregister(this);
         closeExcelFile();
+        if (mSound != null) mSound.stop();
     }
 
     @Override
@@ -434,6 +525,17 @@ public class MultimeterActivity extends AppCompatActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         if (!hasFocus) {
             reset();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 101:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mExportButton.setChecked(true);
+                }
+                break;
         }
     }
 

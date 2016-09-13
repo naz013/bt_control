@@ -1,16 +1,22 @@
 package com.example.helio.arduino.multimeter;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.helio.arduino.BuildConfig;
 import com.example.helio.arduino.R;
 
 import java.io.File;
@@ -53,7 +59,51 @@ public class FilesRecyclerAdapter extends RecyclerView.Adapter<FilesRecyclerAdap
             fileNameView = (TextView) itemView.findViewById(R.id.nameView);
             fileNameView.setOnClickListener(v -> handleClick(getAdapterPosition()));
             ImageButton button = (ImageButton) itemView.findViewById(R.id.deleteButton);
+            ImageButton shareButton = (ImageButton) itemView.findViewById(R.id.shareButton);
             button.setOnClickListener(view -> showDeleteDialog(getAdapterPosition()));
+            shareButton.setOnClickListener(view -> showPopup(getAdapterPosition(), view));
+        }
+    }
+
+    private void showPopup(int position, View view) {
+        PopupMenu popup = new PopupMenu(mContext, view);
+        popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.mail_action:
+                    sendEmail(position);
+                    break;
+                case R.id.drive_action:
+                    saveToDrive(position);
+                    break;
+            }
+            return true;
+        });
+        popup.show();
+    }
+
+    private void saveToDrive(int position) {
+        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(mDataList.get(position).getFullPath())));
+        intent.setPackage("com.google.android.apps.docs");
+        try {
+            mContext.startActivity(Intent.createChooser(intent, ""));
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(mContext, R.string.google_drive_not_found, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void sendEmail(int position) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, mContext.getString(R.string.app_name));
+        Uri uri = Uri.fromFile(new File(mDataList.get(position).getFullPath()));
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        try {
+            mContext.startActivity(Intent.createChooser(intent, mContext.getString(R.string.send_email)));
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(mContext, R.string.no_applications, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -78,9 +128,14 @@ public class FilesRecyclerAdapter extends RecyclerView.Adapter<FilesRecyclerAdap
     }
 
     private void handleClick(int position) {
+        File file = new File(mDataList.get(position).getFullPath());
+        Uri uri = Uri.fromFile(file);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            uri = FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", file);
+        }
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(new File(mDataList.get(position).getFullPath())), "application/vnd.ms-excel");
+        intent.setDataAndType(uri, "application/vnd.ms-excel");
         mContext.startActivity(intent);
     }
 }
