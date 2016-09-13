@@ -421,7 +421,6 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     private String convertResistance(float resistance) throws NumberFormatException{
-        Log.d(TAG, "convertResistance: " + resistance);
         String res = "" + resistance;
         if (resistance <= 590) {
             res = Math.round(resistance) + " " + getString(R.string.omega);

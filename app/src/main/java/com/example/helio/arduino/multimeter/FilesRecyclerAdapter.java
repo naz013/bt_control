@@ -4,6 +4,8 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,6 +16,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.helio.arduino.BuildConfig;
 import com.example.helio.arduino.R;
 
 import java.io.File;
@@ -125,9 +128,14 @@ public class FilesRecyclerAdapter extends RecyclerView.Adapter<FilesRecyclerAdap
     }
 
     private void handleClick(int position) {
+        File file = new File(mDataList.get(position).getFullPath());
+        Uri uri = Uri.fromFile(file);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            uri = FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", file);
+        }
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(new File(mDataList.get(position).getFullPath())), "application/vnd.ms-excel");
+        intent.setDataAndType(uri, "application/vnd.ms-excel");
         mContext.startActivity(intent);
     }
 }
