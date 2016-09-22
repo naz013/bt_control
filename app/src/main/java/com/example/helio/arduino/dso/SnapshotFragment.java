@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +36,7 @@ public class SnapshotFragment extends Fragment {
     private ImageButton zoomInY, zoomOutY;
     private ImageButton moveRight, moveLeft;
     private ImageButton moveTop, moveBottom;
+    private ImageButton traceX, traceY;
     private ProgressDialog mProgressDialog;
 
     private ChartView mChartView;
@@ -54,7 +54,6 @@ public class SnapshotFragment extends Fragment {
     };
 
     private void setButtonEnabled(boolean b) {
-        Log.d(TAG, "setButtonEnabled: " + b);
         moveTop.setEnabled(b);
         moveBottom.setEnabled(b);
         moveLeft.setEnabled(b);
@@ -63,6 +62,8 @@ public class SnapshotFragment extends Fragment {
         zoomOutY.setEnabled(b);
         zoomInX.setEnabled(b);
         zoomOutX.setEnabled(b);
+        traceX.setEnabled(b);
+        traceY.setEnabled(b);
     }
 
     public SnapshotFragment() {
@@ -117,8 +118,8 @@ public class SnapshotFragment extends Fragment {
         view.findViewById(R.id.stopButton).setOnClickListener(mListener);
         view.findViewById(R.id.captureButton).setOnClickListener(mListener);
         view.findViewById(R.id.gallery_item).setOnClickListener(mListener);
-        view.findViewById(R.id.traceY).setOnClickListener(mListener);
-        view.findViewById(R.id.traceX).setOnClickListener(mListener);
+        traceY = (ImageButton) view.findViewById(R.id.traceY);
+        traceX = (ImageButton) view.findViewById(R.id.traceX);
         moveBottom = (ImageButton) view.findViewById(R.id.moveBottom);
         moveTop = (ImageButton) view.findViewById(R.id.moveTop);
         moveLeft = (ImageButton) view.findViewById(R.id.moveLeft);
@@ -138,6 +139,8 @@ public class SnapshotFragment extends Fragment {
         moveRight.setOnClickListener(mListener);
         moveLeft.setOnClickListener(mListener);
         moveTop.setOnClickListener(mListener);
+        traceY.setOnClickListener(mListener);
+        traceX.setOnClickListener(mListener);
     }
 
     private void loadFromFile() {
@@ -218,6 +221,7 @@ public class SnapshotFragment extends Fragment {
 
     private void stopCapturing() {
         sendMessage(Constants.S);
+        setButtonEnabled(true);
     }
 
     private void showScreenshots() {
@@ -230,6 +234,7 @@ public class SnapshotFragment extends Fragment {
         showProgressDialog();
         mChartView.setUpClearGraph();
         sendMessage(Constants.C);
+        setButtonEnabled(false);
     }
 
     private boolean checkPermission() {

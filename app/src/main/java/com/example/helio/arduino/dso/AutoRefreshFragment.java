@@ -36,7 +36,9 @@ public class AutoRefreshFragment extends Fragment {
     private ImageButton zoomInY, zoomOutY;
     private ImageButton moveRight, moveLeft;
     private ImageButton moveTop, moveBottom;
+    private ImageButton traceX, traceY;
 
+    private boolean isCapturing;
     private ChartController mController;
     private ChartListener mChartCallback = new ChartListener() {
         @Override
@@ -51,6 +53,7 @@ public class AutoRefreshFragment extends Fragment {
     };
 
     private void setButtonEnabled(boolean b) {
+        if (isCapturing) return;
         moveTop.setEnabled(b);
         moveBottom.setEnabled(b);
         moveLeft.setEnabled(b);
@@ -59,6 +62,8 @@ public class AutoRefreshFragment extends Fragment {
         zoomOutY.setEnabled(b);
         zoomInX.setEnabled(b);
         zoomOutX.setEnabled(b);
+        traceX.setEnabled(b);
+        traceY.setEnabled(b);
     }
 
     public AutoRefreshFragment() {
@@ -97,8 +102,8 @@ public class AutoRefreshFragment extends Fragment {
         view.findViewById(R.id.stopButton).setOnClickListener(mListener);
         view.findViewById(R.id.captureButton).setOnClickListener(mListener);
         view.findViewById(R.id.gallery_item).setOnClickListener(mListener);
-        view.findViewById(R.id.traceY).setOnClickListener(mListener);
-        view.findViewById(R.id.traceX).setOnClickListener(mListener);
+        traceY = (ImageButton) view.findViewById(R.id.traceY);
+        traceX = (ImageButton) view.findViewById(R.id.traceX);
         moveBottom = (ImageButton) view.findViewById(R.id.moveBottom);
         moveTop = (ImageButton) view.findViewById(R.id.moveTop);
         moveLeft = (ImageButton) view.findViewById(R.id.moveLeft);
@@ -115,6 +120,8 @@ public class AutoRefreshFragment extends Fragment {
         moveRight.setOnClickListener(mListener);
         moveLeft.setOnClickListener(mListener);
         moveTop.setOnClickListener(mListener);
+        traceY.setOnClickListener(mListener);
+        traceX.setOnClickListener(mListener);
     }
 
     private View.OnClickListener mListener = v -> {
@@ -184,6 +191,8 @@ public class AutoRefreshFragment extends Fragment {
     }
 
     private void stopCapturing() {
+        isCapturing = false;
+        setButtonEnabled(true);
         sendMessage(Constants.S);
     }
 
@@ -194,6 +203,8 @@ public class AutoRefreshFragment extends Fragment {
     }
 
     private void capture() {
+        setButtonEnabled(false);
+        isCapturing = true;
         mChartView.setUpClearGraph();
         sendMessage(Constants.A);
     }
