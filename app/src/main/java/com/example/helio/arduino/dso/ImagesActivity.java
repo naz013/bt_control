@@ -39,7 +39,7 @@ public class ImagesActivity extends AppCompatActivity {
         if (folder.exists()) {
             File[] files = folder.listFiles();
             for (File f : files) {
-                list.add(f.toString());
+                if (f.isFile() && f.toString().endsWith(".png")) list.add(f.toString());
             }
         }
         return list;

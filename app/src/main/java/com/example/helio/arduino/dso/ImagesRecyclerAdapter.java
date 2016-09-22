@@ -10,8 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 
 import com.example.helio.arduino.R;
+import com.example.helio.arduino.core.ShareUtil;
 import com.example.helio.arduino.databinding.ImageListItemBinding;
 import com.squareup.picasso.Picasso;
 
@@ -24,7 +26,7 @@ public class ImagesRecyclerAdapter extends RecyclerView.Adapter<ImagesRecyclerAd
     private final Context mContext;
     private final List<String> mDataList;
 
-    public ImagesRecyclerAdapter(Context context, List<String> list) {
+    ImagesRecyclerAdapter(Context context, List<String> list) {
         this.mContext = context;
         this.mDataList = new ArrayList<>(list);
     }
@@ -46,26 +48,54 @@ public class ImagesRecyclerAdapter extends RecyclerView.Adapter<ImagesRecyclerAd
         return mDataList.size();
     }
 
-    public class ImageViewHolder extends RecyclerView.ViewHolder{
+    class ImageViewHolder extends RecyclerView.ViewHolder {
 
         final ImageListItemBinding binding;
 
-        public ImageViewHolder(View itemView) {
+        ImageViewHolder(View itemView) {
             super(itemView);
             binding = DataBindingUtil.bind(itemView);
-            binding.setClick(view -> performClick(view.getId(), getAdapterPosition()));
+            binding.setClick(view -> performClick(view, getAdapterPosition()));
         }
     }
 
-    private void performClick(int id, int adapterPosition) {
-        switch (id) {
+    private void performClick(View view, int adapterPosition) {
+        switch (view.getId()) {
             case R.id.screenView:
                 openActivity(adapterPosition);
                 break;
             case R.id.removeButton:
                 showConfirmationDialog(adapterPosition);
                 break;
+            case R.id.shareButton:
+                showPopup(adapterPosition, view);
+                break;
         }
+    }
+
+    private void showPopup(int position, View view) {
+        PopupMenu popup = new PopupMenu(mContext, view);
+        popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.mail_action:
+                    sendEmail(position);
+                    break;
+                case R.id.drive_action:
+                    saveToDrive(position);
+                    break;
+            }
+            return true;
+        });
+        popup.show();
+    }
+
+    private void sendEmail(int position) {
+        ShareUtil.sendEmail(mContext, new File(mDataList.get(position)));
+    }
+
+    private void saveToDrive(int position) {
+        ShareUtil.saveToDrive(mContext, new File(mDataList.get(position)));
     }
 
     private void showConfirmationDialog(final int position) {
