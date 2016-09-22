@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.core.Constants;
@@ -32,6 +33,7 @@ public class AutoRefreshFragment extends Fragment {
     private static final String TAG = "AutoRefreshFragment";
 
     private ChartView mChartView;
+    private TextView freqView, voltageView;
     private ImageButton zoomInX, zoomOutX;
     private ImageButton zoomInY, zoomOutY;
     private ImageButton moveRight, moveLeft;
@@ -79,13 +81,28 @@ public class AutoRefreshFragment extends Fragment {
         mChartView.setData(yVals, xVals);
     }
 
+    public void setExtraData(float voltage, float frequency) {
+        if (voltage < 0.4) {
+            freqView.setText(getString(R.string.f_) + " " + getString(R.string.undefined));
+        } else {
+            freqView.setText(getString(R.string.f_) + " " + frequency);
+        }
+        voltageView.setText(getString(R.string.v_p_p) + " " + voltage);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_snapshot, container, false);
+        initTextViews(view);
         initButtons(view);
         initChart(view);
         return view;
+    }
+
+    private void initTextViews(View view) {
+        freqView = (TextView) view.findViewById(R.id.freqView);
+        voltageView = (TextView) view.findViewById(R.id.voltageView);
     }
 
     private void initChart(View v) {

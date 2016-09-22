@@ -188,8 +188,12 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
     private void readDso(String data) {
         List<Float> mYVals = new ArrayList<>();
         List<Float> mXVals = new ArrayList<>();
-        if (data.startsWith(Constants.rY)) {
-            String yArray = data.replace(Constants.rY, "");
+        Log.d(TAG, "readDso: " + data.substring(data.length() - 50));
+        String[] elm = data.split(";");
+        Log.d(TAG, "readDso: " + elm.length);
+        Log.d(TAG, "readDso: " + elm[1] + elm[2]);
+        if (elm[0].startsWith(Constants.rY)) {
+            String yArray = elm[0].replace(Constants.rY, "");
             String[] parts = yArray.split(Constants.COMMA);
             mYVals.clear();
             for (int i = 0; i < parts.length; i++) {
@@ -201,7 +205,35 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
                 mXVals.add(x);
             }
         }
+        float frequency = 0f;
+        float voltage = 0f;
+        if (elm[1].startsWith("Frequency:")) {
+            String fqStr = elm[1].replace("Frequency:", "");
+            frequency = Float.parseFloat(fqStr);
+        }
+        if (elm[2].startsWith("p2p:")) {
+            String volStr = elm[2].replace("p2p:", "");
+            voltage = Float.parseFloat(volStr);
+        }
         sendDataToFragment(mXVals, mYVals);
+        sendExtraToFragment(frequency, voltage);
+    }
+
+    private void sendExtraToFragment(float frequency, float voltage) {
+        Fragment fragment = mPagerAdapter.getFragment(mSelectedPage);
+        Log.d(TAG, "sendExtraToFragment: " + fragment);
+        switch (mEnabledAction) {
+            case SNAPSHOT:
+                if (fragment instanceof SnapshotFragment) {
+                    ((SnapshotFragment) fragment).setExtraData(voltage, frequency);
+                }
+                break;
+            case AUTO_REFRESH:
+                if (fragment instanceof AutoRefreshFragment) {
+                    ((AutoRefreshFragment) fragment).setExtraData(voltage, frequency);
+                }
+                break;
+        }
     }
 
     private void sendDataToFragment(List<Float> mXVals, List<Float> mYVals) {

@@ -88,4 +88,7 @@
     <string name="no_applications">No application than can perform this action</string>
     <string name="make_sure_module_is_enabled">Make sure Current is selected on the Module!</string>
     <string name="ok">Ok</string>
+    <string name="undefined">~</string>
+    <string name="v_p_p">V p-p:</string>
+    <string name="f_">f:</string>
 </resources>
