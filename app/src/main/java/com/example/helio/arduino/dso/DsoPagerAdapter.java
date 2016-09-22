@@ -7,23 +7,23 @@ import android.support.v13.app.FragmentPagerAdapter;
 
 import com.example.helio.arduino.R;
 
-public class DsoPagerAdapter extends FragmentPagerAdapter {
+class DsoPagerAdapter extends FragmentPagerAdapter {
 
     private Context mContext;
     private Fragment[] fragment = new Fragment[2];
 
-    public DsoPagerAdapter(Context context, FragmentManager fm) {
+    DsoPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
         this.mContext = context;
     }
 
-    public Fragment getFragment(int position) {
+    Fragment getFragment(int position) {
         return fragment[position];
     }
 
     @Override
     public Fragment getItem(int position) {
-        if (position == 0) {
+        if (position == 1) {
             fragment[position] = SnapshotFragment.newInstance();
         } else {
             fragment[position] = AutoRefreshFragment.newInstance();
@@ -39,9 +39,9 @@ public class DsoPagerAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         switch (position) {
-            case 0:
-                return mContext.getString(R.string.snapshot);
             case 1:
+                return mContext.getString(R.string.snapshot);
+            case 0:
                 return mContext.getString(R.string.auto_refresh);
         }
         return null;
