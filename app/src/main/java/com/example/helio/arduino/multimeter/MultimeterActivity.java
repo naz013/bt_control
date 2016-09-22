@@ -48,6 +48,7 @@ public class MultimeterActivity extends AppCompatActivity {
     private static final int CURRENT = R.id.currentButton;
     private static final int RESISTANCE = R.id.resistanceButton;
     private static final int SCT = R.id.sctButton;
+    private static final int SET_RATE = R.id.setRateButton;
     private static final String TAG = "MultimeterActivity";
 
     private TextView mMeterField;
@@ -116,7 +117,7 @@ public class MultimeterActivity extends AppCompatActivity {
         findViewById(VOLTAGE).setOnClickListener(mListener);
         findViewById(CURRENT).setOnClickListener(mListener);
         findViewById(SCT).setOnClickListener(mListener);
-        findViewById(R.id.setRateButton).setOnClickListener(mListener);
+        findViewById(SET_RATE).setOnClickListener(mListener);
         findViewById(R.id.filesButton).setOnClickListener(mListener);
         mExportButton = (SwitchCompat) findViewById(R.id.exportButton);
         mExportButton.setOnCheckedChangeListener(mCheckListener);
@@ -206,7 +207,7 @@ public class MultimeterActivity extends AppCompatActivity {
                 case R.id.resetButton:
                     reset();
                     break;
-                case R.id.setRateButton:
+                case SET_RATE:
                     sendRefreshRate();
                     break;
                 case R.id.filesButton:
@@ -241,7 +242,7 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private void checkButton(View v) {
         int id = v.getId();
-        if (id != R.id.resetButton && id != R.id.setRateButton && id != R.id.filesButton && id != CURRENT) {
+        if (id != R.id.resetButton && id != SET_RATE && id != R.id.filesButton && id != CURRENT) {
             selectButton(v);
         }
     }
@@ -312,6 +313,7 @@ public class MultimeterActivity extends AppCompatActivity {
         findViewById(CURRENT).setEnabled(true);
         findViewById(SCT).setEnabled(true);
         mResetButton.setEnabled(false);
+        findViewById(SET_RATE).setEnabled(true);
     }
 
     private void disableAll(int id) {
@@ -319,6 +321,7 @@ public class MultimeterActivity extends AppCompatActivity {
         if (id != VOLTAGE) findViewById(VOLTAGE).setEnabled(false);
         if (id != CURRENT) findViewById(CURRENT).setEnabled(false);
         if (id != SCT) findViewById(SCT).setEnabled(false);
+        findViewById(SET_RATE).setEnabled(false);
     }
 
     private void deselectAll() {
