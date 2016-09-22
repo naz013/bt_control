@@ -32,6 +32,8 @@ public class SignalFragment extends Fragment {
     private EditText mFrequencyField;
     private TextInputLayout mFreqLabel;
 
+    private boolean isGenerating;
+
     private final View.OnClickListener mListener = v -> {
         switch (v.getId()) {
             case R.id.generateButton:
@@ -53,6 +55,7 @@ public class SignalFragment extends Fragment {
             } else if (position == 2) {
                 setMaxLength(2);
             }
+            if (isGenerating) return;
             checkFrequency();
         }
 
@@ -106,6 +109,7 @@ public class SignalFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (isGenerating) return;
                 if (s.length() == 0) {
                     mGenerateButton.setEnabled(false);
                 } else {
@@ -165,6 +169,7 @@ public class SignalFragment extends Fragment {
     }
 
     private void sendTerminateMessage() {
+        isGenerating = false;
         String msg = Constants.T;
         mGenerateButton.setEnabled(true);
         if (mFragmentListener != null) {
@@ -199,6 +204,7 @@ public class SignalFragment extends Fragment {
         String msg = Constants.G + ";w:" + wave + ";f:" + frequency;
         Log.d("TAG", "sendSignal: " + msg);
         mGenerateButton.setEnabled(false);
+        isGenerating = true;
         if (mFragmentListener != null) {
             mFragmentListener.onAction(msg);
         }
