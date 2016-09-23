@@ -18,6 +18,9 @@
     <string name="connected_to">Connected to</string>
     <string name="screenshots">Screenshots</string>
     <string name="bluetooth">Bluetooth</string>
+    <string name="hz">Hz</string>
+    <string name="khz">kHz</string>
+    <string name="mhz">MHz</string>
 
     <array name="wave_types">
         <item>Square Wave</item>
@@ -25,9 +28,9 @@
     </array>
 
     <array name="frequency_measure">
-        <item>Hz</item>
-        <item>kHz</item>
-        <item>MHz</item>
+        <item>@string/hz</item>
+        <item>@string/khz</item>
+        <item>@string/mhz</item>
     </array>
 
     <string name="title_connecting">Connecting to</string>
@@ -88,4 +91,7 @@
     <string name="no_applications">No application than can perform this action</string>
     <string name="make_sure_module_is_enabled">Make sure Current is selected on the Module!</string>
     <string name="ok">Ok</string>
+    <string name="undefined">~</string>
+    <string name="v_p_p">V p-p:</string>
+    <string name="f_">f:</string>
 </resources>

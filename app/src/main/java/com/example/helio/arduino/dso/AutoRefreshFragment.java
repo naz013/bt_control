@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.core.Constants;
@@ -32,10 +33,13 @@ public class AutoRefreshFragment extends Fragment {
     private static final String TAG = "AutoRefreshFragment";
 
     private ChartView mChartView;
+    private TextView freqView, voltageView;
     private ImageButton zoomInX, zoomOutX;
     private ImageButton zoomInY, zoomOutY;
     private ImageButton moveRight, moveLeft;
     private ImageButton moveTop, moveBottom;
+    private ImageButton traceX, traceY;
+    private ImageButton captureButton, stopButton;
 
     private ChartController mController;
     private ChartListener mChartCallback = new ChartListener() {
@@ -59,6 +63,8 @@ public class AutoRefreshFragment extends Fragment {
         zoomOutY.setEnabled(b);
         zoomInX.setEnabled(b);
         zoomOutX.setEnabled(b);
+        traceX.setEnabled(b);
+        traceY.setEnabled(b);
     }
 
     public AutoRefreshFragment() {
@@ -74,13 +80,28 @@ public class AutoRefreshFragment extends Fragment {
         mChartView.setData(yVals, xVals);
     }
 
+    public void setExtraData(float voltage, float frequency) {
+        if (voltage < 0.4) {
+            freqView.setText(getString(R.string.f_) + " " + getString(R.string.undefined));
+        } else {
+            freqView.setText(DsoUtil.getFrequencyFormatted(getActivity(), frequency));
+        }
+        voltageView.setText(DsoUtil.getVoltageFormatted(getActivity(), voltage));
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_snapshot, container, false);
+        initTextViews(view);
         initButtons(view);
         initChart(view);
         return view;
+    }
+
+    private void initTextViews(View view) {
+        freqView = (TextView) view.findViewById(R.id.freqView);
+        voltageView = (TextView) view.findViewById(R.id.voltageView);
     }
 
     private void initChart(View v) {
@@ -94,11 +115,9 @@ public class AutoRefreshFragment extends Fragment {
     private void initButtons(View view) {
         view.findViewById(R.id.screenshot_item).setOnClickListener(mListener);
         view.findViewById(R.id.clearButton).setOnClickListener(mListener);
-        view.findViewById(R.id.stopButton).setOnClickListener(mListener);
-        view.findViewById(R.id.captureButton).setOnClickListener(mListener);
         view.findViewById(R.id.gallery_item).setOnClickListener(mListener);
-        view.findViewById(R.id.traceY).setOnClickListener(mListener);
-        view.findViewById(R.id.traceX).setOnClickListener(mListener);
+        traceY = (ImageButton) view.findViewById(R.id.traceY);
+        traceX = (ImageButton) view.findViewById(R.id.traceX);
         moveBottom = (ImageButton) view.findViewById(R.id.moveBottom);
         moveTop = (ImageButton) view.findViewById(R.id.moveTop);
         moveLeft = (ImageButton) view.findViewById(R.id.moveLeft);
@@ -107,6 +126,8 @@ public class AutoRefreshFragment extends Fragment {
         zoomOutX = (ImageButton) view.findViewById(R.id.zoomOutX);
         zoomInY = (ImageButton) view.findViewById(R.id.zoomInY);
         zoomOutY = (ImageButton) view.findViewById(R.id.zoomOutY);
+        captureButton = (ImageButton) view.findViewById(R.id.captureButton);
+        stopButton = (ImageButton) view.findViewById(R.id.stopButton);
         zoomInX.setOnClickListener(mListener);
         zoomOutX.setOnClickListener(mListener);
         zoomInY.setOnClickListener(mListener);
@@ -115,6 +136,10 @@ public class AutoRefreshFragment extends Fragment {
         moveRight.setOnClickListener(mListener);
         moveLeft.setOnClickListener(mListener);
         moveTop.setOnClickListener(mListener);
+        traceY.setOnClickListener(mListener);
+        traceX.setOnClickListener(mListener);
+        stopButton.setOnClickListener(mListener);
+        captureButton.setOnClickListener(mListener);
     }
 
     private View.OnClickListener mListener = v -> {
@@ -184,6 +209,7 @@ public class AutoRefreshFragment extends Fragment {
     }
 
     private void stopCapturing() {
+        captureButton.setEnabled(true);
         sendMessage(Constants.S);
     }
 
@@ -194,6 +220,7 @@ public class AutoRefreshFragment extends Fragment {
     }
 
     private void capture() {
+        captureButton.setEnabled(false);
         mChartView.setUpClearGraph();
         sendMessage(Constants.A);
     }

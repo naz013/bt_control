@@ -11,7 +11,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,7 +18,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.helio.arduino.BuildConfig;
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.SettingsActivity;
 import com.example.helio.arduino.core.BluetoothService;
@@ -40,7 +38,6 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
 
     private static final int REQUEST_ENABLE_BT = 3;
     private static final String TAG = "DsoActivity";
-    private static final boolean D = BuildConfig.DEBUG;
     private static final int SNAPSHOT = 0;
     private static final int AUTO_REFRESH = 1;
     private static final int REAL_TIME = 2;
@@ -188,8 +185,9 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
     private void readDso(String data) {
         List<Float> mYVals = new ArrayList<>();
         List<Float> mXVals = new ArrayList<>();
-        if (data.startsWith(Constants.rY)) {
-            String yArray = data.replace(Constants.rY, "");
+        String[] elm = data.split(";");
+        if (elm[0].startsWith(Constants.rY)) {
+            String yArray = elm[0].replace(Constants.rY, "");
             String[] parts = yArray.split(Constants.COMMA);
             mYVals.clear();
             for (int i = 0; i < parts.length; i++) {
@@ -201,12 +199,38 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
                 mXVals.add(x);
             }
         }
+        float frequency = 0f;
+        float voltage = 0f;
+        if (elm[1].startsWith(Constants.FREQ)) {
+            String fqStr = elm[1].replace(Constants.FREQ, "");
+            frequency = Float.parseFloat(fqStr);
+        }
+        if (elm[2].startsWith(Constants.VOL)) {
+            String volStr = elm[2].replace(Constants.VOL, "");
+            voltage = Float.parseFloat(volStr);
+        }
         sendDataToFragment(mXVals, mYVals);
+        sendExtraToFragment(frequency, voltage);
+    }
+
+    private void sendExtraToFragment(float frequency, float voltage) {
+        Fragment fragment = mPagerAdapter.getFragment(mSelectedPage);
+        switch (mEnabledAction) {
+            case SNAPSHOT:
+                if (fragment instanceof SnapshotFragment) {
+                    ((SnapshotFragment) fragment).setExtraData(voltage, frequency);
+                }
+                break;
+            case AUTO_REFRESH:
+                if (fragment instanceof AutoRefreshFragment) {
+                    ((AutoRefreshFragment) fragment).setExtraData(voltage, frequency);
+                }
+                break;
+        }
     }
 
     private void sendDataToFragment(List<Float> mXVals, List<Float> mYVals) {
         Fragment fragment = mPagerAdapter.getFragment(mSelectedPage);
-        Log.d(TAG, "sendDataToFragment: " + fragment);
         switch (mEnabledAction) {
             case SNAPSHOT:
                 if (fragment instanceof SnapshotFragment) {

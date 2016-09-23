@@ -11,11 +11,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.core.Constants;
@@ -33,10 +33,12 @@ public class SnapshotFragment extends Fragment {
     private static final String TAG = "SnapshotFragment";
     private FragmentListener mFragmentListener;
 
+    private TextView freqView, voltageView;
     private ImageButton zoomInX, zoomOutX;
     private ImageButton zoomInY, zoomOutY;
     private ImageButton moveRight, moveLeft;
     private ImageButton moveTop, moveBottom;
+    private ImageButton traceX, traceY;
     private ProgressDialog mProgressDialog;
 
     private ChartView mChartView;
@@ -54,7 +56,6 @@ public class SnapshotFragment extends Fragment {
     };
 
     private void setButtonEnabled(boolean b) {
-        Log.d(TAG, "setButtonEnabled: " + b);
         moveTop.setEnabled(b);
         moveBottom.setEnabled(b);
         moveLeft.setEnabled(b);
@@ -63,6 +64,8 @@ public class SnapshotFragment extends Fragment {
         zoomOutY.setEnabled(b);
         zoomInX.setEnabled(b);
         zoomOutX.setEnabled(b);
+        traceX.setEnabled(b);
+        traceY.setEnabled(b);
     }
 
     public SnapshotFragment() {
@@ -83,13 +86,28 @@ public class SnapshotFragment extends Fragment {
         mChartView.setData(yVals, xVals);
     }
 
+    public void setExtraData(float voltage, float frequency) {
+        if (voltage < 0.4) {
+            freqView.setText(getString(R.string.f_) + " " + getString(R.string.undefined));
+        } else {
+            freqView.setText(DsoUtil.getFrequencyFormatted(getActivity(), frequency));
+        }
+        voltageView.setText(DsoUtil.getVoltageFormatted(getActivity(), voltage));
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_snapshot, container, false);
+        initTextViews(view);
         initButtons(view);
         initChart(view);
         return view;
+    }
+
+    private void initTextViews(View view) {
+        freqView = (TextView) view.findViewById(R.id.freqView);
+        voltageView = (TextView) view.findViewById(R.id.voltageView);
     }
 
     private void hideProgressDialog() {
@@ -117,8 +135,8 @@ public class SnapshotFragment extends Fragment {
         view.findViewById(R.id.stopButton).setOnClickListener(mListener);
         view.findViewById(R.id.captureButton).setOnClickListener(mListener);
         view.findViewById(R.id.gallery_item).setOnClickListener(mListener);
-        view.findViewById(R.id.traceY).setOnClickListener(mListener);
-        view.findViewById(R.id.traceX).setOnClickListener(mListener);
+        traceY = (ImageButton) view.findViewById(R.id.traceY);
+        traceX = (ImageButton) view.findViewById(R.id.traceX);
         moveBottom = (ImageButton) view.findViewById(R.id.moveBottom);
         moveTop = (ImageButton) view.findViewById(R.id.moveTop);
         moveLeft = (ImageButton) view.findViewById(R.id.moveLeft);
@@ -138,6 +156,8 @@ public class SnapshotFragment extends Fragment {
         moveRight.setOnClickListener(mListener);
         moveLeft.setOnClickListener(mListener);
         moveTop.setOnClickListener(mListener);
+        traceY.setOnClickListener(mListener);
+        traceX.setOnClickListener(mListener);
     }
 
     private void loadFromFile() {
@@ -218,6 +238,7 @@ public class SnapshotFragment extends Fragment {
 
     private void stopCapturing() {
         sendMessage(Constants.S);
+        setButtonEnabled(true);
     }
 
     private void showScreenshots() {
@@ -230,6 +251,7 @@ public class SnapshotFragment extends Fragment {
         showProgressDialog();
         mChartView.setUpClearGraph();
         sendMessage(Constants.C);
+        setButtonEnabled(false);
     }
 
     private boolean checkPermission() {

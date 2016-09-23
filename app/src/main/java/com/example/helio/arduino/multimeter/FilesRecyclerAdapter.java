@@ -1,6 +1,5 @@
 package com.example.helio.arduino.multimeter;
 
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -14,21 +13,21 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.helio.arduino.BuildConfig;
 import com.example.helio.arduino.R;
+import com.example.helio.arduino.core.ShareUtil;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FilesRecyclerAdapter extends RecyclerView.Adapter<FilesRecyclerAdapter.DeviceViewHolder> {
+class FilesRecyclerAdapter extends RecyclerView.Adapter<FilesRecyclerAdapter.DeviceViewHolder> {
 
     private final Context mContext;
     private final List<FileItem> mDataList;
 
-    public FilesRecyclerAdapter(Context context, List<FileItem> list) {
+    FilesRecyclerAdapter(Context context, List<FileItem> list) {
         this.mContext = context;
         this.mDataList = new ArrayList<>(list);
     }
@@ -50,11 +49,11 @@ public class FilesRecyclerAdapter extends RecyclerView.Adapter<FilesRecyclerAdap
         return mDataList.size();
     }
 
-    public class DeviceViewHolder extends RecyclerView.ViewHolder{
+    class DeviceViewHolder extends RecyclerView.ViewHolder{
 
         final TextView fileNameView;
 
-        public DeviceViewHolder(View itemView) {
+        DeviceViewHolder(View itemView) {
             super(itemView);
             fileNameView = (TextView) itemView.findViewById(R.id.nameView);
             fileNameView.setOnClickListener(v -> handleClick(getAdapterPosition()));
@@ -82,29 +81,12 @@ public class FilesRecyclerAdapter extends RecyclerView.Adapter<FilesRecyclerAdap
         popup.show();
     }
 
-    private void saveToDrive(int position) {
-        Intent intent = new Intent(android.content.Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(mDataList.get(position).getFullPath())));
-        intent.setPackage("com.google.android.apps.docs");
-        try {
-            mContext.startActivity(Intent.createChooser(intent, ""));
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(mContext, R.string.google_drive_not_found, Toast.LENGTH_SHORT).show();
-        }
+    private void sendEmail(int position) {
+        ShareUtil.sendEmail(mContext, new File(mDataList.get(position).getFullPath()));
     }
 
-    private void sendEmail(int position) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT, mContext.getString(R.string.app_name));
-        Uri uri = Uri.fromFile(new File(mDataList.get(position).getFullPath()));
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
-        try {
-            mContext.startActivity(Intent.createChooser(intent, mContext.getString(R.string.send_email)));
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(mContext, R.string.no_applications, Toast.LENGTH_SHORT).show();
-        }
+    private void saveToDrive(int position) {
+        ShareUtil.saveToDrive(mContext, new File(mDataList.get(position).getFullPath()));
     }
 
     private void showDeleteDialog(int position) {

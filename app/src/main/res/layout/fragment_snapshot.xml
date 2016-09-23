@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <android.support.v7.widget.CardView
         android:id="@+id/chartCard"
@@ -22,222 +22,261 @@
 
     </android.support.v7.widget.CardView>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/zoomOutY"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/freqView"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/dso_fab_margin"
-                    android:background="@color/colorBlue"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_zoom_out_black_24px" />
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-                <ImageButton
-                    android:id="@+id/zoomInY"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/voltageView"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/dso_fab_margin"
-                    android:background="@color/colorBlue"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_zoom_in_black_24px" />
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
                 android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/moveTop"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/dso_fab_margin"
-                    android:background="@color/colorBlue"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_expand_less_black_24dp" />
+                    android:orientation="vertical">
 
-                <ImageButton
-                    android:id="@+id/moveBottom"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <ImageButton
+                            android:id="@+id/zoomOutY"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/dso_fab_margin"
+                            android:background="@drawable/button_blue_selector"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_zoom_out_black_24px" />
+
+                        <ImageButton
+                            android:id="@+id/zoomInY"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/dso_fab_margin"
+                            android:background="@drawable/button_blue_selector"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_zoom_in_black_24px" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <ImageButton
+                            android:id="@+id/moveTop"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/dso_fab_margin"
+                            android:background="@drawable/button_blue_selector"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_expand_less_black_24dp" />
+
+                        <ImageButton
+                            android:id="@+id/moveBottom"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/dso_fab_margin"
+                            android:background="@drawable/button_blue_selector"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_expand_more_black_24dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <ImageButton
+                            android:id="@+id/traceY"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/dso_fab_margin"
+                            android:background="@drawable/button_blue_selector"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_trace_y" />
+
+                        <ImageButton
+                            android:id="@+id/screenshot_item"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/dso_fab_margin"
+                            android:background="@color/colorRed"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_camera_alt_black_24dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/dso_fab_margin"
-                    android:background="@color/colorBlue"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_expand_more_black_24dp" />
+                    android:orientation="vertical">
 
-            </LinearLayout>
+                    <ImageButton
+                        android:id="@+id/captureButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_margin="@dimen/dso_fab_margin"
+                        android:background="@drawable/button_white_selector"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_chart_areaspline" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                    <ImageButton
+                        android:id="@+id/stopButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/dso_fab_margin"
+                        android:background="@drawable/button_white_selector"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_stop_black_24dp" />
 
-                <ImageButton
-                    android:id="@+id/traceY"
+                    <ImageButton
+                        android:id="@+id/clearButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/dso_fab_margin"
+                        android:background="@drawable/button_white_selector"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_delete_black_24dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/dso_fab_margin"
-                    android:background="@color/colorBlue"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_trace_y" />
+                    android:orientation="vertical">
 
-                <ImageButton
-                    android:id="@+id/screenshot_item"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/dso_fab_margin"
-                    android:background="@color/colorRed"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_camera_alt_black_24dp" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <ImageButton
+                            android:id="@+id/zoomOutX"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/dso_fab_margin"
+                            android:background="@drawable/button_green_selector"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_zoom_out_black_24px" />
+
+                        <ImageButton
+                            android:id="@+id/zoomInX"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/dso_fab_margin"
+                            android:background="@drawable/button_green_selector"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_zoom_in_black_24px" />
+
+                        <ImageButton
+                            android:id="@+id/readButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/dso_fab_margin"
+                            android:background="@color/colorWhite"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_sd_storage_black_24dp"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <ImageButton
+                            android:id="@+id/moveLeft"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/dso_fab_margin"
+                            android:background="@drawable/button_green_selector"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_chevron_left_black_24dp" />
+
+                        <ImageButton
+                            android:id="@+id/moveRight"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/dso_fab_margin"
+                            android:background="@drawable/button_green_selector"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_chevron_right_black_24dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <ImageButton
+                            android:id="@+id/gallery_item"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/dso_fab_margin"
+                            android:background="@color/colorRed"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_collections_black_24dp" />
+
+                        <ImageButton
+                            android:id="@+id/traceX"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/dso_fab_margin"
+                            android:background="@drawable/button_green_selector"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_trace_x" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <ImageButton
-                android:id="@+id/captureButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="@dimen/dso_fab_margin"
-                android:background="@color/colorWhite"
-                android:padding="8dp"
-                android:src="@drawable/ic_chart_areaspline" />
-
-            <ImageButton
-                android:id="@+id/stopButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/dso_fab_margin"
-                android:background="@color/colorWhite"
-                android:padding="8dp"
-                android:src="@drawable/ic_stop_black_24dp" />
-
-            <ImageButton
-                android:id="@+id/clearButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/dso_fab_margin"
-                android:background="@color/colorWhite"
-                android:padding="8dp"
-                android:src="@drawable/ic_delete_black_24dp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/zoomOutX"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/dso_fab_margin"
-                    android:background="@color/colorGreen"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_zoom_out_black_24px" />
-
-                <ImageButton
-                    android:id="@+id/zoomInX"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/dso_fab_margin"
-                    android:background="@color/colorGreen"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_zoom_in_black_24px" />
-
-                <ImageButton
-                    android:id="@+id/readButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/dso_fab_margin"
-                    android:background="@color/colorWhite"
-                    android:padding="8dp"
-                    android:visibility="gone"
-                    android:src="@drawable/ic_sd_storage_black_24dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/moveLeft"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/dso_fab_margin"
-                    android:background="@color/colorGreen"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_chevron_left_black_24dp" />
-
-                <ImageButton
-                    android:id="@+id/moveRight"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/dso_fab_margin"
-                    android:background="@color/colorGreen"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_chevron_right_black_24dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/gallery_item"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/dso_fab_margin"
-                    android:background="@color/colorRed"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_collections_black_24dp" />
-
-                <ImageButton
-                    android:id="@+id/traceX"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/dso_fab_margin"
-                    android:background="@color/colorGreen"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_trace_x" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

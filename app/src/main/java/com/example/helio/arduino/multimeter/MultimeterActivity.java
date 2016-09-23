@@ -16,7 +16,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -48,6 +47,7 @@ public class MultimeterActivity extends AppCompatActivity {
     private static final int CURRENT = R.id.currentButton;
     private static final int RESISTANCE = R.id.resistanceButton;
     private static final int SCT = R.id.sctButton;
+    private static final int SET_RATE = R.id.setRateButton;
     private static final String TAG = "MultimeterActivity";
 
     private TextView mMeterField;
@@ -71,10 +71,6 @@ public class MultimeterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this;
-        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        currVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
-        am.setStreamVolume(AudioManager.STREAM_MUSIC, 25, 0);
-        mSound = new Sound(this);
         setContentView(R.layout.activity_multimeter);
         initBluetoothAdapter();
         initActionBar();
@@ -116,7 +112,7 @@ public class MultimeterActivity extends AppCompatActivity {
         findViewById(VOLTAGE).setOnClickListener(mListener);
         findViewById(CURRENT).setOnClickListener(mListener);
         findViewById(SCT).setOnClickListener(mListener);
-        findViewById(R.id.setRateButton).setOnClickListener(mListener);
+        findViewById(SET_RATE).setOnClickListener(mListener);
         findViewById(R.id.filesButton).setOnClickListener(mListener);
         mExportButton = (SwitchCompat) findViewById(R.id.exportButton);
         mExportButton.setOnCheckedChangeListener(mCheckListener);
@@ -206,7 +202,7 @@ public class MultimeterActivity extends AppCompatActivity {
                 case R.id.resetButton:
                     reset();
                     break;
-                case R.id.setRateButton:
+                case SET_RATE:
                     sendRefreshRate();
                     break;
                 case R.id.filesButton:
@@ -241,7 +237,7 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private void checkButton(View v) {
         int id = v.getId();
-        if (id != R.id.resetButton && id != R.id.setRateButton && id != R.id.filesButton && id != CURRENT) {
+        if (id != R.id.resetButton && id != SET_RATE && id != R.id.filesButton && id != CURRENT) {
             selectButton(v);
         }
     }
@@ -266,6 +262,14 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private void showSct() {
         sendMessage(Constants.Q);
+        initAudio();
+    }
+
+    private void initAudio() {
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        currVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, 25, 0);
+        mSound = new Sound(this);
         try {
             mSound.prepareMelody();
         } catch (IOException e) {
@@ -288,10 +292,16 @@ public class MultimeterActivity extends AppCompatActivity {
         deselectAll();
         enableAll();
         if (mSound != null) mSound.stop();
+        resetVolume();
         mMeterField.setText("");
         isReading = false;
         mSelectedId = -1;
         mSctStatus.setBackgroundResource(R.drawable.gray_circle);
+    }
+
+    private void resetVolume() {
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, currVolume, 0);
     }
 
     private void closeExcelFile() {
@@ -312,6 +322,7 @@ public class MultimeterActivity extends AppCompatActivity {
         findViewById(CURRENT).setEnabled(true);
         findViewById(SCT).setEnabled(true);
         mResetButton.setEnabled(false);
+        findViewById(SET_RATE).setEnabled(true);
     }
 
     private void disableAll(int id) {
@@ -319,6 +330,7 @@ public class MultimeterActivity extends AppCompatActivity {
         if (id != VOLTAGE) findViewById(VOLTAGE).setEnabled(false);
         if (id != CURRENT) findViewById(CURRENT).setEnabled(false);
         if (id != SCT) findViewById(SCT).setEnabled(false);
+        findViewById(SET_RATE).setEnabled(false);
     }
 
     private void deselectAll() {
@@ -478,8 +490,6 @@ public class MultimeterActivity extends AppCompatActivity {
         mBlockView.setVisibility(View.VISIBLE);
         stopService(new Intent(this, BluetoothService.class));
         closeExcelFile();
-        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        am.setStreamVolume(AudioManager.STREAM_MUSIC, currVolume, 0);
     }
 
     @Override

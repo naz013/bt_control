@@ -39,6 +39,8 @@ public class Constants {
     public static final String rI = "i:";
     public static final String rR = "r:";
     public static final String sCT = "SCT:";
+    public static final String FREQ = "Frequency:";
+    public static final String VOL = "p2p:";
 
     public static final String DEVICE_ADDRESS = "device_address";
     public static final String PREFS = "app_prefs";

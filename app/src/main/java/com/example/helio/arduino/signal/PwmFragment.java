@@ -32,6 +32,8 @@ public class PwmFragment extends Fragment {
     private TextInputLayout mCycleLabel;
     private TextInputLayout mFreqLabel;
 
+    private boolean isGenerating;
+
     private final View.OnClickListener mListener = v -> {
         switch (v.getId()) {
             case R.id.generateButton:
@@ -53,6 +55,7 @@ public class PwmFragment extends Fragment {
             } else if (position == 2) {
                 setMaxLength(2);
             }
+            if (isGenerating) return;
             checkFrequency();
         }
 
@@ -125,6 +128,7 @@ public class PwmFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (isGenerating) return;
                 checkData();
                 checkDuty();
             }
@@ -213,6 +217,7 @@ public class PwmFragment extends Fragment {
     private void sendTerminateMessage() {
         String msg = Constants.E;
         mGenerateButton.setEnabled(true);
+        isGenerating = false;
         if (mFragmentListener != null) {
             mFragmentListener.onAction(msg);
         }
@@ -245,6 +250,7 @@ public class PwmFragment extends Fragment {
         }
         String msg = Constants.P + ";d:" + percent + ";f:" + frequency;
         mGenerateButton.setEnabled(false);
+        isGenerating = true;
         if (mFragmentListener != null) {
             mFragmentListener.onAction(msg);
         }
