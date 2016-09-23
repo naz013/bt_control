@@ -90,9 +90,9 @@ public class SnapshotFragment extends Fragment {
         if (voltage < 0.4) {
             freqView.setText(getString(R.string.f_) + " " + getString(R.string.undefined));
         } else {
-            freqView.setText(getString(R.string.f_) + " " + frequency);
+            freqView.setText(DsoUtil.getFrequencyFormatted(getActivity(), frequency));
         }
-        voltageView.setText(getString(R.string.v_p_p) + " " + voltage);
+        voltageView.setText(DsoUtil.getVoltageFormatted(getActivity(), voltage));
     }
 
     @Override
