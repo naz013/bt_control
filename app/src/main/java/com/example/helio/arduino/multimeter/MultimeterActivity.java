@@ -355,7 +355,6 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private void sendMessage(String message) {
         EventBus.getDefault().post(new ControlEvent(message));
-        showToast(getString(R.string.request_sent));
     }
 
     private void postResponse(Message msg) {

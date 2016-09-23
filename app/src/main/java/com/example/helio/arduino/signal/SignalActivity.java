@@ -192,6 +192,5 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
     public void onAction(String message) {
         if (D) Log.d(TAG, "onAction: " + message);
         EventBus.getDefault().post(new ControlEvent(message));
-        showToast(getString(R.string.request_sent));
     }
 }

@@ -166,7 +166,6 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
     private void sendCancelMessage() {
         String msg = Constants.S;
         EventBus.getDefault().post(new ControlEvent(msg));
-        showToast(getString(R.string.request_sent));
     }
 
     private void readDso(short[] array) {
@@ -343,7 +342,6 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
     @Override
     public void onAction(String message) {
         EventBus.getDefault().post(new ControlEvent(message));
-        showToast(getString(R.string.request_sent));
         if (message.matches(Constants.C)) {
             mEnabledAction = SNAPSHOT;
         } else if (message.matches(Constants.A)) {
