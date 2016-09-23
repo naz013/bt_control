@@ -16,7 +16,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -72,10 +71,6 @@ public class MultimeterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this;
-        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        currVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
-        am.setStreamVolume(AudioManager.STREAM_MUSIC, 25, 0);
-        mSound = new Sound(this);
         setContentView(R.layout.activity_multimeter);
         initBluetoothAdapter();
         initActionBar();
@@ -267,6 +262,14 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private void showSct() {
         sendMessage(Constants.Q);
+        initAudio();
+    }
+
+    private void initAudio() {
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        currVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, 25, 0);
+        mSound = new Sound(this);
         try {
             mSound.prepareMelody();
         } catch (IOException e) {
@@ -289,10 +292,16 @@ public class MultimeterActivity extends AppCompatActivity {
         deselectAll();
         enableAll();
         if (mSound != null) mSound.stop();
+        resetVolume();
         mMeterField.setText("");
         isReading = false;
         mSelectedId = -1;
         mSctStatus.setBackgroundResource(R.drawable.gray_circle);
+    }
+
+    private void resetVolume() {
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, currVolume, 0);
     }
 
     private void closeExcelFile() {
@@ -481,8 +490,6 @@ public class MultimeterActivity extends AppCompatActivity {
         mBlockView.setVisibility(View.VISIBLE);
         stopService(new Intent(this, BluetoothService.class));
         closeExcelFile();
-        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        am.setStreamVolume(AudioManager.STREAM_MUSIC, currVolume, 0);
     }
 
     @Override
