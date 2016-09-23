@@ -77,11 +77,6 @@ public class SnapshotFragment extends Fragment {
 
     public void setData(List<Float> xVals, List<Float> yVals) {
         if (xVals.size() == 0 || yVals.size() == 0) return;
-        try {
-            DsoWriter.writeToFile(yVals);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         hideProgressDialog();
         mChartView.setData(yVals, xVals);
     }
