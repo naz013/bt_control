@@ -132,7 +132,7 @@ public class ImagesRecyclerAdapter extends RecyclerView.Adapter<ImagesRecyclerAd
                 .putExtra(mContext.getString(R.string.image_path_intent), mDataList.get(adapterPosition)));
     }
 
-    @BindingAdapter("app:loadImage")
+    @BindingAdapter("loadImage")
     public static void loadImage(ImageView imageView, String v) {
         File file = new File(v);
         Picasso.with(imageView.getContext())

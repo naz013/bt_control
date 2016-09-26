@@ -44,6 +44,8 @@ public class ChartView extends LinearLayout {
     private List<Float> mXVals = new ArrayList<>();
     private boolean mIsYTracing = false;
     private boolean mIsXTracing = false;
+    private float mPreviousX = 0f;
+    private float mPreviousY = 0f;
 
     private ScatterChart mChart;
     private ChartController mControl;
@@ -110,7 +112,8 @@ public class ChartView extends LinearLayout {
                     float y = motionEvent.getRawY();
                     if (mIsXTracing) {
                         drawVerticalLine(getXPositionByTouch(x, y));
-                    } else if (mIsYTracing) {
+                    }
+                    if (mIsYTracing) {
                         drawHorizontalLine(getYPositionByTouch(x, y));
                     }
                     break;
@@ -179,7 +182,7 @@ public class ChartView extends LinearLayout {
 
     private float getYPositionByTouch(float x, float y) {
         MPPointD pointD = mChart.getValuesByTouchPoint(x, y, YAxis.AxisDependency.LEFT);
-        return (float) pointD.y + ChartController.CHART_MAX_Y / 2;
+        return (float) pointD.y + ChartController.CHART_MAX_Y / 1.5f;
     }
 
     private void refreshChart() {
@@ -220,17 +223,25 @@ public class ChartView extends LinearLayout {
 
     public void traceY() {
         mIsYTracing = !mIsYTracing;
-        mIsXTracing = false;
         mChart.getXAxis().removeAllLimitLines();
         if (mIsYTracing) {
             drawHorizontalLine(ChartController.CHART_MAX_Y / 2);
         } else {
-            mChart.getAxisLeft().removeAllLimitLines();
-            mChart.invalidate();
+            clearHorizontalLines();
+        }
+        if (mIsXTracing) {
+            clearVerticalLines();
+            drawVerticalLine(mPreviousX);
         }
     }
 
+    private void clearHorizontalLines() {
+        mChart.getAxisLeft().removeAllLimitLines();
+        mChart.invalidate();
+    }
+
     private void drawHorizontalLine(float position) {
+        mPreviousY = position;
         mChart.getAxisLeft().removeAllLimitLines();
         LimitLine yLimit = new LimitLine(position);
         yLimit.setLineColor(getResources().getColor(R.color.colorRed));
@@ -262,6 +273,7 @@ public class ChartView extends LinearLayout {
     }
 
     private void drawVerticalLine(float position) {
+        mPreviousX = position;
         mChart.getXAxis().removeAllLimitLines();
         LimitLine xLimit = new LimitLine(position);
         xLimit.setLineColor(getResources().getColor(R.color.colorRed));
@@ -302,14 +314,21 @@ public class ChartView extends LinearLayout {
 
     public void traceX() {
         mIsXTracing = !mIsXTracing;
-        mIsYTracing = false;
         mChart.getAxisLeft().removeAllLimitLines();
         if (mIsXTracing) {
             drawVerticalLine(ChartController.CHART_MAX_X / 2);
         } else {
-            mChart.getXAxis().removeAllLimitLines();
-            mChart.invalidate();
+            clearVerticalLines();
         }
+        if (mIsYTracing) {
+            clearHorizontalLines();
+            drawHorizontalLine(mPreviousY);
+        }
+    }
+
+    private void clearVerticalLines() {
+        mChart.getXAxis().removeAllLimitLines();
+        mChart.invalidate();
     }
 
     private void reloadTraceLines() {

@@ -45,7 +45,7 @@ import jxl.write.WriteException;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class WriteExcel {
+class WriteExcel {
 
     private static final String TAG = "WriteExcel";
     private WritableCellFormat timesBoldUnderline;
@@ -56,11 +56,11 @@ public class WriteExcel {
     private WritableSheet mExcelSheet;
     private WritableWorkbook mWorkbook;
 
-    public WriteExcel(Context context) {
+    WriteExcel(Context context) {
         this.mContext = context;
     }
 
-    public void setOutput(String type) {
+    void setOutput(String type) {
         this.type = type;
         initCellStyles();
         readOrCreateFile();
@@ -147,7 +147,7 @@ public class WriteExcel {
         }
     }
 
-    public void copyFile(File src, File dst) throws IOException {
+    private void copyFile(File src, File dst) throws IOException {
         InputStream in = new FileInputStream(src);
         OutputStream out = new FileOutputStream(dst);
         byte[] buf = new byte[1024];
@@ -159,11 +159,11 @@ public class WriteExcel {
         out.close();
     }
 
-    public void write() throws IOException, WriteException {
+    void write() throws IOException, WriteException {
         mWorkbook.write();
     }
 
-    public void close() throws IOException, WriteException {
+    void close() throws IOException, WriteException {
         mWorkbook.close();
     }
 
@@ -177,6 +177,7 @@ public class WriteExcel {
         }
         addCaption(1, 0, mContext.getString(R.string.value));
         addCaption(2, 0, mContext.getString(R.string.time));
+        addCaption(3, 0, mContext.getString(R.string.date));
         updatePointer();
     }
 
@@ -201,13 +202,16 @@ public class WriteExcel {
         mExcelSheet.addCell(number);
     }
 
-    public void addValue(String s) throws WriteException {
+    void addValue(String s) throws WriteException {
         if (mExcelSheet == null) return;
         addNumber(0, pointer, pointer);
         mExcelSheet.addCell(new Label(1, pointer, s, times));
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
         String timeStamp = sdf.format(new Date());
         mExcelSheet.addCell(new Label(2, pointer, timeStamp, times));
+        sdf = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
+        String dateStamp = sdf.format(new Date());
+        mExcelSheet.addCell(new Label(3, pointer, dateStamp, times));
         updatePointer();
     }
 }

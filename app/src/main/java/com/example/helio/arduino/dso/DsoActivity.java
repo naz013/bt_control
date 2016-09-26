@@ -118,7 +118,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
 
     private void initTabNavigation() {
         mPagerAdapter = new DsoPagerAdapter(this, getFragmentManager());
-        ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
+        NonSwipableViewPager mViewPager = (NonSwipableViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.addOnPageChangeListener(mPageListener);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);

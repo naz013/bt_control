@@ -12,14 +12,14 @@ import com.example.helio.arduino.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecyclerAdapter.DeviceViewHolder> {
+class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecyclerAdapter.DeviceViewHolder> {
 
     private final Context mContext;
     private final List<String> mDataList;
     private final List<String> mDataAddresses;
     private final DeviceClickListener mListener;
 
-    public DevicesRecyclerAdapter(Context context, DeviceClickListener listener) {
+    DevicesRecyclerAdapter(Context context, DeviceClickListener listener) {
         this.mContext = context;
         this.mDataList = new ArrayList<>();
         this.mDataAddresses = new ArrayList<>();
@@ -43,22 +43,22 @@ public class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecycler
         return mDataList.size();
     }
 
-    public String getDevice(int position) {
+    String getDevice(int position) {
         return mDataAddresses.get(position);
     }
 
-    public class DeviceViewHolder extends RecyclerView.ViewHolder{
+    class DeviceViewHolder extends RecyclerView.ViewHolder{
 
         final TextView deviceName;
 
-        public DeviceViewHolder(View itemView) {
+        DeviceViewHolder(View itemView) {
             super(itemView);
             deviceName = (TextView) itemView.findViewById(R.id.deviceName);
             deviceName.setOnClickListener(v -> handleClick(getAdapterPosition()));
         }
     }
 
-    public void addDevice(String name, String address) {
+    void addDevice(String name, String address) {
         if (mDataList.size() > 0) {
             String noDevices = mContext.getString(R.string.none_found);
             if (mDataList.contains(noDevices)) {
