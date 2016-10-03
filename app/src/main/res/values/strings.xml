@@ -95,4 +95,14 @@
     <string name="v_p_p">V p-p:</string>
     <string name="f_">f:</string>
     <string name="date">Date</string>
+    <string name="electrical_currenet">Electrical currenet</string>
+    <string name="sct">SCT</string>
+    <string name="current_rate">Current rate</string>
+    <string name="refresh_rate_short">Refresh rate</string>
+    <string name="set">Set</string>
+    <string name="_0_00">0.00</string>
+    <string name="status">Status:</string>
+    <string name="connected">Connected</string>
+    <string name="failed_to_connect">Failed to connect</string>
+    <string name="connecting">Connecting...</string>
 </resources>
