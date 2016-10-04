@@ -1,22 +1,23 @@
 package com.example.helio.arduino.dso;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import com.example.helio.arduino.R;
-import com.example.helio.arduino.SettingsActivity;
 import com.example.helio.arduino.core.BluetoothService;
 import com.example.helio.arduino.core.ConnectionEvent;
 import com.example.helio.arduino.core.Constants;
@@ -129,6 +130,35 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
 
     private void initActionBar() {
         findViewById(R.id.backButton).setOnClickListener(view -> closeScreen());
+        findViewById(R.id.screenshotButton).setOnClickListener(view -> requestScreenshot());
+        findViewById(R.id.galleryButton).setOnClickListener(view -> showScreenshots());
+    }
+
+    private void showScreenshots() {
+        if (checkReadPermission()) {
+            startActivity(new Intent(this, ImagesActivity.class));
+        }
+    }
+
+    private boolean checkReadPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 102);
+                return false;
+            }
+            return true;
+        }
+        return true;
+    }
+
+    private void requestScreenshot() {
+        Fragment fragment = mPagerAdapter.getFragment(mSelectedPage);
+        if (fragment instanceof SnapshotFragment) {
+            ((SnapshotFragment) fragment).makeScreenshot();
+        }
+        if (fragment instanceof AutoRefreshFragment) {
+            ((AutoRefreshFragment) fragment).makeScreenshot();
+        }
     }
 
     private void requestBtEnable() {
@@ -282,29 +312,22 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.actionSettings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ENABLE_BT && resultCode != RESULT_OK) {
             requestBtEnable();
         } else {
             startService(new Intent(this, BluetoothService.class));
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 102:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startActivity(new Intent(this, ImagesActivity.class));
+                }
+                break;
         }
     }
 

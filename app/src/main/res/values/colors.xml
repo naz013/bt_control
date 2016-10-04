@@ -26,4 +26,6 @@
     <color name="dsoPrimary">#53acf6</color>
     <color name="dsoPrimaryDark">#448AFF</color>
     <color name="dsoAccent">#fe5621</color>
+    <color name="dsoValue">#009587</color>
+    <color name="dsoButton">#02ac9c</color>
 </resources>

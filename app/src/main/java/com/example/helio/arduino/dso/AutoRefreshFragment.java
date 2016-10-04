@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -74,6 +73,10 @@ public class AutoRefreshFragment extends Fragment {
         return new AutoRefreshFragment();
     }
 
+    public void makeScreenshot() {
+        takeScreenshot();
+    }
+
     public void setData(List<Float> xVals, List<Float> yVals) {
         Log.d(TAG, "setData: " + xVals.size() + ", " + yVals.size());
         if (xVals.size() == 0 || yVals.size() == 0) return;
@@ -113,9 +116,7 @@ public class AutoRefreshFragment extends Fragment {
     }
 
     private void initButtons(View view) {
-        view.findViewById(R.id.screenshot_item).setOnClickListener(mListener);
         view.findViewById(R.id.clearButton).setOnClickListener(mListener);
-        view.findViewById(R.id.gallery_item).setOnClickListener(mListener);
         traceY = (ImageButton) view.findViewById(R.id.traceY);
         traceX = (ImageButton) view.findViewById(R.id.traceX);
         moveBottom = (ImageButton) view.findViewById(R.id.moveBottom);
@@ -147,17 +148,11 @@ public class AutoRefreshFragment extends Fragment {
             case R.id.captureButton:
                 capture();
                 break;
-            case R.id.screenshot_item:
-                takeScreenshot();
-                break;
             case R.id.stopButton:
                 stopCapturing();
                 break;
             case R.id.clearButton:
                 mChartView.setUpClearGraph();
-                break;
-            case R.id.gallery_item:
-                showScreenshots();
                 break;
             case R.id.zoomInX:
                 scaleX(1);
@@ -213,12 +208,6 @@ public class AutoRefreshFragment extends Fragment {
         sendMessage(Constants.S);
     }
 
-    private void showScreenshots() {
-        if (checkReadPermission()) {
-            startActivity(new Intent(getActivity(), ImagesActivity.class));
-        }
-    }
-
     private void capture() {
         captureButton.setEnabled(false);
         mChartView.setUpClearGraph();
@@ -229,17 +218,6 @@ public class AutoRefreshFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
-                return false;
-            }
-            return true;
-        }
-        return true;
-    }
-
-    private boolean checkReadPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 102);
                 return false;
             }
             return true;
@@ -294,11 +272,6 @@ public class AutoRefreshFragment extends Fragment {
             case 101:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     takeScreenshot();
-                }
-                break;
-            case 102:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startActivity(new Intent(getActivity(), ImagesActivity.class));
                 }
                 break;
         }
