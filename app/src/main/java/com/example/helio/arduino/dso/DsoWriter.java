@@ -1,7 +1,6 @@
 package com.example.helio.arduino.dso;
 
 import android.os.Environment;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -27,7 +26,6 @@ public class DsoWriter {
 
     private static final String DATA_FILE_PATH = Environment.getExternalStorageDirectory().getPath() + "/" + "DSO_data.txt";
     private static final String DATA_KEY = "data_key";
-    private static final String TAG = "DsoWriter";
 
     public static void writeToFile(List<Float> yValues) throws IOException {
         File file = new File(DATA_FILE_PATH);
@@ -71,9 +69,7 @@ public class DsoWriter {
 
     public static boolean hasDsoData() {
         File file = new File(DATA_FILE_PATH);
-        boolean res = file.exists();
-        Log.d(TAG, "hasDsoData: " + res);
-        return res;
+        return file.exists();
     }
 
     private static List<Float> getArrayFromJson(String json) {

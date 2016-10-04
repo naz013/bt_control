@@ -38,7 +38,7 @@ public class AutoRefreshFragment extends Fragment {
     private ImageButton moveRight, moveLeft;
     private ImageButton moveTop, moveBottom;
     private ImageButton traceX, traceY;
-    private ImageButton captureButton, stopButton;
+    private ImageButton captureButton;
 
     private ChartController mController;
     private ChartListener mChartCallback = new ChartListener() {
@@ -128,7 +128,7 @@ public class AutoRefreshFragment extends Fragment {
         zoomInY = (ImageButton) view.findViewById(R.id.zoomInY);
         zoomOutY = (ImageButton) view.findViewById(R.id.zoomOutY);
         captureButton = (ImageButton) view.findViewById(R.id.captureButton);
-        stopButton = (ImageButton) view.findViewById(R.id.stopButton);
+        ImageButton stopButton = (ImageButton) view.findViewById(R.id.stopButton);
         zoomInX.setOnClickListener(mListener);
         zoomOutX.setOnClickListener(mListener);
         zoomInY.setOnClickListener(mListener);

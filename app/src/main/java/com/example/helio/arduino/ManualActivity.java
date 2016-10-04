@@ -19,9 +19,7 @@ public class ManualActivity extends AppCompatActivity {
         Toast.makeText(ManualActivity.this, R.string.failed_to_open_file, Toast.LENGTH_SHORT).show();
         finish();
     };
-    private OnLoadCompleteListener mLoadListener = nbPages -> {
-        hideProgress();
-    };
+    private OnLoadCompleteListener mLoadListener = nbPages -> hideProgress();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

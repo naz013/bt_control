@@ -25,7 +25,7 @@ public class BluetoothService extends Service {
     private ConnectionManager mBtService = null;
     private BluetoothAdapter mBtAdapter = null;
 
-    private final Handler mHandler = new Handler() {
+    private static final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -45,7 +45,7 @@ public class BluetoothService extends Service {
         }
     };
 
-    private void obtainConnectionMessage(Message msg) {
+    private static void obtainConnectionMessage(Message msg) {
         switch (msg.arg1) {
             case ConnectionManager.STATE_CONNECTED:
                 EventBus.getDefault().post(new ConnectionEvent(true));

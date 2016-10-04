@@ -53,7 +53,7 @@
                         android:inputType="numberDecimal"
                         android:maxLength="8"
                         android:minWidth="150dp"
-                        android:singleLine="true" />
+                        android:maxLines="1" />
 
                 </android.support.design.widget.TextInputLayout>
 

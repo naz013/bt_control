@@ -31,8 +31,6 @@ import com.example.helio.arduino.core.ConnectionManager;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.DeviceData;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 public class StartActivity extends AppCompatActivity {
@@ -47,7 +45,6 @@ public class StartActivity extends AppCompatActivity {
     private String mDeviceName;
 
     private ProgressDialog mDialog;
-    private final List<BluetoothDevice> mDevices = new ArrayList<>();
 
     private DevicesRecyclerAdapter mRecyclerAdapter;
     private ConnectionManager mBtService = null;
@@ -105,7 +102,6 @@ public class StartActivity extends AppCompatActivity {
     private void addBoundedDevicesToList() {
         if (mBtAdapter != null) {
             Set<BluetoothDevice> devices = mBtAdapter.getBondedDevices();
-            mDevices.clear();
             for (BluetoothDevice device : devices) {
                 addDeviceToList(device);
             }
@@ -129,7 +125,6 @@ public class StartActivity extends AppCompatActivity {
     private void addDeviceToList(BluetoothDevice device) {
         String name = device.getName();
         String address = device.getAddress();
-        mDevices.add(device);
         mRecyclerAdapter.addDevice(name, address);
     }
 
@@ -137,7 +132,7 @@ public class StartActivity extends AppCompatActivity {
         SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(Constants.DEVICE_ADDRESS, address);
-        editor.commit();
+        editor.apply();
     }
 
     private final Handler mHandler = new Handler() {

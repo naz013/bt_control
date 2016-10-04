@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BluetoothUtils {
+class BluetoothUtils {
     private static final String TAG = "BluetoothUtils";
     private static final boolean D = true;
 
@@ -112,7 +112,7 @@ public class BluetoothUtils {
         uuidsDescriptions.put("1204", "GenericTelephonyService");
     }
 
-    public static ArrayList<ParcelUuid> getDeviceUuids(BluetoothDevice device) {
+    static ArrayList<ParcelUuid> getDeviceUuids(BluetoothDevice device) {
         ArrayList<ParcelUuid> result = new ArrayList<>();
 
         try {
@@ -162,7 +162,7 @@ public class BluetoothUtils {
         return getDeviceServices(uuids);
     }
 
-    public static BluetoothSocket createRfcommSocket(BluetoothDevice device) {
+    static BluetoothSocket createRfcommSocket(BluetoothDevice device) {
         BluetoothSocket tmp = null;
         try {
             Class class1 = device.getClass();
@@ -170,7 +170,7 @@ public class BluetoothUtils {
             aclass[0] = Integer.TYPE;
             Method method = class1.getMethod("createRfcommSocket", aclass);
             Object aobj[] = new Object[1];
-            aobj[0] = Integer.valueOf(1);
+            aobj[0] = 1;
 
             tmp = (BluetoothSocket) method.invoke(device, aobj);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {

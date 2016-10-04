@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.multimeterButton).setOnClickListener(mListener);
         findViewById(R.id.dsoButton).setOnClickListener(mListener);
         findViewById(R.id.signalButton).setOnClickListener(mListener);
-        findViewById(R.id.fab).setOnClickListener(mListener);
+        findViewById(R.id.manualButton).setOnClickListener(mListener);
     }
 
     private void initActionBar() {
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.signalButton:
                 openSignal();
                 break;
-            case R.id.fab:
+            case R.id.manualButton:
                 openManual();
                 break;
         }
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         if (preferences.contains(Constants.DEVICE_ADDRESS)) {
             SharedPreferences.Editor editor = preferences.edit();
             editor.remove(Constants.DEVICE_ADDRESS);
-            editor.commit();
+            editor.apply();
         }
     }
 
