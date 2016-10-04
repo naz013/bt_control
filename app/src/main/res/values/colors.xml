@@ -28,4 +28,6 @@
     <color name="dsoAccent">#fe5621</color>
     <color name="dsoValue">#009587</color>
     <color name="dsoButton">#02ac9c</color>
+    <color name="manualPrimary">#fca743</color>
+    <color name="manualPrimaryDark">#FF9100</color>
 </resources>

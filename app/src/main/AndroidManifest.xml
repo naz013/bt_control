@@ -48,16 +48,20 @@
             android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity
             android:name=".dso.ImagesActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Screenshots" />
         <activity
             android:name=".dso.ImagePreviewActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Screenshots" />
 
         <service android:name=".core.BluetoothService" />
 
         <activity
             android:name=".ManualActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Manual" />
+
         <activity android:name=".multimeter.FileListActivity" />
 
         <provider

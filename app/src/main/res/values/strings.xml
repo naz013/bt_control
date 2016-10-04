@@ -116,6 +116,7 @@
     <string name="enter_your_number">Enter your number</string>
     <string name="f_n_a">f: n/a</string>
     <string name="v_p_p_n_a">V p-p: n/a</string>
+    <string name="send_screenshot">Send screenshot</string>
 
     <array name="share_options">
         <item>@string/save_to_google_drive</item>

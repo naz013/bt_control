@@ -24,6 +24,22 @@
         <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back_white_24dp</item>
     </style>
 
+    <style name="AppTheme.Screenshots" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorAccent">@color/dsoAccent</item>
+        <item name="colorPrimary">@color/dsoPrimary</item>
+        <item name="colorPrimaryDark">@color/dsoPrimaryDark</item>
+        <item name="android:actionBarStyle">@style/AppTheme.ActionBar</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back_white_24dp</item>
+    </style>
+
+    <style name="AppTheme.Manual" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorAccent">@color/dsoPrimary</item>
+        <item name="colorPrimary">@color/manualPrimary</item>
+        <item name="colorPrimaryDark">@color/manualPrimaryDark</item>
+        <item name="android:actionBarStyle">@style/AppTheme.ActionBar</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back_white_24dp</item>
+    </style>
+
     <style name="AppTheme.Fullscreen" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorPrimary">@color/colorPrimary</item>
