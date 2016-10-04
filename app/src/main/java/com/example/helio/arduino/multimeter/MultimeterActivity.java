@@ -26,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.helio.arduino.R;
-import com.example.helio.arduino.SettingsActivity;
 import com.example.helio.arduino.core.BluetoothService;
 import com.example.helio.arduino.core.ConnectionEvent;
 import com.example.helio.arduino.core.Constants;
@@ -500,9 +499,6 @@ public class MultimeterActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.actionSettings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                return true;
             case android.R.id.home:
                 closeScreen();
                 return true;

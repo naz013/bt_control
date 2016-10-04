@@ -26,9 +26,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".connecting.StartActivity"
             android:screenOrientation="portrait" />
         <activity
