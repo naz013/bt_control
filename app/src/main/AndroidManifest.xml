@@ -36,7 +36,8 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".dso.DsoActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Dso" />
         <activity
             android:name=".multimeter.MultimeterActivity"
             android:screenOrientation="portrait" />
@@ -66,7 +67,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
     </application>
 

@@ -1,6 +1,5 @@
 package com.example.helio.arduino.dso;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
@@ -8,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -16,7 +14,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.SettingsActivity;
@@ -44,12 +41,8 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
     private static final int NONE = -1;
 
     private TextView mBlockView;
-
     private BluetoothAdapter mBtAdapter = null;
-
-    private static Activity activity;
     private int mEnabledAction;
-
     private DsoPagerAdapter mPagerAdapter;
 
     private int mSelectedPage;
@@ -67,7 +60,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         try {
             readDso(dsoEvent.getArray());
         } catch (NumberFormatException e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -75,7 +68,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         try {
             readDso((String) event.getMsg().obj);
         } catch (NumberFormatException e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -108,7 +101,6 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activity = this;
         setContentView(R.layout.activity_dso);
         initBtAdapter();
         initActionBar();
@@ -125,10 +117,6 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         tabLayout.setupWithViewPager(mViewPager);
     }
 
-    public static Activity getActivity() {
-        return activity;
-    }
-
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
         mBlockView.setVisibility(View.VISIBLE);
@@ -140,14 +128,7 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
     }
 
     private void initActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
-            actionBar.setTitle(R.string.dso);
-        }
+        findViewById(R.id.backButton).setOnClickListener(view -> closeScreen());
     }
 
     private void requestBtEnable() {
@@ -275,10 +256,6 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         finish();
     }
 
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -316,9 +293,6 @@ public class DsoActivity extends AppCompatActivity implements FragmentListener {
         switch (item.getItemId()) {
             case R.id.actionSettings:
                 startActivity(new Intent(this, SettingsActivity.class));
-                return true;
-            case android.R.id.home:
-                closeScreen();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

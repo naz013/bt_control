@@ -23,4 +23,7 @@
     <color name="signalPrimary">#f5817a</color>
     <color name="signalPrimaryDark">#FF5252</color>
     <color name="signalAccent">#009688</color>
+    <color name="dsoPrimary">#53acf6</color>
+    <color name="dsoPrimaryDark">#448AFF</color>
+    <color name="dsoAccent">#fe5621</color>
 </resources>
