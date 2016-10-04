@@ -3,6 +3,7 @@
     <color name="colorPrimary">#009688</color>
     <color name="colorPrimaryDark">#00796B</color>
     <color name="colorAccent">#FF5722</color>
+    <color name="textColor">#fe5621</color>
     <color name="colorWhite">#ffffff</color>
     <color name="colorRed">#F44336</color>
     <color name="colorBlue">#2196F3</color>
@@ -10,7 +11,10 @@
     <color name="colorGreenDark">#1B5E20</color>
     <color name="materialGray">#9E9E9E</color>
     <color name="materialGrayLight">#E0E0E0</color>
+    <color name="materialDivider">#979797</color>
     <color name="colorGray">#616161</color>
     <color name="colorGrayTr">#8c616161</color>
     <color name="colorBlackTr">#64616161</color>
+    <color name="deviceName">#de000000</color>
+    <color name="deviceAddress">#8b000000</color>
 </resources>

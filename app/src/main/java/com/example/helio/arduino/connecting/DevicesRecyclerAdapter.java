@@ -29,13 +29,14 @@ class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecyclerAdapter
     @Override
     public DeviceViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View view = inflater.inflate(R.layout.device_list_item, null, false);
+        View view = inflater.inflate(R.layout.device_list_item, parent, false);
         return new DeviceViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(DeviceViewHolder holder, int position) {
         holder.deviceName.setText(mDataList.get(position));
+        holder.deviceAddress.setText(mDataAddresses.get(position));
     }
 
     @Override
@@ -50,11 +51,13 @@ class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecyclerAdapter
     class DeviceViewHolder extends RecyclerView.ViewHolder{
 
         final TextView deviceName;
+        final TextView deviceAddress;
 
         DeviceViewHolder(View itemView) {
             super(itemView);
             deviceName = (TextView) itemView.findViewById(R.id.deviceName);
-            deviceName.setOnClickListener(v -> handleClick(getAdapterPosition()));
+            deviceAddress = (TextView) itemView.findViewById(R.id.deviceAddress);
+            itemView.findViewById(R.id.containerItem).setOnClickListener(v -> handleClick(getAdapterPosition()));
         }
     }
 

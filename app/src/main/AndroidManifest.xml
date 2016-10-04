@@ -30,8 +30,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".connecting.StartActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Fullscreen" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait" />
