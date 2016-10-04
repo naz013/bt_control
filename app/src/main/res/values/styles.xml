@@ -8,7 +8,7 @@
         <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back_white_24dp</item>
     </style>
 
-    <style name="AppTheme.Signal" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme.Signal" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorAccent">@color/signalAccent</item>
         <item name="colorPrimary">@color/signalPrimary</item>
         <item name="colorPrimaryDark">@color/signalPrimaryDark</item>

@@ -1,15 +1,12 @@
 package com.example.helio.arduino.signal;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -32,8 +29,6 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
     private BluetoothAdapter mBtAdapter = null;
 
     private TextView mBlockView;
-
-    private static Activity activity;
 
     private ViewPager.OnPageChangeListener mPageListener = new ViewPager.OnPageChangeListener() {
         @Override
@@ -72,7 +67,6 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activity = this;
         setContentView(R.layout.activity_signal);
         initBtAdapter();
         initActionBar();
@@ -90,10 +84,6 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
         tabLayout.setupWithViewPager(mViewPager);
     }
 
-    public static Activity getActivity() {
-        return activity;
-    }
-
     private void initBlockView() {
         mBlockView = (TextView) findViewById(R.id.blockView);
         mBlockView.setVisibility(View.VISIBLE);
@@ -105,14 +95,7 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
     }
 
     private void initActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(true);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
-            actionBar.setTitle(getString(R.string.signal_generator));
-        }
+        findViewById(R.id.backButton).setOnClickListener(view -> finish());
     }
 
     private void requestBtEnable() {
@@ -151,17 +134,6 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
         super.onStop();
         sendCancelSignal();
         EventBus.getDefault().unregister(this);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override

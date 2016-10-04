@@ -1,7 +1,6 @@
 package com.example.helio.arduino.multimeter;
 
 import android.Manifest;
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
@@ -63,7 +62,6 @@ public class MultimeterActivity extends AppCompatActivity {
     private int currVolume;
 
     private BluetoothAdapter mBtAdapter = null;
-    private static Activity activity;
     private WriteExcel mWriteExcel;
     private Sound mSound;
     private CompoundButton.OnCheckedChangeListener mCheckListener = (compoundButton, b) -> switchExport(b);
@@ -71,7 +69,6 @@ public class MultimeterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activity = this;
         setContentView(R.layout.activity_multimeter);
         initBluetoothAdapter();
         initActionBar();
@@ -81,10 +78,6 @@ public class MultimeterActivity extends AppCompatActivity {
         rateValueView = (TextView) findViewById(R.id.rateValueView);
         statusTitle = (TextView) findViewById(R.id.statusTitle);
         mSctStatus = findViewById(R.id.sctStatus);
-    }
-
-    public static Activity getActivity() {
-        return activity;
     }
 
     public void onEvent(ResponseEvent responseEvent) {
@@ -216,7 +209,7 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private boolean checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
                 return false;
             }

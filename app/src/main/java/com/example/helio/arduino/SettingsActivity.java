@@ -13,9 +13,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.helio.arduino.core.Constants;
-import com.example.helio.arduino.dso.DsoActivity;
-import com.example.helio.arduino.multimeter.MultimeterActivity;
-import com.example.helio.arduino.signal.SignalActivity;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -63,18 +60,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void removeBtDevice() {
         removePrefs();
-        if (DsoActivity.getActivity() != null) {
-            DsoActivity.getActivity().finish();
-        }
-        if (MainActivity.getActivity() != null) {
-            MainActivity.getActivity().finish();
-        }
-        if (SignalActivity.getActivity() != null) {
-            SignalActivity.getActivity().finish();
-        }
-        if (MultimeterActivity.getActivity() != null) {
-            MultimeterActivity.getActivity().finish();
-        }
         startActivity(new Intent(getApplicationContext(), SplashActivity.class));
         finish();
     }
