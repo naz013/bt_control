@@ -144,8 +144,8 @@
                         android:layout_marginBottom="16dp"
                         android:layout_marginTop="16dp"
                         android:background="@drawable/button_accent_selector"
-                        android:drawableLeft="@drawable/ic_omega"
-                        android:paddingLeft="16dp"
+                        android:drawableLeft="@drawable/ic_v_letter"
+                        android:paddingLeft="20dp"
                         android:paddingRight="16dp"
                         android:text="@string/voltage"
                         android:textColor="@color/colorWhite" />
@@ -166,9 +166,9 @@
                         android:layout_height="32dp"
                         android:layout_marginTop="16dp"
                         android:background="@drawable/button_accent_selector"
-                        android:drawableLeft="@drawable/ic_omega"
+                        android:drawableLeft="@drawable/ic_a_letter"
                         android:gravity="center"
-                        android:paddingLeft="16dp"
+                        android:paddingLeft="18dp"
                         android:paddingRight="16dp"
                         android:text="@string/current"
                         android:textColor="@color/colorWhite" />
