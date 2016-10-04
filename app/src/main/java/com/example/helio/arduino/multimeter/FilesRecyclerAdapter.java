@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.example.helio.arduino.BuildConfig;
@@ -19,13 +18,17 @@ import com.example.helio.arduino.R;
 import com.example.helio.arduino.core.ShareUtil;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 class FilesRecyclerAdapter extends RecyclerView.Adapter<FilesRecyclerAdapter.DeviceViewHolder> {
 
     private final Context mContext;
     private final List<FileItem> mDataList;
+    private int item = 0;
 
     FilesRecyclerAdapter(Context context, List<FileItem> list) {
         this.mContext = context;
@@ -35,13 +38,24 @@ class FilesRecyclerAdapter extends RecyclerView.Adapter<FilesRecyclerAdapter.Dev
     @Override
     public DeviceViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View view = inflater.inflate(R.layout.file_item_layout, null, false);
+        View view = inflater.inflate(R.layout.file_item_layout, parent, false);
         return new DeviceViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(DeviceViewHolder holder, int position) {
         holder.fileNameView.setText(mDataList.get(position).getFileName());
+        File file = new File(mDataList.get(position).getFullPath());
+        if (file.exists()) {
+            holder.fileDateView.setText(getConvertedDate(file.lastModified()));
+        }
+    }
+
+    private String getConvertedDate(long mills) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(mills);
+        SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault());
+        return format.format(calendar.getTime());
     }
 
     @Override
@@ -52,33 +66,37 @@ class FilesRecyclerAdapter extends RecyclerView.Adapter<FilesRecyclerAdapter.Dev
     class DeviceViewHolder extends RecyclerView.ViewHolder{
 
         final TextView fileNameView;
+        final TextView fileDateView;
 
         DeviceViewHolder(View itemView) {
             super(itemView);
             fileNameView = (TextView) itemView.findViewById(R.id.nameView);
-            fileNameView.setOnClickListener(v -> handleClick(getAdapterPosition()));
+            fileDateView = (TextView) itemView.findViewById(R.id.dateView);
+            itemView.findViewById(R.id.card).setOnClickListener(v -> handleClick(getAdapterPosition()));
             ImageButton button = (ImageButton) itemView.findViewById(R.id.deleteButton);
             ImageButton shareButton = (ImageButton) itemView.findViewById(R.id.shareButton);
             button.setOnClickListener(view -> showDeleteDialog(getAdapterPosition()));
-            shareButton.setOnClickListener(view -> showPopup(getAdapterPosition(), view));
+            shareButton.setOnClickListener(view -> showShareDialog(getAdapterPosition()));
         }
     }
 
-    private void showPopup(int position, View view) {
-        PopupMenu popup = new PopupMenu(mContext, view);
-        popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.mail_action:
-                    sendEmail(position);
-                    break;
-                case R.id.drive_action:
-                    saveToDrive(position);
-                    break;
+    private void showShareDialog(int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setCancelable(true);
+        builder.setTitle(R.string.send_data_file);
+        item = 0;
+        builder.setSingleChoiceItems(R.array.share_options, item, (dialogInterface, i) -> item = i);
+        builder.setPositiveButton(R.string.send, (dialog, which) -> {
+            if (item == 0) {
+                saveToDrive(position);
+            } else {
+                sendEmail(position);
             }
-            return true;
+            dialog.dismiss();
         });
-        popup.show();
+        builder.setNegativeButton(mContext.getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void sendEmail(int position) {

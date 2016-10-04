@@ -468,6 +468,12 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        checkBtAdapterStatus();
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         checkBtAdapterStatus();

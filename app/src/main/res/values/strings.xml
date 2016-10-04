@@ -108,4 +108,12 @@
     <string name="modules">Modules</string>
     <string name="please_select_module_to_continue">Please select Module to continue</string>
     <string name="refresh">Refresh</string>
+    <string name="send_data_file">Send data file</string>
+    <string name="send">Send</string>
+    <string name="n_a">n/a</string>
+
+    <array name="share_options">
+        <item>@string/save_to_google_drive</item>
+        <item>@string/send_via_e_mail</item>
+    </array>
 </resources>

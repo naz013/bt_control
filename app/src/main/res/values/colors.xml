@@ -17,4 +17,7 @@
     <color name="colorBlackTr">#64616161</color>
     <color name="deviceName">#de000000</color>
     <color name="deviceAddress">#8b000000</color>
+    <color name="fileDivider">#1f000000</color>
+    <color name="fileIconBg">#40686767</color>
+    <color name="negativeColor">#beb8b6</color>
 </resources>
