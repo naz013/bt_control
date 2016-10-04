@@ -43,6 +43,7 @@
         <activity
             android:name=".signal.SignalActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Signal"
             android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity
             android:name=".dso.ImagesActivity"

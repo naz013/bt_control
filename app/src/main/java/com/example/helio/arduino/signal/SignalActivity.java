@@ -9,16 +9,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.helio.arduino.BuildConfig;
 import com.example.helio.arduino.R;
-import com.example.helio.arduino.SettingsActivity;
 import com.example.helio.arduino.core.BluetoothService;
 import com.example.helio.arduino.core.ConnectionEvent;
 import com.example.helio.arduino.core.Constants;
@@ -111,10 +107,11 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
     private void initActionBar() {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
+            actionBar.setTitle(getString(R.string.signal_generator));
         }
     }
 
@@ -133,10 +130,6 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
 
     private void showBlockView() {
         mBlockView.setVisibility(View.VISIBLE);
-    }
-
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -161,18 +154,8 @@ public class SignalActivity extends AppCompatActivity implements FragmentListene
     }
 
     @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.actionSettings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                return true;
             case android.R.id.home:
                 finish();
                 return true;

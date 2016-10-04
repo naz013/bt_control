@@ -21,10 +21,12 @@
     <string name="hz">Hz</string>
     <string name="khz">kHz</string>
     <string name="mhz">MHz</string>
+    <string name="square_wave">Square Wave</string>
+    <string name="sine_wave">Sine Wave</string>
 
     <array name="wave_types">
-        <item>Square Wave</item>
-        <item>Sine Wave</item>
+        <item>@string/square_wave</item>
+        <item>@string/sine_wave</item>
     </array>
 
     <array name="frequency_measure">
@@ -111,6 +113,7 @@
     <string name="send_data_file">Send data file</string>
     <string name="send">Send</string>
     <string name="n_a">n/a</string>
+    <string name="enter_your_number">Enter your number</string>
 
     <array name="share_options">
         <item>@string/save_to_google_drive</item>

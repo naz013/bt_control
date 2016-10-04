@@ -1,178 +1,196 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.helio.arduino.signal.SignalFragment">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginTop="8dp"
-                app:cardCornerRadius="2dp"
-                app:cardElevation="2dp"
-                app:cardUseCompatPadding="true">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/signal_type"
-                        android:textColor="@color/colorBlackTr"
-                        android:textSize="18sp" />
-
-                    <Spinner
-                        android:id="@+id/waveType"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:layout_marginTop="8dp"
-                        android:background="@drawable/spinner_bg"
-                        android:entries="@array/wave_types"
-                        android:minWidth="180dp"
-                        android:popupBackground="@color/colorWhite" />
-
-                </LinearLayout>
-
-            </android.support.v7.widget.CardView>
-
-            <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginTop="8dp"
-                app:cardCornerRadius="2dp"
-                app:cardElevation="2dp"
-                app:cardUseCompatPadding="true">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/frequency"
-                        android:textColor="@color/colorBlackTr"
-                        android:textSize="18sp" />
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:layout_marginTop="8dp"
-                        android:orientation="horizontal">
-
-                        <android.support.design.widget.TextInputLayout
-                            android:id="@+id/freqInput"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
-                            android:layout_alignParentStart="true"
-                            android:layout_alignParentTop="true">
-
-                            <EditText
-                                android:id="@+id/freqField"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:background="@null"
-                                android:digits="0123456789"
-                                android:hint="@string/frequency"
-                                android:inputType="numberDecimal"
-                                android:maxLength="8"
-                                android:minWidth="150dp"
-                                android:singleLine="true" />
-
-                        </android.support.design.widget.TextInputLayout>
-
-                        <Spinner
-                            android:id="@+id/freqSelector"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="8dp"
-                            android:layout_toRightOf="@+id/freqInput"
-                            android:background="@drawable/spinner_bg"
-                            android:entries="@array/frequency_measure"
-                            android:minWidth="120dp"
-                            android:popupBackground="@color/colorWhite" />
-
-                    </RelativeLayout>
-
-                </LinearLayout>
-
-            </android.support.v7.widget.CardView>
+            android:layout_margin="8dp"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="2dp"
+            app:cardUseCompatPadding="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                android:layout_marginTop="16dp"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/generateButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="@drawable/button_blue_selector"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:paddingBottom="10dp"
-                    android:paddingLeft="15dp"
-                    android:paddingRight="15dp"
-                    android:paddingTop="10dp"
-                    android:text="@string/generate"
-                    android:textColor="@color/colorWhite"
-                    android:textSize="18sp" />
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/signal_type"
+                    android:textColor="@color/signalAccent"
+                    android:textSize="14sp" />
 
-                <TextView
-                    android:id="@+id/terminateButton"
+                <RadioGroup
+                    android:id="@+id/waveGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="32dp"
-                    android:background="@drawable/button_red_selector"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:paddingBottom="10dp"
-                    android:paddingLeft="15dp"
-                    android:paddingRight="15dp"
-                    android:paddingTop="10dp"
-                    android:text="@string/terminate"
-                    android:textColor="@color/colorWhite"
-                    android:textSize="18sp" />
+                    android:layout_marginLeft="12dp"
+                    android:orientation="vertical">
 
+                    <RadioButton
+                        android:id="@+id/squareCheck"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:checked="true"
+                        android:text="@string/square_wave"
+                        android:textColor="@color/deviceName"
+                        android:textSize="14sp" />
+
+                    <RadioButton
+                        android:id="@+id/sineCheck"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/sine_wave"
+                        android:textColor="@color/deviceName"
+                        android:textSize="14sp" />
+
+                </RadioGroup>
             </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="2dp"
+            app:cardUseCompatPadding="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/frequency"
+                    android:textColor="@color/signalAccent"
+                    android:textSize="14sp" />
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/freqInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="12dp">
+
+                    <EditText
+                        android:id="@+id/freqField"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:digits="0123456789"
+                        android:hint="@string/enter_your_number"
+                        android:inputType="numberDecimal"
+                        android:maxLength="8"
+                        android:minWidth="150dp"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <RadioGroup
+                    android:id="@+id/freqGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/hzCheck"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/hz"
+                        android:checked="true"
+                        android:textColor="@color/deviceName"
+                        android:textSize="14sp" />
+
+                    <RadioButton
+                        android:id="@+id/khzCheck"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/khz"
+                        android:textColor="@color/deviceName"
+                        android:textSize="14sp" />
+
+                    <RadioButton
+                        android:id="@+id/mhzCheck"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/mhz"
+                        android:textColor="@color/deviceName"
+                        android:textSize="14sp" />
+
+                </RadioGroup>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/generateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/button_orange_selector"
+                android:foreground="?attr/selectableItemBackground"
+                android:paddingBottom="10dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="10dp"
+                android:text="@string/generate"
+                android:textColor="@color/colorWhite"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/terminateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="20dp"
+                android:background="@drawable/button_orange_selector"
+                android:foreground="?attr/selectableItemBackground"
+                android:paddingBottom="10dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingTop="10dp"
+                android:text="@string/terminate"
+                android:textColor="@color/colorWhite"
+                android:textSize="18sp" />
 
         </LinearLayout>
 
-    </ScrollView>
+    </LinearLayout>
 
-</FrameLayout>
+</ScrollView>

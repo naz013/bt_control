@@ -20,4 +20,7 @@
     <color name="fileDivider">#1f000000</color>
     <color name="fileIconBg">#40686767</color>
     <color name="negativeColor">#beb8b6</color>
+    <color name="signalPrimary">#f5817a</color>
+    <color name="signalPrimaryDark">#FF5252</color>
+    <color name="signalAccent">#009688</color>
 </resources>

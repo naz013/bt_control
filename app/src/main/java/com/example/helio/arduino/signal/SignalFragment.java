@@ -13,10 +13,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.example.helio.arduino.R;
@@ -26,9 +25,10 @@ public class SignalFragment extends Fragment {
 
     private FragmentListener mFragmentListener;
 
-    private TextView mGenerateButton;
-    private Spinner mWaveSelector;
-    private Spinner mFrequencySelector;
+    private Button mGenerateButton;
+    private Button mTerminateButton;
+    private RadioGroup waveGroup;
+    private RadioGroup freqGroup;
     private EditText mFrequencyField;
     private TextInputLayout mFreqLabel;
 
@@ -45,23 +45,18 @@ public class SignalFragment extends Fragment {
         }
     };
 
-    private AdapterView.OnItemSelectedListener mItemSelectListener = new AdapterView.OnItemSelectedListener() {
+    private RadioGroup.OnCheckedChangeListener mCheckedChangeListener = new RadioGroup.OnCheckedChangeListener() {
         @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            if (position == 0) {
+        public void onCheckedChanged(RadioGroup radioGroup, int i) {
+            if (i == R.id.hzCheck) {
                 setMaxLength(8);
-            } else if (position == 1) {
+            } else if (i == R.id.khzCheck) {
                 setMaxLength(5);
-            } else if (position == 2) {
+            } else if (i == R.id.mhzCheck) {
                 setMaxLength(2);
             }
             if (isGenerating) return;
             checkFrequency();
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-
         }
     };
 
@@ -77,7 +72,6 @@ public class SignalFragment extends Fragment {
     }
 
     public SignalFragment() {
-        // Required empty public constructor
     }
 
     public static SignalFragment newInstance() {
@@ -94,9 +88,9 @@ public class SignalFragment extends Fragment {
     }
 
     private void initViews(View view) {
-        mWaveSelector = (Spinner) view.findViewById(R.id.waveType);
-        mFrequencySelector = (Spinner) view.findViewById(R.id.freqSelector);
-        mFrequencySelector.setOnItemSelectedListener(mItemSelectListener);
+        waveGroup = (RadioGroup) view.findViewById(R.id.waveGroup);
+        freqGroup = (RadioGroup) view.findViewById(R.id.freqGroup);
+        freqGroup.setOnCheckedChangeListener(mCheckedChangeListener);
 
         mFreqLabel = (TextInputLayout) view.findViewById(R.id.freqInput);
         mFreqLabel.setHintEnabled(false);
@@ -148,30 +142,32 @@ public class SignalFragment extends Fragment {
 
     private long getFrequency() {
         long freq = Integer.parseInt(mFrequencyField.getText().toString().trim());
-        int multi = mFrequencySelector.getSelectedItemPosition();
+        int id = freqGroup.getCheckedRadioButtonId();
         long eval = 1;
-        if (multi == 0) {
+        if (id == R.id.hzCheck) {
             eval = Constants.HZ;
-        } else if (multi == 1) {
+        } else if (id == R.id.khzCheck) {
             eval = Constants.kHZ;
-        } else if (multi == 2) {
+        } else if (id == R.id.mhzCheck) {
             eval = Constants.MHZ;
         }
         return freq * eval;
     }
 
     private void initButtons(View view) {
-        mGenerateButton = (TextView) view.findViewById(R.id.generateButton);
+        mGenerateButton = (Button) view.findViewById(R.id.generateButton);
         mGenerateButton.setOnClickListener(mListener);
-        TextView mTerminateButton = (TextView) view.findViewById(R.id.terminateButton);
+        mTerminateButton = (Button) view.findViewById(R.id.terminateButton);
         mTerminateButton.setOnClickListener(mListener);
         mGenerateButton.setEnabled(false);
+        mTerminateButton.setEnabled(false);
     }
 
     private void sendTerminateMessage() {
         isGenerating = false;
         String msg = Constants.T;
         mGenerateButton.setEnabled(true);
+        mTerminateButton.setEnabled(false);
         if (mFragmentListener != null) {
             mFragmentListener.onAction(msg);
         }
@@ -185,14 +181,17 @@ public class SignalFragment extends Fragment {
             return;
         }
         long frequency = Long.parseLong(freqString);
-        int wave = mWaveSelector.getSelectedItemPosition() + 1;
-        int multi = mFrequencySelector.getSelectedItemPosition();
+        int wave = 1;
+        if (waveGroup.getCheckedRadioButtonId() == R.id.sineCheck) {
+            wave = 2;
+        }
+        int id = freqGroup.getCheckedRadioButtonId();
         long eval = 1;
-        if (multi == 0) {
+        if (id == R.id.hzCheck) {
             eval = Constants.HZ;
-        } else if (multi == 1) {
+        } else if (id == R.id.khzCheck) {
             eval = Constants.kHZ;
-        } else if (multi == 2) {
+        } else if (id == R.id.mhzCheck) {
             eval = Constants.MHZ;
         }
         frequency = frequency * eval;
@@ -204,6 +203,7 @@ public class SignalFragment extends Fragment {
         String msg = Constants.G + ";w:" + wave + ";f:" + frequency;
         Log.d("TAG", "sendSignal: " + msg);
         mGenerateButton.setEnabled(false);
+        mTerminateButton.setEnabled(true);
         isGenerating = true;
         if (mFragmentListener != null) {
             mFragmentListener.onAction(msg);
