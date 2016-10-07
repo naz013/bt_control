@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.helio.arduino.connecting.StartActivity;
 import com.example.helio.arduino.core.BluetoothService;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.dso.DsoActivity;
@@ -121,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void removeBtDevice() {
         removePrefs();
-        startActivity(new Intent(getApplicationContext(), SplashActivity.class));
+        startActivity(new Intent(getApplicationContext(), StartActivity.class));
         finish();
     }
 

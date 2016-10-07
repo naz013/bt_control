@@ -89,6 +89,9 @@ public class AutoRefreshFragment extends Fragment {
         } else {
             freqView.setText(DsoUtil.getFrequencyFormatted(getActivity(), frequency));
         }
+        if (frequency < 500) {
+            freqView.setText(getString(R.string.f_) + " " + getString(R.string.undefined));
+        }
         voltageView.setText(DsoUtil.getVoltageFormatted(getActivity(), voltage));
     }
 

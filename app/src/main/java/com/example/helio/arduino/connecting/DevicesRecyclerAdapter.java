@@ -67,13 +67,13 @@ class DevicesRecyclerAdapter extends RecyclerView.Adapter<DevicesRecyclerAdapter
             if (mDataList.contains(noDevices)) {
                 mDataList.remove(noDevices);
             }
-            if (mDataList.contains(name)) {
+            if (mDataAddresses.contains(address)) {
                 return;
             }
         }
         mDataList.add(name);
         mDataAddresses.add(address);
-        int pos = mDataList.indexOf(name);
+        int pos = mDataAddresses.indexOf(address);
         notifyItemInserted(pos);
     }
 
