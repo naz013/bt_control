@@ -15,12 +15,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 
 import com.example.helio.arduino.MainActivity;
 import com.example.helio.arduino.R;
@@ -28,8 +31,6 @@ import com.example.helio.arduino.core.ConnectionManager;
 import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.core.DeviceData;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 public class StartActivity extends AppCompatActivity {
@@ -43,11 +44,7 @@ public class StartActivity extends AppCompatActivity {
     private String mDeviceAddress;
     private String mDeviceName;
 
-    private Button mPairButton;
-    private RecyclerView mDeviceList;
-
     private ProgressDialog mDialog;
-    private final List<BluetoothDevice> mDevices = new ArrayList<>();
 
     private DevicesRecyclerAdapter mRecyclerAdapter;
     private ConnectionManager mBtService = null;
@@ -69,9 +66,21 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
+        initActionBar();
         initDeviceList();
-        initButtons();
         initReceiver();
+        doDiscovery(REQUEST_CLICK);
+    }
+
+    private void initActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(false);
+            actionBar.setDisplayHomeAsUpEnabled(false);
+            actionBar.setHomeButtonEnabled(false);
+            actionBar.setTitle(R.string.modules);
+        }
     }
 
     private void initReceiver() {
@@ -81,13 +90,8 @@ public class StartActivity extends AppCompatActivity {
         this.registerReceiver(mReceiver, filter);
     }
 
-    private void initButtons() {
-        mPairButton = (Button) findViewById(R.id.pairButton);
-        mPairButton.setOnClickListener(visibleClick);
-    }
-
     private void initDeviceList() {
-        mDeviceList = (RecyclerView) findViewById(R.id.deviceList);
+        RecyclerView mDeviceList = (RecyclerView) findViewById(R.id.deviceList);
         mDeviceList.setHasFixedSize(true);
         mDeviceList.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerAdapter = new DevicesRecyclerAdapter(StartActivity.this, mListener);
@@ -98,7 +102,6 @@ public class StartActivity extends AppCompatActivity {
     private void addBoundedDevicesToList() {
         if (mBtAdapter != null) {
             Set<BluetoothDevice> devices = mBtAdapter.getBondedDevices();
-            mDevices.clear();
             for (BluetoothDevice device : devices) {
                 addDeviceToList(device);
             }
@@ -117,29 +120,19 @@ public class StartActivity extends AppCompatActivity {
                 mBtAdapter.startDiscovery();
             }
         }
-        if (code == REQUEST_CLICK) {
-            mPairButton.setVisibility(View.GONE);
-            mDeviceList.setVisibility(View.VISIBLE);
-        }
     }
-
-    private final View.OnClickListener visibleClick = v -> {
-        v.setVisibility(View.GONE);
-        doDiscovery(REQUEST_CLICK);
-    };
 
     private void addDeviceToList(BluetoothDevice device) {
         String name = device.getName();
         String address = device.getAddress();
-        mDevices.add(device);
-        mRecyclerAdapter.addDevice(name + "\n" + address, address);
+        mRecyclerAdapter.addDevice(name, address);
     }
 
     private void saveBtDevice(String address) {
         SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(Constants.DEVICE_ADDRESS, address);
-        editor.commit();
+        editor.apply();
     }
 
     private final Handler mHandler = new Handler() {
@@ -162,11 +155,11 @@ public class StartActivity extends AppCompatActivity {
             case ConnectionManager.STATE_CONNECTED:
                 hideDialog();
                 saveBtDevice(mDeviceAddress);
-                showMainButton();
+                openApplication();
                 break;
             case ConnectionManager.STATE_CONNECTING:
-                mDialog = ProgressDialog.show(this, getString(R.string.bluetooth),
-                        getString(R.string.title_connecting) + " " + mDeviceName, true, true);
+                mDialog = ProgressDialog.show(this, getString(R.string.title_connecting),
+                        mDeviceName, true, true);
                 break;
             case ConnectionManager.STATE_NONE:
                 break;
@@ -237,16 +230,27 @@ public class StartActivity extends AppCompatActivity {
         }
     }
 
-    private final View.OnClickListener mClick = v -> {
+    private void openApplication() {
         startActivity(new Intent(StartActivity.this, MainActivity.class));
         finish();
-    };
+    }
 
-    private void showMainButton() {
-        mDeviceList.setVisibility(View.GONE);
-        mPairButton.setVisibility(View.VISIBLE);
-        mPairButton.setText(R.string.go_to_main_menu);
-        mPairButton.setOnClickListener(mClick);
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_start, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_refresh:
+                doDiscovery(REQUEST_CLICK);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

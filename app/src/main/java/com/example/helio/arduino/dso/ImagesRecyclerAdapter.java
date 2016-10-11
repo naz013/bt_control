@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 
 import com.example.helio.arduino.R;
 import com.example.helio.arduino.core.ShareUtil;
@@ -25,6 +24,7 @@ public class ImagesRecyclerAdapter extends RecyclerView.Adapter<ImagesRecyclerAd
 
     private final Context mContext;
     private final List<String> mDataList;
+    private int item = 0;
 
     ImagesRecyclerAdapter(Context context, List<String> list) {
         this.mContext = context;
@@ -68,26 +68,28 @@ public class ImagesRecyclerAdapter extends RecyclerView.Adapter<ImagesRecyclerAd
                 showConfirmationDialog(adapterPosition);
                 break;
             case R.id.shareButton:
-                showPopup(adapterPosition, view);
+                showShareDialog(adapterPosition);
                 break;
         }
     }
 
-    private void showPopup(int position, View view) {
-        PopupMenu popup = new PopupMenu(mContext, view);
-        popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.mail_action:
-                    sendEmail(position);
-                    break;
-                case R.id.drive_action:
-                    saveToDrive(position);
-                    break;
+    private void showShareDialog(int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setCancelable(true);
+        builder.setTitle(R.string.send_screenshot);
+        item = 0;
+        builder.setSingleChoiceItems(R.array.share_options, item, (dialogInterface, i) -> item = i);
+        builder.setPositiveButton(R.string.send, (dialog, which) -> {
+            if (item == 0) {
+                saveToDrive(position);
+            } else {
+                sendEmail(position);
             }
-            return true;
+            dialog.dismiss();
         });
-        popup.show();
+        builder.setNegativeButton(mContext.getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void sendEmail(int position) {
@@ -132,7 +134,7 @@ public class ImagesRecyclerAdapter extends RecyclerView.Adapter<ImagesRecyclerAd
                 .putExtra(mContext.getString(R.string.image_path_intent), mDataList.get(adapterPosition)));
     }
 
-    @BindingAdapter("app:loadImage")
+    @BindingAdapter("loadImage")
     public static void loadImage(ImageView imageView, String v) {
         File file = new File(v);
         Picasso.with(imageView.getContext())

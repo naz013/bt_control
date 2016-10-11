@@ -12,10 +12,9 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.example.helio.arduino.R;
@@ -25,8 +24,9 @@ public class PwmFragment extends Fragment {
 
     private FragmentListener mFragmentListener;
 
-    private TextView mGenerateButton;
-    private Spinner mFrequencySelector;
+    private Button mGenerateButton;
+    private Button mTerminateButton;
+    private RadioGroup freqGroup;
     private EditText mFrequencyField;
     private EditText mDutyField;
     private TextInputLayout mCycleLabel;
@@ -45,23 +45,18 @@ public class PwmFragment extends Fragment {
         }
     };
 
-    private AdapterView.OnItemSelectedListener mItemSelectListener = new AdapterView.OnItemSelectedListener() {
+    private RadioGroup.OnCheckedChangeListener mCheckedChangeListener = new RadioGroup.OnCheckedChangeListener() {
         @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            if (position == 0) {
+        public void onCheckedChanged(RadioGroup radioGroup, int i) {
+            if (i == R.id.hzCheck) {
                 setMaxLength(8);
-            } else if (position == 1) {
+            } else if (i == R.id.khzCheck) {
                 setMaxLength(5);
-            } else if (position == 2) {
+            } else if (i == R.id.mhzCheck) {
                 setMaxLength(2);
             }
             if (isGenerating) return;
             checkFrequency();
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-
         }
     };
 
@@ -77,7 +72,6 @@ public class PwmFragment extends Fragment {
     }
 
     public PwmFragment() {
-        // Required empty public constructor
     }
 
     public static PwmFragment newInstance() {
@@ -114,8 +108,8 @@ public class PwmFragment extends Fragment {
 
             }
         });
-        mFrequencySelector = (Spinner) view.findViewById(R.id.freqSelector);
-        mFrequencySelector.setOnItemSelectedListener(mItemSelectListener);
+        freqGroup = (RadioGroup) view.findViewById(R.id.freqGroup);
+        freqGroup.setOnCheckedChangeListener(mCheckedChangeListener);
 
         mCycleLabel = (TextInputLayout) view.findViewById(R.id.cycleInput);
         mCycleLabel.setHintEnabled(false);
@@ -194,29 +188,31 @@ public class PwmFragment extends Fragment {
 
     private long getFrequency() {
         long freq = Integer.parseInt(mFrequencyField.getText().toString().trim());
-        int multi = mFrequencySelector.getSelectedItemPosition();
+        int id = freqGroup.getCheckedRadioButtonId();
         long eval = 1;
-        if (multi == 0) {
+        if (id == R.id.hzCheck) {
             eval = Constants.HZ;
-        } else if (multi == 1) {
+        } else if (id == R.id.khzCheck) {
             eval = Constants.kHZ;
-        } else if (multi == 2) {
+        } else if (id == R.id.mhzCheck) {
             eval = Constants.MHZ;
         }
         return freq * eval;
     }
 
     private void initButtons(View view) {
-        mGenerateButton = (TextView) view.findViewById(R.id.generateButton);
+        mGenerateButton = (Button) view.findViewById(R.id.generateButton);
         mGenerateButton.setOnClickListener(mListener);
-        TextView mTerminateButton = (TextView) view.findViewById(R.id.terminateButton);
+        mTerminateButton = (Button) view.findViewById(R.id.terminateButton);
         mTerminateButton.setOnClickListener(mListener);
         mGenerateButton.setEnabled(false);
+        mTerminateButton.setEnabled(false);
     }
 
     private void sendTerminateMessage() {
         String msg = Constants.E;
         mGenerateButton.setEnabled(true);
+        mTerminateButton.setEnabled(false);
         isGenerating = false;
         if (mFragmentListener != null) {
             mFragmentListener.onAction(msg);
@@ -250,6 +246,7 @@ public class PwmFragment extends Fragment {
         }
         String msg = Constants.P + ";d:" + percent + ";f:" + frequency;
         mGenerateButton.setEnabled(false);
+        mTerminateButton.setEnabled(true);
         isGenerating = true;
         if (mFragmentListener != null) {
             mFragmentListener.onAction(msg);

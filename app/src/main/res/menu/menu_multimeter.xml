@@ -2,8 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:icon="@drawable/ic_lan_disconnect_white"
-        android:title="@string/forgot"
-        android:id="@+id/action_disconnect"
-        app:showAsAction="always" />
+        android:id="@+id/files_menu"
+        android:title="@string/exported_data"
+        app:showAsAction="never" />
 </menu>

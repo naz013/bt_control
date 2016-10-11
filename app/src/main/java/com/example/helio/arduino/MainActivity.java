@@ -1,17 +1,22 @@
 package com.example.helio.arduino;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.helio.arduino.connecting.StartActivity;
 import com.example.helio.arduino.core.BluetoothService;
+import com.example.helio.arduino.core.Constants;
 import com.example.helio.arduino.dso.DsoActivity;
 import com.example.helio.arduino.multimeter.MultimeterActivity;
 import com.example.helio.arduino.signal.SignalActivity;
@@ -20,28 +25,22 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT_AUTO = 16;
 
-    private static Activity activity;
     private BluetoothAdapter mBtAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activity = this;
         setContentView(R.layout.activity_main);
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         initActionBar();
         initButtons();
     }
 
-    public static Activity getActivity() {
-        return activity;
-    }
-
     private void initButtons() {
         findViewById(R.id.multimeterButton).setOnClickListener(mListener);
         findViewById(R.id.dsoButton).setOnClickListener(mListener);
         findViewById(R.id.signalButton).setOnClickListener(mListener);
-        findViewById(R.id.fab).setOnClickListener(mListener);
+        findViewById(R.id.manualButton).setOnClickListener(mListener);
     }
 
     private void initActionBar() {
@@ -51,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(false);
             actionBar.setDisplayHomeAsUpEnabled(false);
             actionBar.setHomeButtonEnabled(false);
-            actionBar.setTitle(R.string.main_menu);
+            actionBar.setTitle(R.string.app_name);
         }
     }
 
@@ -78,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.signalButton:
                 openSignal();
                 break;
-            case R.id.fab:
+            case R.id.manualButton:
                 openManual();
                 break;
         }
@@ -121,14 +120,53 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void removeBtDevice() {
+        removePrefs();
+        startActivity(new Intent(getApplicationContext(), StartActivity.class));
+        finish();
+    }
+
+    private void removePrefs() {
+        SharedPreferences preferences = getSharedPreferences(Constants.PREFS, Context.MODE_PRIVATE);
+        if (preferences.contains(Constants.DEVICE_ADDRESS)) {
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.remove(Constants.DEVICE_ADDRESS);
+            editor.apply();
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.actionSettings:
-                startActivity(new Intent(this, SettingsActivity.class));
+            case R.id.action_disconnect:
+                showConfirmationDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private String getDeviceName() {
+        BluetoothAdapter mAdapter = BluetoothAdapter.getDefaultAdapter();
+        SharedPreferences preferences = getSharedPreferences(Constants.PREFS, MODE_PRIVATE);
+        String mAddress = preferences.getString(Constants.DEVICE_ADDRESS, null);
+        if (mAddress != null) {
+            BluetoothDevice device = mAdapter.getRemoteDevice(mAddress);
+            return device.getName();
+        }
+        return "";
+    }
+
+    private void showConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setMessage(getString(R.string.are_you_sure_disconnect) + " " + getDeviceName());
+        builder.setPositiveButton(getString(R.string.forgot), (dialog, which) -> {
+            dialog.dismiss();
+            removeBtDevice();
+        });
+        builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

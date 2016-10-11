@@ -23,37 +23,41 @@ import android.media.MediaPlayer;
 
 import java.io.IOException;
 
-public class Sound {
+class Sound {
 
     private static final String TAG = "Sound";
     private Context mContext;
     private MediaPlayer mMediaPlayer;
     private boolean isPaused;
 
-    public Sound(Context context){
+    Sound(Context context){
         this.mContext = context;
     }
 
-    public void stop(){
+    void stop(){
         if (mMediaPlayer != null) {
             try {
                 mMediaPlayer.stop();
                 mMediaPlayer.release();
                 isPaused = true;
-            } catch (IllegalStateException e) {}
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public synchronized void pause(){
+    synchronized void pause(){
         if (isPlaying()) {
             try {
                 mMediaPlayer.pause();
                 isPaused = true;
-            } catch (IllegalStateException e) {}
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public synchronized void resume(){
+    synchronized void resume(){
         if (!isPlaying()) {
             mMediaPlayer.seekTo(0);
             mMediaPlayer.start();
@@ -68,20 +72,22 @@ public class Sound {
         }
     }
 
-    public boolean isPaused(){
+    boolean isPaused(){
         return isPaused;
     }
 
-    public boolean isPlaying() {
+    private boolean isPlaying() {
         return mMediaPlayer != null && mMediaPlayer.isPlaying();
     }
 
-    public void prepareMelody() throws IOException {
+    void prepareMelody() throws IOException {
         AssetFileDescriptor afd = mContext.getAssets().openFd("beep.mp3");
         if (mMediaPlayer != null) {
             try {
                 mMediaPlayer.stop();
-            } catch (IllegalStateException e) {}
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
         }
         mMediaPlayer = new MediaPlayer();
         try {

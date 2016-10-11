@@ -1,7 +1,6 @@
 package com.example.helio.arduino.multimeter;
 
 import android.Manifest;
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.helio.arduino.R;
-import com.example.helio.arduino.SettingsActivity;
 import com.example.helio.arduino.core.BluetoothService;
 import com.example.helio.arduino.core.ConnectionEvent;
 import com.example.helio.arduino.core.Constants;
@@ -51,7 +49,8 @@ public class MultimeterActivity extends AppCompatActivity {
     private static final String TAG = "MultimeterActivity";
 
     private TextView mMeterField;
-    private TextView mBlockView;
+    private TextView statusTitle;
+    private TextView rateValueView;
     private EditText mRefreshRateField;
     private Button mResetButton;
     private SwitchCompat mExportButton;
@@ -62,7 +61,6 @@ public class MultimeterActivity extends AppCompatActivity {
     private int currVolume;
 
     private BluetoothAdapter mBtAdapter = null;
-    private static Activity activity;
     private WriteExcel mWriteExcel;
     private Sound mSound;
     private CompoundButton.OnCheckedChangeListener mCheckListener = (compoundButton, b) -> switchExport(b);
@@ -70,19 +68,15 @@ public class MultimeterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activity = this;
         setContentView(R.layout.activity_multimeter);
         initBluetoothAdapter();
         initActionBar();
         initButtons();
         mRefreshRateField = (EditText) findViewById(R.id.refreshRateField);
         mMeterField = (TextView) findViewById(R.id.meterField);
+        rateValueView = (TextView) findViewById(R.id.rateValueView);
+        statusTitle = (TextView) findViewById(R.id.statusTitle);
         mSctStatus = findViewById(R.id.sctStatus);
-        initBlockView();
-    }
-
-    public static Activity getActivity() {
-        return activity;
     }
 
     public void onEvent(ResponseEvent responseEvent) {
@@ -91,16 +85,10 @@ public class MultimeterActivity extends AppCompatActivity {
 
     public void onEvent(ConnectionEvent responseEvent) {
         if (responseEvent.isConnected()) {
-            mBlockView.setVisibility(View.GONE);
+            statusTitle.setText(R.string.connected);
         } else {
-            mBlockView.setVisibility(View.VISIBLE);
+            statusTitle.setText(R.string.failed_to_connect);
         }
-    }
-
-    private void initBlockView() {
-        mBlockView = (TextView) findViewById(R.id.blockView);
-        mBlockView.setVisibility(View.VISIBLE);
-        mBlockView.setOnTouchListener((v, event) -> true);
     }
 
     private void initBluetoothAdapter() {
@@ -113,7 +101,6 @@ public class MultimeterActivity extends AppCompatActivity {
         findViewById(CURRENT).setOnClickListener(mListener);
         findViewById(SCT).setOnClickListener(mListener);
         findViewById(SET_RATE).setOnClickListener(mListener);
-        findViewById(R.id.filesButton).setOnClickListener(mListener);
         mExportButton = (SwitchCompat) findViewById(R.id.exportButton);
         mExportButton.setOnCheckedChangeListener(mCheckListener);
         mExportButton.setChecked(false);
@@ -136,9 +123,7 @@ public class MultimeterActivity extends AppCompatActivity {
     private void showCurrentDialog(View v) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.make_sure_module_is_enabled);
-        builder.setPositiveButton(R.string.ok, (dialogInterface, i) -> {
-            showCurrent(v);
-        });
+        builder.setPositiveButton(R.string.ok, (dialogInterface, i) -> showCurrent(v));
         AlertDialog dialog = builder.create();
         dialog.show();
     }
@@ -205,9 +190,6 @@ public class MultimeterActivity extends AppCompatActivity {
                 case SET_RATE:
                     sendRefreshRate();
                     break;
-                case R.id.filesButton:
-                    showSavedFiles();
-                    break;
             }
         }
     };
@@ -226,7 +208,7 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private boolean checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
                 return false;
             }
@@ -237,7 +219,7 @@ public class MultimeterActivity extends AppCompatActivity {
 
     private void checkButton(View v) {
         int id = v.getId();
-        if (id != R.id.resetButton && id != SET_RATE && id != R.id.filesButton && id != CURRENT) {
+        if (id != R.id.resetButton && id != SET_RATE && id != CURRENT) {
             selectButton(v);
         }
     }
@@ -257,6 +239,7 @@ public class MultimeterActivity extends AppCompatActivity {
             showToast(getString(R.string.refresh_cannot_be_zero));
             return;
         }
+        rateValueView.setText(String.valueOf(rate));
         sendMessage(Constants.W + ": " + rate);
     }
 
@@ -293,7 +276,7 @@ public class MultimeterActivity extends AppCompatActivity {
         enableAll();
         if (mSound != null) mSound.stop();
         resetVolume();
-        mMeterField.setText("");
+        mMeterField.setText(getString(R.string._0_00));
         isReading = false;
         mSelectedId = -1;
         mSctStatus.setBackgroundResource(R.drawable.gray_circle);
@@ -477,6 +460,12 @@ public class MultimeterActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        checkBtAdapterStatus();
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         checkBtAdapterStatus();
@@ -486,7 +475,7 @@ public class MultimeterActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mBlockView.setVisibility(View.VISIBLE);
+        statusTitle.setText(R.string.connecting);
         stopService(new Intent(this, BluetoothService.class));
         closeExcelFile();
     }
@@ -503,18 +492,18 @@ public class MultimeterActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
+        inflater.inflate(R.menu.menu_multimeter, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.actionSettings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                return true;
             case android.R.id.home:
                 closeScreen();
+                return true;
+            case R.id.files_menu:
+                showSavedFiles();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -527,13 +516,6 @@ public class MultimeterActivity extends AppCompatActivity {
             requestBtEnable();
         } else {
             startService(new Intent(this, BluetoothService.class));
-        }
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        if (!hasFocus) {
-            reset();
         }
     }
 

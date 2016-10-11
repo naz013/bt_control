@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,8 +23,6 @@ import com.example.helio.arduino.dso.chart.ChartListener;
 import com.example.helio.arduino.dso.chart.ChartView;
 import com.example.helio.arduino.signal.FragmentListener;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class SnapshotFragment extends Fragment {
@@ -75,6 +72,10 @@ public class SnapshotFragment extends Fragment {
         return new SnapshotFragment();
     }
 
+    public void makeScreenshot() {
+        takeScreenshot();
+    }
+
     public void setData(List<Float> xVals, List<Float> yVals) {
         if (xVals.size() == 0 || yVals.size() == 0) return;
         hideProgressDialog();
@@ -86,6 +87,9 @@ public class SnapshotFragment extends Fragment {
             freqView.setText(getString(R.string.f_) + " " + getString(R.string.undefined));
         } else {
             freqView.setText(DsoUtil.getFrequencyFormatted(getActivity(), frequency));
+        }
+        if (frequency < 500) {
+            freqView.setText(getString(R.string.f_) + " " + getString(R.string.undefined));
         }
         voltageView.setText(DsoUtil.getVoltageFormatted(getActivity(), voltage));
     }
@@ -125,11 +129,9 @@ public class SnapshotFragment extends Fragment {
     }
 
     private void initButtons(View view) {
-        view.findViewById(R.id.screenshot_item).setOnClickListener(mListener);
         view.findViewById(R.id.clearButton).setOnClickListener(mListener);
         view.findViewById(R.id.stopButton).setOnClickListener(mListener);
         view.findViewById(R.id.captureButton).setOnClickListener(mListener);
-        view.findViewById(R.id.gallery_item).setOnClickListener(mListener);
         traceY = (ImageButton) view.findViewById(R.id.traceY);
         traceX = (ImageButton) view.findViewById(R.id.traceX);
         moveBottom = (ImageButton) view.findViewById(R.id.moveBottom);
@@ -140,9 +142,6 @@ public class SnapshotFragment extends Fragment {
         zoomOutX = (ImageButton) view.findViewById(R.id.zoomOutX);
         zoomInY = (ImageButton) view.findViewById(R.id.zoomInY);
         zoomOutY = (ImageButton) view.findViewById(R.id.zoomOutY);
-        ImageButton readButton = (ImageButton) view.findViewById(R.id.readButton);
-        if (DsoWriter.hasDsoData()) readButton.setVisibility(View.VISIBLE);
-        readButton.setOnClickListener(view1 -> loadFromFile());
         zoomInX.setOnClickListener(mListener);
         zoomOutX.setOnClickListener(mListener);
         zoomInY.setOnClickListener(mListener);
@@ -155,32 +154,16 @@ public class SnapshotFragment extends Fragment {
         traceX.setOnClickListener(mListener);
     }
 
-    private void loadFromFile() {
-        List<Float> xVals = new ArrayList<>();
-        List<Float> yVals = DsoWriter.readDsoAsArray();
-        for (int i = 0; i < yVals.size(); i++) {
-            float x = ((float) i / ((float) yVals.size() / 1500f)) * (1f / 1000f);
-            xVals.add(x);
-        }
-        mChartView.setData(yVals, xVals);
-    }
-
     private View.OnClickListener mListener = v -> {
         switch (v.getId()) {
             case R.id.captureButton:
                 capture();
-                break;
-            case R.id.screenshot_item:
-                takeScreenshot();
                 break;
             case R.id.stopButton:
                 stopCapturing();
                 break;
             case R.id.clearButton:
                 mChartView.setUpClearGraph();
-                break;
-            case R.id.gallery_item:
-                showScreenshots();
                 break;
             case R.id.zoomInX:
                 scaleX(1);
@@ -236,12 +219,6 @@ public class SnapshotFragment extends Fragment {
         setButtonEnabled(true);
     }
 
-    private void showScreenshots() {
-        if (checkReadPermission()) {
-            startActivity(new Intent(getActivity(), ImagesActivity.class));
-        }
-    }
-
     private void capture() {
         showProgressDialog();
         mChartView.setUpClearGraph();
@@ -253,17 +230,6 @@ public class SnapshotFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
-                return false;
-            }
-            return true;
-        }
-        return true;
-    }
-
-    private boolean checkReadPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 102);
                 return false;
             }
             return true;
@@ -318,11 +284,6 @@ public class SnapshotFragment extends Fragment {
             case 101:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     takeScreenshot();
-                }
-                break;
-            case 102:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startActivity(new Intent(getActivity(), ImagesActivity.class));
                 }
                 break;
         }
