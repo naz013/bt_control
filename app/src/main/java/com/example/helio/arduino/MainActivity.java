@@ -105,6 +105,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_disconnect:
                 showConfirmationDialog();
                 return true;
+            case R.id.action_clear_queue:
+                QueueManager.getInstance().clearQueue();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

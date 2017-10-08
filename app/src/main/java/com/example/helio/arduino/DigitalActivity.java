@@ -2,7 +2,6 @@ package com.example.helio.arduino;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,17 +13,18 @@ import com.example.helio.arduino.core.QueueManager;
 import com.example.helio.arduino.core.RequestAction;
 import com.example.helio.arduino.core.StatusRequest;
 import com.example.helio.arduino.databinding.ActivityDigitalInBinding;
-import com.example.helio.arduino.databinding.ActivityLedBinding;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.util.Random;
+import java.util.Locale;
 
-public class DigitalActivity extends AppCompatActivity {
+public class DigitalActivity extends AppCompatActivity implements QueueManager.QueueObserver {
 
     private static final String TAG = "LedActivity";
-    private static final long TIME = 100;
+    private static final long TIME = 500;
+    private static final long SECOND = 1000;
+    private static final long MINUTE = SECOND * 60;
 
     private ActivityDigitalInBinding binding;
 
@@ -32,26 +32,39 @@ public class DigitalActivity extends AppCompatActivity {
         @Override
         public void onAnswerReady(String value) {
             Log.d(TAG, "onAnswerReady: " + value);
-            TextView tv = new TextView(DigitalActivity.this);
-            tv.setText(value);
-            binding.contentTable.addView(tv);
+            if (value.equalsIgnoreCase("1")) {
+                TextView tv = new TextView(DigitalActivity.this);
+                tv.setText("Hold");
+                binding.contentTable.addView(tv);
+            }
         }
     };
 
-    private Handler mAutoHandler = new Handler();
-    private Runnable mAutoRunnable = new Runnable() {
-        @Override
-        public void run() {
-            sendCommand("z", statusAction);
-            mAutoHandler.postDelayed(mAutoRunnable, TIME);
+    private String getParsedTime(String value) {
+        long mills = 0;
+        try {
+            mills = Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
         }
-    };
+        if (mills > 0) {
+            long mins = mills / MINUTE;
+            long secs = (mills - (MINUTE * mins)) / SECOND;
+            long lefs = (mills - (MINUTE * mins) - (SECOND * secs));
+            if (mins > 0) {
+                return String.format(Locale.getDefault(), "%d.%d.%d", mins, secs, lefs);
+            } else {
+                return String.format(Locale.getDefault(), "%d.%d", secs, lefs);
+            }
+        }
+        return "0";
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
-
+        QueueManager.getInstance().addObserver(this);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_digital_in);
         initActionBar();
 
@@ -82,7 +95,7 @@ public class DigitalActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mAutoHandler.removeCallbacks(mAutoRunnable);
+        QueueManager.getInstance().removeObserver(this);
         EventBus.getDefault().unregister(this);
     }
 
@@ -90,9 +103,14 @@ public class DigitalActivity extends AppCompatActivity {
     public void onEvent(ConnectionStatus event) {
         if (event.isConnected()) {
             binding.statusView.setText("Connected");
-            mAutoHandler.postDelayed(mAutoRunnable, TIME);
+            sendCommand("z", statusAction);
         } else {
             binding.statusView.setText("Connecting...");
         }
+    }
+
+    @Override
+    public void onDeQueue() {
+        sendCommand("z", statusAction);
     }
 }

@@ -2,6 +2,8 @@ package com.example.helio.arduino.core;
 
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -12,6 +14,7 @@ public class QueueManager {
     private Queue<QueueItem> queue = new ConcurrentLinkedQueue<>();
     private ConnectionManager manager;
     private static QueueManager instance;
+    private List<QueueObserver> observers = new ArrayList<>();
 
     private QueueManager() {
     }
@@ -21,6 +24,18 @@ public class QueueManager {
             instance = new QueueManager();
         }
         return instance;
+    }
+
+    public void addObserver(QueueObserver observer) {
+        if (!observers.contains(observer)) {
+            observers.add(observer);
+        }
+    }
+
+    public void removeObserver(QueueObserver observer) {
+        if (observers.contains(observer)) {
+            observers.remove(observer);
+        }
     }
 
     public String insert(QueueItem item) {
@@ -50,6 +65,7 @@ public class QueueManager {
         if (next != null) {
             manager.writeMessage(next.getData());
         }
+        notifyObservers();
         return item;
     }
 
@@ -61,5 +77,15 @@ public class QueueManager {
         QueueItem item = getCurrent();
         Log.d(TAG, "notifyQueue: " + item + ", " + manager);
         if (item != null && manager != null) manager.writeMessage(item.getData());
+    }
+
+    private void notifyObservers() {
+        for (QueueObserver observer : observers) {
+            observer.onDeQueue();
+        }
+    }
+
+    public interface QueueObserver {
+        void onDeQueue();
     }
 }
