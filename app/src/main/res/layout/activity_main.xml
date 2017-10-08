@@ -61,14 +61,14 @@
             app:cardElevation="4dp">
 
             <Button
-                android:id="@+id/signalButton"
+                android:id="@+id/light_button"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:drawableLeft="@drawable/ic_signal_icon"
                 android:padding="32dp"
-                android:text="@string/signal_generator"
+                android:text="Light sensor"
                 android:textColor="@color/colorWhite"
                 android:textSize="20sp" />
 

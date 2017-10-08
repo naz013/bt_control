@@ -46,6 +46,7 @@
 
         <activity android:name=".LedActivity" />
         <activity android:name=".DigitalActivity" />
+        <activity android:name=".LightActivity" />
     </application>
 
 </manifest>

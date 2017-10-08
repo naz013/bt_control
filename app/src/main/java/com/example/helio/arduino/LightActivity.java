@@ -5,35 +5,31 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.TextView;
+import android.widget.SeekBar;
 
 import com.example.helio.arduino.core.ConnectionStatus;
 import com.example.helio.arduino.core.QueueItem;
 import com.example.helio.arduino.core.QueueManager;
 import com.example.helio.arduino.core.RequestAction;
 import com.example.helio.arduino.core.StatusRequest;
-import com.example.helio.arduino.databinding.ActivityDigitalInBinding;
+import com.example.helio.arduino.databinding.ActivityLightSensorBinding;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.util.Locale;
-
-public class DigitalActivity extends AppCompatActivity implements QueueManager.QueueObserver {
+public class LightActivity extends AppCompatActivity implements QueueManager.QueueObserver {
 
     private static final String TAG = "LedActivity";
+    private static final long TIME = 100;
 
-    private ActivityDigitalInBinding binding;
+    private ActivityLightSensorBinding binding;
 
+    private boolean auto = true;
     private RequestAction statusAction = new RequestAction() {
         @Override
         public void onAnswerReady(String value) {
             Log.d(TAG, "onAnswerReady: " + value);
-            if (!value.equalsIgnoreCase("0")) {
-                TextView tv = new TextView(DigitalActivity.this);
-                tv.setText(value);
-                binding.contentTable.addView(tv);
-            }
+            binding.lightLevelView.setText(value);
         }
     };
 
@@ -42,10 +38,26 @@ public class DigitalActivity extends AppCompatActivity implements QueueManager.Q
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
         QueueManager.getInstance().addObserver(this);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_digital_in);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_light_sensor);
         initActionBar();
 
-        binding.clearButton.setOnClickListener(view -> binding.contentTable.removeAllViewsInLayout());
+        binding.autoButton.setOnClickListener(view -> sendCommand("l", statusAction));
+        binding.levelSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                sendCommand("c" + i, statusAction);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                auto = false;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                auto = true;
+            }
+        });
     }
 
     private void initActionBar() {
@@ -55,7 +67,7 @@ public class DigitalActivity extends AppCompatActivity implements QueueManager.Q
             actionBar.setDisplayShowHomeEnabled(false);
             actionBar.setDisplayHomeAsUpEnabled(false);
             actionBar.setHomeButtonEnabled(false);
-            actionBar.setTitle("Digital In");
+            actionBar.setTitle("Light sensor");
         }
     }
 
@@ -80,7 +92,7 @@ public class DigitalActivity extends AppCompatActivity implements QueueManager.Q
     public void onEvent(ConnectionStatus event) {
         if (event.isConnected()) {
             binding.statusView.setText("Connected");
-            sendCommand("z", statusAction);
+            sendCommand("k", statusAction);
         } else {
             binding.statusView.setText("Connecting...");
         }
@@ -88,6 +100,6 @@ public class DigitalActivity extends AppCompatActivity implements QueueManager.Q
 
     @Override
     public void onDeQueue() {
-        sendCommand("z", statusAction);
+        if (auto) sendCommand("k", statusAction);
     }
 }

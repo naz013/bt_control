@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         binding.ledButton.setOnClickListener(view -> startActivity(new Intent(this, LedActivity.class)));
         binding.digitalIn.setOnClickListener(view -> startActivity(new Intent(this, DigitalActivity.class)));
+        binding.lightButton.setOnClickListener(view -> startActivity(new Intent(this, LightActivity.class)));
     }
 
     private void initActionBar() {

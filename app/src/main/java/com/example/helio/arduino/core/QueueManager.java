@@ -65,7 +65,9 @@ public class QueueManager {
         if (next != null) {
             manager.writeMessage(next.getData());
         }
-        notifyObservers();
+        if (queue.size() == 0) {
+            notifyObservers();
+        }
         return item;
     }
 
