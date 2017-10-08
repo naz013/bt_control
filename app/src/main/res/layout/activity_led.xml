@@ -112,30 +112,53 @@
                     android:text="Switch" />
 
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="SINGLE"
+                    android:textColor="@color/colorBlue"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/single_status_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="Off" />
+
+                <Button
+                    android:id="@+id/single_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Switch" />
+
+            </LinearLayout>
         </LinearLayout>
 
         <Button
             android:id="@+id/auto_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:layout_gravity="center"
+            android:layout_marginTop="16dp"
             android:text="Auto play" />
 
         <Button
             android:id="@+id/disable_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:layout_gravity="center"
+            android:layout_marginTop="16dp"
             android:text="Disable all" />
-
-        <Button
-            android:id="@+id/single_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_gravity="center"
-            android:text="Single LED" />
     </LinearLayout>
 </layout>

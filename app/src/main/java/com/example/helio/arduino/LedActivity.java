@@ -50,7 +50,7 @@ public class LedActivity extends AppCompatActivity {
         @Override
         public void onAnswerReady(String value) {
             Log.d(TAG, "onAnswerReady: " + value);
-            binding.greenStatusView.setText(getHumanReadableText(value));
+            binding.singleStatusView.setText(getHumanReadableText(value));
         }
     };
 
@@ -64,11 +64,19 @@ public class LedActivity extends AppCompatActivity {
 
     private boolean isAutoRunning;
     private Handler mAutoHandler = new Handler();
+    private Handler mAutoSingleHandler = new Handler();
     private Runnable mAutoRunnable = new Runnable() {
         @Override
         public void run() {
             sendCommand();
             mAutoHandler.postDelayed(mAutoRunnable, TIME);
+        }
+    };
+    private Runnable mAutoSingleRunnable = new Runnable() {
+        @Override
+        public void run() {
+            sendCommand("t", singleLedAction);
+            mAutoSingleHandler.postDelayed(mAutoSingleRunnable, 500);
         }
     };
 
@@ -130,7 +138,6 @@ public class LedActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         EventBus.getDefault().post(new StatusRequest());
-        checkStatus();
     }
 
     private void checkStatus() {
@@ -144,6 +151,7 @@ public class LedActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mAutoHandler.removeCallbacks(mAutoRunnable);
+        mAutoSingleHandler.removeCallbacks(mAutoSingleRunnable);
         EventBus.getDefault().unregister(this);
     }
 
@@ -151,6 +159,8 @@ public class LedActivity extends AppCompatActivity {
     public void onEvent(ConnectionStatus event) {
         if (event.isConnected()) {
             binding.statusView.setText("Connected");
+            checkStatus();
+            mAutoSingleHandler.postDelayed(mAutoSingleRunnable, 500);
         } else {
             binding.statusView.setText("Connecting...");
         }
