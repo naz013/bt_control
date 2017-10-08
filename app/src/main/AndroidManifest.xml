@@ -11,15 +11,14 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:fullBackupContent="false"
         android:theme="@style/AppTheme">
         <activity
             android:name=".SplashActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/SplashTheme">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,35 +31,8 @@
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".dso.DsoActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Dso" />
-        <activity
-            android:name=".multimeter.MultimeterActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".signal.SignalActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Signal"
-            android:windowSoftInputMode="stateVisible|adjustResize" />
-        <activity
-            android:name=".dso.ImagesActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Screenshots" />
-        <activity
-            android:name=".dso.ImagePreviewActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Screenshots" />
 
         <service android:name=".core.BluetoothService" />
-
-        <activity
-            android:name=".ManualActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Manual" />
-
-        <activity android:name=".multimeter.FileListActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -71,6 +43,9 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
+
+        <activity android:name=".LedActivity" />
+        <activity android:name=".DigitalActivity" />
     </application>
 
 </manifest>

@@ -215,10 +215,13 @@ public class ConnectionManager {
                 try {
                     bytes = mmInStream.read(buffer);
                     String s = new String(buffer, 0, bytes);
-                    readMessage.append(s);
+                    Log.d(TAG, "run: READ " + s);
                     if (s.contains("\n")) {
+                        readMessage.append(s.substring(0, s.length() - 1));
                         mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
                         readMessage.setLength(0);
+                    } else {
+                        readMessage.append(s);
                     }
                 } catch (IOException e) {
                     if (D) Log.e(TAG, "disconnected", e);
@@ -233,6 +236,7 @@ public class ConnectionManager {
                 mmOutStream.write(buffer);
                 mmOutStream.flush();
                 mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer).sendToTarget();
+                Log.d(TAG, "writeData: ");
             } catch (IOException e) {
                 if (D) Log.e(TAG, "Exception during write", e);
             }
@@ -241,13 +245,7 @@ public class ConnectionManager {
         public void write(byte command) {
             byte[] buffer = new byte[1];
             buffer[0] = command;
-            try {
-                mmOutStream.write(buffer);
-                mmOutStream.flush();
-                mHandler.obtainMessage(Constants.MESSAGE_WRITE, -1, -1, buffer).sendToTarget();
-            } catch (IOException e) {
-                if (D) Log.e(TAG, "Exception during write", e);
-            }
+            writeData(buffer);
         }
 
         public void cancel() {

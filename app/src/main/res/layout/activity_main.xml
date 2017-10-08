@@ -1,95 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.v7.widget.CardView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        app:cardBackgroundColor="@color/colorPrimary"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="8dp">
+        android:gravity="center"
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/multimeterButton"
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:drawableLeft="@drawable/ic_multimeter_white"
-            android:padding="32dp"
-            android:text="@string/multimeter"
-            android:textColor="@color/colorWhite"
-            android:textSize="20sp" />
+            android:layout_weight="1"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="8dp">
 
-    </android.support.v7.widget.CardView>
+            <Button
+                android:id="@+id/led_button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:drawableLeft="@drawable/ic_multimeter_white"
+                android:padding="32dp"
+                android:text="RGB LED"
+                android:textColor="@color/colorWhite"
+                android:textSize="20sp" />
 
-    <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        app:cardBackgroundColor="@color/dsoPrimary"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="6dp">
+        </android.support.v7.widget.CardView>
 
-        <Button
-            android:id="@+id/dsoButton"
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:drawableLeft="@drawable/ic_chart_areaspline"
-            android:padding="32dp"
-            android:text="@string/dso"
-            android:textColor="@color/colorWhite"
-            android:textSize="20sp" />
+            android:layout_weight="1"
+            app:cardBackgroundColor="@color/dsoPrimary"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="6dp">
 
-    </android.support.v7.widget.CardView>
+            <Button
+                android:id="@+id/digital_in"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:drawableLeft="@drawable/ic_chart_areaspline"
+                android:padding="32dp"
+                android:text="Digital In"
+                android:textColor="@color/colorWhite"
+                android:textSize="20sp" />
 
-    <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        app:cardBackgroundColor="@color/signalPrimary"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="4dp">
+        </android.support.v7.widget.CardView>
 
-        <Button
-            android:id="@+id/signalButton"
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:drawableLeft="@drawable/ic_signal_icon"
-            android:padding="32dp"
-            android:text="@string/signal_generator"
-            android:textColor="@color/colorWhite"
-            android:textSize="20sp" />
+            android:layout_weight="1"
+            app:cardBackgroundColor="@color/signalPrimary"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="4dp">
 
-    </android.support.v7.widget.CardView>
+            <Button
+                android:id="@+id/signalButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:drawableLeft="@drawable/ic_signal_icon"
+                android:padding="32dp"
+                android:text="@string/signal_generator"
+                android:textColor="@color/colorWhite"
+                android:textSize="20sp" />
 
-    <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        app:cardBackgroundColor="@color/manualPrimary"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="2dp">
+        </android.support.v7.widget.CardView>
 
-        <Button
-            android:id="@+id/manualButton"            android:layout_width="match_parent"
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:drawableLeft="@drawable/book_open_variant"
-            android:padding="32dp"
-            android:text="@string/user_manual"
-            android:textColor="@color/colorWhite"
-            android:textSize="20sp" />
+            android:layout_weight="1"
+            app:cardBackgroundColor="@color/manualPrimary"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="2dp">
 
-    </android.support.v7.widget.CardView>
-</LinearLayout>
+            <Button
+                android:id="@+id/manualButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:drawableLeft="@drawable/book_open_variant"
+                android:padding="32dp"
+                android:text="@string/user_manual"
+                android:textColor="@color/colorWhite"
+                android:textSize="20sp" />
+
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
+</layout>

@@ -1,18 +1,19 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.android.databinding'
-apply plugin: 'me.tatarka.retrolambda'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
 
     defaultConfig {
         applicationId "com.example.helio.arduino"
         minSdkVersion 16
-        targetSdkVersion 24
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
+    }
+    dataBinding {
+        enabled = true
     }
     signingConfigs {
         debugApp {
@@ -28,15 +29,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        debug {
-            signingConfig signingConfigs.debugApp
-            applicationVariants.all { variant ->
-                variant.outputs.each { output ->
-                    output.outputFile = new File(output.outputFile.parent, output.outputFile.name.replace("app-debug.apk", "arduino_debug_" + getDateTime() +   ".apk"))
-
-                }
-            }
-        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -49,33 +41,25 @@ android {
 
 repositories {
     maven { url "https://jitpack.io" }
+    google()
 }
 
 dependencies {
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
-    compile 'com.android.support:cardview-v7:24.2.1'
-    compile 'com.android.support:recyclerview-v7:24.2.1'
-    compile project(':imagePreview')
-    compile 'com.android.support:support-v13:24.2.1'
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:design:26.1.0'
+    compile 'com.android.support:cardview-v7:26.1.0'
+    compile 'com.android.support:recyclerview-v7:26.1.0'
+    compile 'com.android.support:support-v13:26.1.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.android.support:support-v4:24.2.1'
-    compile 'de.greenrobot:eventbus:2.4.1'
-    compile project(':MPChartLib')
+    compile 'com.android.support:support-v4:26.1.0'
+    compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.github.barteksc:android-pdf-viewer:1.4.0'
-    compile 'com.android.support:multidex:1.0.1'
-    compile 'com.google.code.gson:gson:2.4'
+    compile 'com.android.support:multidex:1.0.2'
+    compile 'com.google.code.gson:gson:2.8.0'
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
     androidTestCompile 'org.testng:testng:6.9.6'
     androidTestCompile 'junit:junit:4.12'
-}
-
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-
-def getDateTime() {
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    return df.format(new Date());
 }

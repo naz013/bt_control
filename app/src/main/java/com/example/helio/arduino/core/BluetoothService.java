@@ -15,7 +15,8 @@ import android.util.Log;
 
 import com.example.helio.arduino.R;
 
-import de.greenrobot.event.EventBus;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 public class BluetoothService extends Service {
 
@@ -24,6 +25,7 @@ public class BluetoothService extends Service {
 
     private ConnectionManager mBtService = null;
     private BluetoothAdapter mBtAdapter = null;
+    private static boolean isConnected;
 
     private static final Handler mHandler = new Handler() {
         @Override
@@ -33,13 +35,15 @@ public class BluetoothService extends Service {
                     obtainConnectionMessage(msg);
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
-                    EventBus.getDefault().post(new ConnectionEvent(true));
+                    EventBus.getDefault().post(new ConnectionStatus(true));
                     break;
                 case Constants.MESSAGE_READ:
-                    EventBus.getDefault().post(new ResponseEvent(msg));
-                    break;
-                case Constants.ARRAY_READ:
-                    EventBus.getDefault().post(new DsoEvent((short[]) msg.obj));
+                    Log.d(TAG, "handleMessage: ");
+                    QueueItem item = QueueManager.getInstance().getCurrent();
+                    if (item != null && item.getAction() != null) {
+                        item.getAction().onAnswerReady((String) msg.obj);
+                    }
+                    QueueManager.getInstance().deQueue();
                     break;
             }
         }
@@ -47,9 +51,16 @@ public class BluetoothService extends Service {
 
     private static void obtainConnectionMessage(Message msg) {
         switch (msg.arg1) {
-            case ConnectionManager.STATE_CONNECTED:
-                EventBus.getDefault().post(new ConnectionEvent(true));
+            case ConnectionManager.STATE_CONNECTING:
+            case ConnectionManager.STATE_NONE:
+                isConnected = false;
                 break;
+            case ConnectionManager.STATE_CONNECTED: {
+                isConnected = true;
+                EventBus.getDefault().post(new ConnectionStatus(true));
+                QueueManager.getInstance().notifyQueue();
+                break;
+            }
         }
     }
 
@@ -59,6 +70,11 @@ public class BluetoothService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Subscribe
+    public void onEvent(StatusRequest request) {
+        EventBus.getDefault().post(new ConnectionStatus(isConnected));
     }
 
     @Override
@@ -73,13 +89,6 @@ public class BluetoothService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return START_STICKY;
-    }
-
-    public void onEvent(ControlEvent controlEvent) {
-        String message = controlEvent.getMsg();
-        if (message != null) {
-            mBtService.writeMessage(message.getBytes());
-        }
     }
 
     private void showNotification() {
@@ -112,6 +121,7 @@ public class BluetoothService extends Service {
                 DeviceData data = new DeviceData(mConnectedDevice, emptyName);
                 mBtService = new ConnectionManager(data, mHandler);
                 mBtService.connect();
+                QueueManager.getInstance().setManager(mBtService);
             }
         } catch (IllegalArgumentException e) {
             Log.d("TAG", "setupConnector failed: " + e.getMessage());
@@ -123,6 +133,6 @@ public class BluetoothService extends Service {
             mBtService.stop();
             mBtService = null;
         }
-        EventBus.getDefault().post(new ConnectionEvent(false));
+        EventBus.getDefault().post(new ConnectionStatus(false));
     }
 }

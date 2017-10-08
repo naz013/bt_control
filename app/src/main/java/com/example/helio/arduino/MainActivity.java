@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -12,35 +13,30 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.example.helio.arduino.connecting.StartActivity;
 import com.example.helio.arduino.core.BluetoothService;
 import com.example.helio.arduino.core.Constants;
-import com.example.helio.arduino.dso.DsoActivity;
-import com.example.helio.arduino.multimeter.MultimeterActivity;
-import com.example.helio.arduino.signal.SignalActivity;
+import com.example.helio.arduino.core.QueueManager;
+import com.example.helio.arduino.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_ENABLE_BT_AUTO = 16;
 
+    private ActivityMainBinding binding;
     private BluetoothAdapter mBtAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         initActionBar();
-        initButtons();
-    }
+        startService(new Intent(this, BluetoothService.class));
 
-    private void initButtons() {
-        findViewById(R.id.multimeterButton).setOnClickListener(mListener);
-        findViewById(R.id.dsoButton).setOnClickListener(mListener);
-        findViewById(R.id.signalButton).setOnClickListener(mListener);
-        findViewById(R.id.manualButton).setOnClickListener(mListener);
+        binding.ledButton.setOnClickListener(view -> startActivity(new Intent(this, LedActivity.class)));
+        binding.digitalIn.setOnClickListener(view -> startActivity(new Intent(this, DigitalActivity.class)));
     }
 
     private void initActionBar() {
@@ -52,39 +48,6 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setHomeButtonEnabled(false);
             actionBar.setTitle(R.string.app_name);
         }
-    }
-
-    private void openSignal() {
-        startActivity(new Intent(this, SignalActivity.class));
-    }
-
-    private void openDSO() {
-        startActivity(new Intent(this, DsoActivity.class));
-    }
-
-    private void openMultimeter() {
-        startActivity(new Intent(this, MultimeterActivity.class));
-    }
-
-    private final View.OnClickListener mListener = v -> {
-        switch (v.getId()) {
-            case R.id.multimeterButton:
-                openMultimeter();
-                break;
-            case R.id.dsoButton:
-                openDSO();
-                break;
-            case R.id.signalButton:
-                openSignal();
-                break;
-            case R.id.manualButton:
-                openManual();
-                break;
-        }
-    };
-
-    private void openManual() {
-        startActivity(new Intent(this, ManualActivity.class));
     }
 
     private void requestBtEnabling(int requestCode) {
@@ -103,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        QueueManager.getInstance().clearQueue();
         stopService(new Intent(this, BluetoothService.class));
     }
 
