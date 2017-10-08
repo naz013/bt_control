@@ -215,9 +215,9 @@ public class ConnectionManager {
                 try {
                     bytes = mmInStream.read(buffer);
                     String s = new String(buffer, 0, bytes);
-                    Log.d(TAG, "run: READ " + s);
                     if (s.contains("\n")) {
-                        readMessage.append(s.substring(0, s.length() - 1));
+                        if (s.length() > 1) readMessage.append(s.substring(0, s.length() - 1));
+                        Log.d(TAG, "run: READ " + readMessage.toString());
                         mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
                         readMessage.setLength(0);
                     } else {

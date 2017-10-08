@@ -32,9 +32,9 @@ public class DigitalActivity extends AppCompatActivity implements QueueManager.Q
         @Override
         public void onAnswerReady(String value) {
             Log.d(TAG, "onAnswerReady: " + value);
-            if (value.equalsIgnoreCase("1")) {
+            if (!value.equalsIgnoreCase("0")) {
                 TextView tv = new TextView(DigitalActivity.this);
-                tv.setText("Hold");
+                tv.setText(value);
                 binding.contentTable.addView(tv);
             }
         }

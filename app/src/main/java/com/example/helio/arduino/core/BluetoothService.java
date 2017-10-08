@@ -38,10 +38,11 @@ public class BluetoothService extends Service {
                     EventBus.getDefault().post(new ConnectionStatus(true));
                     break;
                 case Constants.MESSAGE_READ:
-                    Log.d(TAG, "handleMessage: ");
+                    String message = (String) msg.obj;
+                    Log.d(TAG, "handleMessage: " + message);
                     QueueItem item = QueueManager.getInstance().getCurrent();
                     if (item != null && item.getAction() != null) {
-                        item.getAction().onAnswerReady((String) msg.obj);
+                        item.getAction().onAnswerReady(message);
                     }
                     QueueManager.getInstance().deQueue();
                     break;
@@ -54,6 +55,7 @@ public class BluetoothService extends Service {
             case ConnectionManager.STATE_CONNECTING:
             case ConnectionManager.STATE_NONE:
                 isConnected = false;
+                EventBus.getDefault().post(new ConnectionStatus(false));
                 break;
             case ConnectionManager.STATE_CONNECTED: {
                 isConnected = true;
